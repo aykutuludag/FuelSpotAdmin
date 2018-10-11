@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -60,8 +61,8 @@ public class MainActivity extends AppCompatActivity {
     public static int mapDefaultStationRange = 50;
     public static float mapDefaultZoom = 16f;
 
-    public static String[] PERMISSIONS_FILEPICKER = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
-    public static String PERMISSIONS_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
+    public static String[] PERMISSIONS_STORAGE = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+    public static String[] PERMISSIONS_LOCATION = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     public static boolean isSigned, isVerified, doubleBackToExitPressedOnce;
 
     public static String userPhoneNumber, userlat, userlon, name, email, password, photo, gender, birthday, location, userCountry, userCountryName, userDisplayLanguage, currencyCode, username, userUnit;
@@ -77,6 +78,31 @@ public class MainActivity extends AppCompatActivity {
     GoogleMap googleMap;
     FusedLocationProviderClient mFusedLocationClient;
     Circle circle;
+
+    public static boolean isNetworkConnected(Context mContext) {
+        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return (cm != null ? cm.getActiveNetworkInfo() : null) != null;
+    }
+
+    public static void getVariables(SharedPreferences prefs) {
+        name = prefs.getString("Name", "");
+        email = prefs.getString("Email", "");
+        password = prefs.getString("password", "");
+        photo = prefs.getString("ProfilePhoto", "http://fuel-spot.com/FUELSPOTAPP/default_icons/profile.png");
+        gender = prefs.getString("Gender", "");
+        birthday = prefs.getString("Birthday", "");
+        location = prefs.getString("Location", "");
+        username = prefs.getString("UserName", "");
+        userlat = prefs.getString("lat", "39.925054");
+        userlon = prefs.getString("lon", "32.8347552");
+        isSigned = prefs.getBoolean("isSigned", false);
+        userCountry = prefs.getString("userCountry", "");
+        userCountryName = prefs.getString("userCountryName", "");
+        userDisplayLanguage = prefs.getString("userLanguage", "");
+        userUnit = prefs.getString("userUnit", "");
+        currencyCode = prefs.getString("userCurrency", "");
+        userPhoneNumber = prefs.getString("userPhoneNumber", "");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,8 +177,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{PERMISSIONS_LOCATION}, REQUEST_PERMISSION);
+        if (ActivityCompat.checkSelfPermission(this, PERMISSIONS_LOCATION[0]) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, PERMISSIONS_LOCATION[1]) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{PERMISSIONS_LOCATION[0], PERMISSIONS_LOCATION[1]}, REQUEST_PERMISSION);
         } else {
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
             loadMap();
@@ -279,26 +305,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Adding request to the queue
         requestQueue.add(stringRequest);
-    }
-
-    public static void getVariables(SharedPreferences prefs) {
-        name = prefs.getString("Name", "");
-        email = prefs.getString("Email", "");
-        password = prefs.getString("password", "");
-        photo = prefs.getString("ProfilePhoto", "http://fuel-spot.com/FUELSPOTAPP/default_icons/profile.png");
-        gender = prefs.getString("Gender", "");
-        birthday = prefs.getString("Birthday", "");
-        location = prefs.getString("Location", "");
-        username = prefs.getString("UserName", "");
-        userlat = prefs.getString("lat", "39.925054");
-        userlon = prefs.getString("lon", "32.8347552");
-        isSigned = prefs.getBoolean("isSigned", false);
-        userCountry = prefs.getString("userCountry", "");
-        userCountryName = prefs.getString("userCountryName", "");
-        userDisplayLanguage = prefs.getString("userLanguage", "");
-        userUnit = prefs.getString("userUnit", "");
-        currencyCode = prefs.getString("userCurrency", "");
-        userPhoneNumber = prefs.getString("userPhoneNumber", "");
     }
 
     public void coloredBars(int color1, int color2) {
