@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">FuelSpotAdmin</string>
+    <string name="unitSystem1">Litre</string>
+    <string name="unitSystem2">Galon</string>
+    <string name="unitSystem3">Imperial galon</string>
+    <string name="exit">Touch again to exit the application.</string>
+    <string name="login">Login</string>
+    <string name="API_ADMIN_LOGIN" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-login.php</string>
+    <string name="login_fail">Username or password incorrect</string>
+    <string name="login_success">Login successful. Welcome on board!</string>
+    <string name="settings_saved">Settings saved</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="error_no_location">We couldn\'t determine your location. Please try again.</string>
+    <string name="error_permission_cancel">Permission denied&#8230;</string>
+    <string name="g_api_key" translatable="false">AIzaSyDSBqfNOMG6e0wS3zNvSKDwmwdg1bZL9ME</string>
+    <string name="API_FETCH_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/station-fetch.php</string> <!-- GoogleID -->
+</resources>

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1064609527514",
+    "firebase_url": "https://fuelspotadmin.firebaseio.com",
+    "project_id": "fuelspotadmin",
+    "storage_bucket": "fuelspotadmin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1064609527514:android:4d099bc8982e8998",
+        "android_client_info": {
+          "package_name": "com.fuelspot.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1064609527514-m05vtpe24jntm5lik2pgabmkap8nipf7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fuelspot.admin",
+            "certificate_hash": "48e50caac5567d21d1464fc0ef73fa5c2f721dbf"
+          }
+        },
+        {
+          "client_id": "1064609527514-4upn1b79sfsdkrphcokb2jt8cmor5ri5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxBaDtIoC8T8SFKAVmEMvWAbph_ChSD1E"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1064609527514-4upn1b79sfsdkrphcokb2jt8cmor5ri5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

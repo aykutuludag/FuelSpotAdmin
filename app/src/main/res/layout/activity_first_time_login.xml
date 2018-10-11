@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WelcomeActivity">
+
+    <RelativeLayout
+        android:id="@+id/layout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_welcome"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="54dp"
+            android:fontFamily="@font/gotham_black"
+            android:text="FuelSpot'a Hoşgeldiniz !"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#ffffff"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView1"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="16dp"
+            android:fontFamily="@font/gotham_medium"
+            android:gravity="center"
+            android:text="FuelSpot ekibine katılndığın için oldukça mutluyuz"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="#fff" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/permissionButton"
+            android:layout_alignParentStart="true"
+            android:layout_margin="16dp"
+            android:fontFamily="@font/gotham_medium"
+            android:gravity="center"
+            android:text="Giriş işlemi başarıyla tamamlandı. Halletmemiz gereken bir iki şey kaldı"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="#fff" />
+
+        <Button
+            android:id="@+id/permissionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="16dp"
+            android:background="@drawable/green_box"
+            android:fontFamily="@font/gotham_black"
+            android:text="DEVAM"
+            android:textColor="#212121" />
+
+    </RelativeLayout>
+</RelativeLayout>
