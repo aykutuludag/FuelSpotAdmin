@@ -46,10 +46,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
     EditText stationNameHolder, stationAddressHolder, gasolineHolder, dieselHolder, lpgHolder, electricityHolder;
     Button buttonUpdateStation;
+    BitmapDescriptor verifiedIcon;
 
     public static boolean isNetworkConnected(Context mContext) {
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -144,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
         // Activate map
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         MapsInitializer.initialize(this.getApplicationContext());
+        verifiedIcon = BitmapDescriptorFactory.fromResource(R.drawable.verified_station);
 
         mMapView = findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
@@ -173,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
                             float distanceInMeter = locLastKnown.distanceTo(locCurrent);
 
-                            if (distanceInMeter >= (mapDefaultStationRange * 5)) {
+                            if (distanceInMeter >= mapDefaultStationRange) {
                                 locLastKnown.setLatitude(Double.parseDouble(userlat));
                                 locLastKnown.setLongitude(Double.parseDouble(userlon));
                                 updateMapObject();
@@ -461,14 +466,8 @@ public class MainActivity extends AppCompatActivity {
         CameraPosition cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapDefaultZoom).build();
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-        //Draw a circle with radius of mapDefaultRange
-        circle = googleMap.addCircle(new CircleOptions()
-                .center(new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon)))
-                .radius(mapDefaultStationRange)
-                .strokeColor(Color.RED));
-
         //Search stations in a radius of mapDefaultRange
-        String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + mapDefaultStationRange + "&type=gas_station&opennow=true&key=" + getString(R.string.g_api_key);
+        String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + mapDefaultStationRange + "&type=gas_station&key=" + getString(R.string.g_api_key);
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -528,6 +527,20 @@ public class MainActivity extends AppCompatActivity {
                                 electricityPrice = (float) obj.getDouble("electricityPrice");
                                 lastUpdated = obj.getString("lastUpdated");
                                 stationLogo = obj.getString("photoURL");
+
+                                //Add marker
+                                LatLng sydney = new LatLng(loc2.getLatitude(), loc2.getLongitude());
+                                if (obj.getInt("isVerified") == 1) {
+                                    googleMap.addMarker(new MarkerOptions().position(sydney).title(obj.getString("name")).snippet(obj.getString("vicinity")).icon(verifiedIcon));
+                                } else {
+                                    googleMap.addMarker(new MarkerOptions().position(sydney).title(obj.getString("name")).snippet(obj.getString("vicinity")));
+                                }
+
+                                //Draw a circle with radius of mapDefaultStationRange
+                                circle = googleMap.addCircle(new CircleOptions()
+                                        .center(new LatLng(sydney.latitude, sydney.longitude))
+                                        .radius(mapDefaultStationRange)
+                                        .strokeColor(Color.RED));
 
                                 loadStationDetails();
                             } catch (JSONException e) {
