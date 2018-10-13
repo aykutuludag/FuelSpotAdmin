@@ -22,21 +22,173 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <RelativeLayout
-        android:id="@+id/mainContainer"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/background_main"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/mapView"
+        <RelativeLayout
+            android:id="@+id/mainContainer"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            map:cameraTargetLat="39.925054"
-            map:cameraTargetLng="32.8347552"
-            map:cameraZoom="11.5" />
-    </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:background="#40ffffff"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                map:cameraTargetLat="39.925054"
+                map:cameraTargetLng="32.8347552"
+                map:cameraZoom="11.5" />
+
+            <RelativeLayout
+                android:id="@+id/baseInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/mapView"
+                android:layout_margin="8dp">
+
+                <EditText
+                    android:id="@+id/editTextStationName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:layout_centerHorizontal="true"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="STATION NAME"
+                    android:inputType="textPersonName"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+                <EditText
+                    android:id="@+id/editTextStationAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/editTextStationName"
+                    android:layout_centerHorizontal="true"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="ADDRESS"
+                    android:inputType="textPostalAddress"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/priceSec"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/baseInfo"
+                android:layout_margin="8dp"
+                android:gravity="center">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/gasolineIcon"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_margin="8dp"
+                    android:src="@drawable/gasoline"
+                    tools:ignore="RtlHardcoded" />
+
+                <EditText
+                    android:id="@+id/editTextGasoline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/gasolineIcon"
+                    android:layout_alignStart="@+id/gasolineIcon"
+                    android:layout_alignEnd="@id/gasolineIcon"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="7.00"
+                    android:inputType="numberDecimal"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/dieselIcon"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_margin="8dp"
+                    android:layout_toRightOf="@id/gasolineIcon"
+                    android:src="@drawable/diesel"
+                    tools:ignore="RtlHardcoded" />
+
+                <EditText
+                    android:id="@+id/editTextDiesel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/dieselIcon"
+                    android:layout_alignStart="@+id/dieselIcon"
+                    android:layout_alignEnd="@id/dieselIcon"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="6.00"
+                    android:inputType="numberDecimal"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/lpgIcon"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_margin="8dp"
+                    android:layout_toRightOf="@id/dieselIcon"
+                    android:src="@drawable/lpg"
+                    tools:ignore="RtlHardcoded" />
+
+                <EditText
+                    android:id="@+id/editTextLPG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/lpgIcon"
+                    android:layout_alignStart="@+id/lpgIcon"
+                    android:layout_alignEnd="@id/lpgIcon"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="5.00"
+                    android:inputType="numberDecimal"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/electricityIcon"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_margin="8dp"
+                    android:layout_toRightOf="@id/lpgIcon"
+                    android:src="@drawable/electricity"
+                    tools:ignore="RtlHardcoded" />
+
+                <EditText
+                    android:id="@+id/editTextElectricity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/electricityIcon"
+                    android:layout_alignStart="@+id/electricityIcon"
+                    android:layout_alignEnd="@id/electricityIcon"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="4.00"
+                    android:inputType="numberDecimal"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/buttonUpdate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/priceSec"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="16dp"
+                android:background="@drawable/green_box"
+                android:fontFamily="@font/gotham_black"
+                android:text="@string/update"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+        </RelativeLayout>
+    </ScrollView>
+
 </android.support.design.widget.CoordinatorLayout>

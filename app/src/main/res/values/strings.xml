@@ -5,8 +5,6 @@
     <string name="unitSystem3">Imperial galon</string>
     <string name="exit">Touch again to exit the application.</string>
     <string name="login">Login</string>
-    <string name="API_ADMIN_LOGIN" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-login.php</string>
-    <string name="API_ADMIN_UPDATE" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-update.php</string>
     <string name="login_fail">Username or password incorrect</string>
     <string name="login_success">Login successful. Welcome on board!</string>
     <string name="settings_saved">Settings saved</string>
@@ -14,7 +12,18 @@
     <string name="error_no_location">We couldn\'t determine your location. Please try again.</string>
     <string name="error_permission_cancel">Permission denied&#8230;</string>
     <string name="g_api_key" translatable="false">AIzaSyDSBqfNOMG6e0wS3zNvSKDwmwdg1bZL9ME</string>
-    <string name="API_FETCH_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/station-fetch.php</string> <!-- GoogleID -->
     <string name="save">Save</string>
     <string name="connection_error">There is a connection error between you and our servers. Please try again later…</string>
+    <string name="waiting_approval">Waiting approval</string>
+    <string name="waiting_approval_text">Your account hasn\'t been verified. We are reviewing your account. You can\'t use the application until your account approved by us.</string>
+    <string name="update">Update</string>
+    <string name="stationUpdated">Station info updated successfully</string>
+    <string name="stationUpdateFail">An error occurred. Please try again later…</string>
+    <string name="stationNameEmpty">Station name can not be empty…</string>
+    <string name="stationAddressEmpty">Station address can not be empty…</string>
+
+    <string name="API_ADMIN_LOGIN" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-login.php</string>
+    <string name="API_ADMIN_UPDATE" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-update.php</string>
+    <string name="API_FETCH_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/station-fetch.php</string> <!-- GoogleID (placeID) -->
+    <string name="API_UPDATE_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/station-update.php</string>
 </resources>

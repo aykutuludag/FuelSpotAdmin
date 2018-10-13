@@ -241,6 +241,9 @@ public class LoginActivity extends AppCompatActivity {
                                     JSONArray res = new JSONArray(response);
                                     JSONObject obj = res.getJSONObject(0);
 
+                                    username = obj.getString("username");
+                                    prefs.edit().putString("UserName", username).apply();
+
                                     name = obj.getString("name");
                                     prefs.edit().putString("Name", name).apply();
 

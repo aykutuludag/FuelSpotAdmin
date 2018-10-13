@@ -144,7 +144,7 @@ public class ProfileEditActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s != null && s.length() > 0 && s.toString().contains("@")) {
+                if (s != null && s.length() > 0) {
                     name = s.toString();
                     editor.putString("Name", name);
                 }
@@ -327,7 +327,6 @@ public class ProfileEditActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        System.out.println("ANANAMA" + response);
                         if (response.equals("Success")) {
                             editor.apply();
                             Toast.makeText(ProfileEditActivity.this, response, Toast.LENGTH_LONG).show();
@@ -444,12 +443,11 @@ public class ProfileEditActivity extends AppCompatActivity {
             case FilePickerConst.REQUEST_CODE_PHOTO:
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     ArrayList<String> aq = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA);
-                    photo = aq.get(0);
 
                     File folder = new File(Environment.getExternalStorageDirectory() + "/FuelSpotAdmin");
                     folder.mkdirs();
 
-                    UCrop.of(Uri.parse("file://" + photo), Uri.fromFile(new File(folder, fileName)))
+                    UCrop.of(Uri.parse("file://" + aq.get(0)), Uri.fromFile(new File(folder, fileName)))
                             .withAspectRatio(1, 1)
                             .withMaxResultSize(1080, 1080)
                             .start(ProfileEditActivity.this);
@@ -461,7 +459,8 @@ public class ProfileEditActivity extends AppCompatActivity {
                     try {
                         bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
                         Glide.with(this).load(bitmap).apply(options).into(userPic);
-                        editor.putString("ProfilePhoto", Environment.getExternalStorageDirectory() + "/FuelSpotAdmin" + fileName);
+                        photo = Environment.getExternalStorageDirectory() + "/FuelSpotAdmin/" + fileName;
+                        editor.putString("ProfilePhoto", photo);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

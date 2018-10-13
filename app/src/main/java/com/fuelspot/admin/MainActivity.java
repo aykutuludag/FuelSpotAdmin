@@ -3,6 +3,7 @@ package com.fuelspot.admin;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -15,12 +16,18 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -79,6 +86,14 @@ public class MainActivity extends AppCompatActivity {
     FusedLocationProviderClient mFusedLocationClient;
     Circle circle;
 
+    // Current station information
+    String stationName, stationVicinity, stationLocation, lastUpdated, stationLogo, placeID;
+    int stationDistance, stationID;
+    float gasolinePrice, dieselPrice, lpgPrice, electricityPrice;
+
+    EditText stationNameHolder, stationAddressHolder, gasolineHolder, dieselHolder, lpgHolder, electricityHolder;
+    Button buttonUpdateStation;
+
     public static boolean isNetworkConnected(Context mContext) {
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         return (cm != null ? cm.getActiveNetworkInfo() : null) != null;
@@ -121,14 +136,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         coloredBars(Color.parseColor("#616161"), Color.parseColor("#ffffff"));
-        requestQueue = Volley.newRequestQueue(MainActivity.this);
         prefs = getSharedPreferences("AdminInformation", Context.MODE_PRIVATE);
-        getVariables(prefs);
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         requestQueue = Volley.newRequestQueue(this);
 
+        fetchAccount();
+
         // Activate map
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         MapsInitializer.initialize(this.getApplicationContext());
 
         mMapView = findViewById(R.id.mapView);
@@ -169,11 +183,241 @@ public class MainActivity extends AppCompatActivity {
                         Snackbar.make(findViewById(R.id.mainContainer), getString(R.string.error_no_location), Snackbar.LENGTH_LONG).show();
                     }
                 }
-
             }
         };
 
-        checkLocationPermission();
+
+        // Layout items
+        stationNameHolder = findViewById(R.id.editTextStationName);
+        stationNameHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    stationName = s.toString();
+                }
+            }
+        });
+        stationAddressHolder = findViewById(R.id.editTextStationAddress);
+        stationAddressHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    stationVicinity = s.toString();
+                }
+            }
+        });
+        gasolineHolder = findViewById(R.id.editTextGasoline);
+        gasolineHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    gasolinePrice = Float.parseFloat(s.toString());
+                }
+            }
+        });
+        dieselHolder = findViewById(R.id.editTextDiesel);
+        dieselHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    dieselPrice = Float.parseFloat(s.toString());
+                }
+            }
+        });
+        lpgHolder = findViewById(R.id.editTextLPG);
+        lpgHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    lpgPrice = Float.parseFloat(s.toString());
+                }
+            }
+        });
+        electricityHolder = findViewById(R.id.editTextElectricity);
+        electricityHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    electricityPrice = Float.parseFloat(s.toString());
+                }
+            }
+        });
+
+        buttonUpdateStation = findViewById(R.id.buttonUpdate);
+        buttonUpdateStation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (stationName != null && stationName.length() > 0) {
+                    if (stationVicinity != null && stationVicinity.length() > 0) {
+                        updateStation();
+                    } else {
+                        Toast.makeText(MainActivity.this, getString(R.string.stationAddressEmpty), Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, getString(R.string.stationNameEmpty), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    void fetchAccount() {
+        //Showing the progress dialog
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_LOGIN),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        switch (response) {
+                            case "Fail":
+                                Snackbar.make(findViewById(android.R.id.content), getString(R.string.login_fail), Snackbar.LENGTH_SHORT).show();
+                                prefs.edit().putBoolean("isSigned", false).apply();
+                                break;
+                            default:
+                                try {
+                                    JSONArray res = new JSONArray(response);
+                                    JSONObject obj = res.getJSONObject(0);
+
+                                    username = obj.getString("username");
+                                    prefs.edit().putString("UserName", username).apply();
+
+                                    name = obj.getString("name");
+                                    prefs.edit().putString("Name", name).apply();
+
+                                    email = obj.getString("email");
+                                    prefs.edit().putString("Email", email).apply();
+
+                                    password = obj.getString("password");
+                                    prefs.edit().putString("password", password).apply();
+
+                                    photo = obj.getString("photo");
+                                    prefs.edit().putString("ProfilePhoto", photo).apply();
+
+                                    gender = obj.getString("gender");
+                                    prefs.edit().putString("Gender", gender).apply();
+
+                                    birthday = obj.getString("birthday");
+                                    prefs.edit().putString("Birthday", birthday).apply();
+
+                                    userPhoneNumber = obj.getString("phoneNumber");
+                                    prefs.edit().putString("userPhoneNumber", userPhoneNumber).apply();
+
+                                    location = obj.getString("location");
+                                    prefs.edit().putString("Location", location).apply();
+
+                                    userCountry = obj.getString("country");
+                                    prefs.edit().putString("userCountry", userCountry).apply();
+
+                                    userDisplayLanguage = obj.getString("language");
+                                    prefs.edit().putString("userLanguage", userDisplayLanguage).apply();
+
+                                    isVerified = obj.getInt("isVerified") == 1;
+                                    prefs.edit().putBoolean("isVerified", isVerified).apply();
+
+                                    getVariables(prefs);
+
+                                    if (isVerified) {
+                                        checkLocationPermission();
+                                    } else {
+                                        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                                        alertDialog.setTitle(getString(R.string.waiting_approval));
+                                        alertDialog.setMessage(getString(R.string.waiting_approval_text));
+                                        alertDialog.setCancelable(false);
+                                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        finish();
+                                                    }
+                                                });
+                                        alertDialog.show();
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Snackbar.make(findViewById(android.R.id.content), getString(R.string.login_fail), Snackbar.LENGTH_SHORT).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                //Creating parameters
+                Map<String, String> params = new Hashtable<>();
+
+                //Adding parameters
+                params.put("username", username);
+                params.put("password", password);
+
+                //returning parameters
+                return params;
+            }
+        };
+
+        //Adding request to the queue
+        requestQueue.add(stringRequest);
     }
 
     public void checkLocationPermission() {
@@ -233,15 +477,18 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(String response) {
                         JSON json = new JSON(response);
                         if (response != null && response.length() > 0) {
-                            fetchStation(json.key("results").index(0).key("place_id").stringValue());
+                            placeID = json.key("results").index(0).key("place_id").stringValue();
+                            fetchStation(placeID);
                         } else {
+                            stationName = "";
+                            stationVicinity = "";
                             Snackbar.make(findViewById(R.id.mainContainer), "Şu anda herhangi bir istasyonda değilsiniz.", Snackbar.LENGTH_LONG).show();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Snackbar.make(findViewById(R.id.mainContainer), "\"Şu anda herhangi bir istasyonda değilsiniz.", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(findViewById(R.id.mainContainer), "Şu anda herhangi bir istasyonda değilsiniz.", Snackbar.LENGTH_LONG).show();
             }
         });
 
@@ -254,34 +501,38 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        try {
-                            JSONArray res = new JSONArray(response);
-                            JSONObject obj = res.getJSONObject(0);
+                        if (response != null && response.length() > 0) {
+                            try {
+                                JSONArray res = new JSONArray(response);
+                                JSONObject obj = res.getJSONObject(0);
 
-                           /* stationName = obj.getString("name");
-                            collapsingToolbarLayout.setTitle(stationName);
-                            stationVicinity = obj.getString("vicinity");
-                            stationLocation = obj.getString("location");
-                            //DISTANCE START
-                            Location loc1 = new Location("");
-                            loc1.setLatitude(Double.parseDouble(MainActivity.userlat));
-                            loc1.setLongitude(Double.parseDouble(MainActivity.userlon));
-                            Location loc2 = new Location("");
-                            String[] stationPoint = stationLocation.split(";");
-                            loc2.setLatitude(Double.parseDouble(stationPoint[0]));
-                            loc2.setLongitude(Double.parseDouble(stationPoint[1]));
-                            stationDistance = (int) loc1.distanceTo(loc2);
-                            //DISTANCE END
+                                stationID = obj.getInt("id");
+                                stationName = obj.getString("name");
+                                stationVicinity = obj.getString("vicinity");
+                                stationLocation = obj.getString("location");
 
-                            gasolinePrice = (float) obj.getDouble("gasolinePrice");
-                            dieselPrice = (float) obj.getDouble("dieselPrice");
-                            lpgPrice = (float) obj.getDouble("lpgPrice");
-                            electricityPrice = (float) obj.getDouble("electricityPrice");
-                            lastUpdated = obj.getString("lastUpdated");
-                            iconURL = obj.getString("photoURL");
-                            loadStationDetails();*/
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                                //DISTANCE START
+                                Location loc1 = new Location("");
+                                loc1.setLatitude(Double.parseDouble(userlat));
+                                loc1.setLongitude(Double.parseDouble(userlon));
+                                Location loc2 = new Location("");
+                                String[] stationPoint = stationLocation.split(";");
+                                loc2.setLatitude(Double.parseDouble(stationPoint[0]));
+                                loc2.setLongitude(Double.parseDouble(stationPoint[1]));
+                                stationDistance = (int) loc1.distanceTo(loc2);
+                                //DISTANCE END
+
+                                gasolinePrice = (float) obj.getDouble("gasolinePrice");
+                                dieselPrice = (float) obj.getDouble("dieselPrice");
+                                lpgPrice = (float) obj.getDouble("lpgPrice");
+                                electricityPrice = (float) obj.getDouble("electricityPrice");
+                                lastUpdated = obj.getString("lastUpdated");
+                                stationLogo = obj.getString("photoURL");
+
+                                loadStationDetails();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 },
@@ -296,7 +547,63 @@ public class MainActivity extends AppCompatActivity {
                 Map<String, String> params = new Hashtable<>();
 
                 //Adding parameters
-                params.put("stationID", String.valueOf(placeID));
+                params.put("placeID", placeID);
+
+                //returning parameters
+                return params;
+            }
+        };
+
+        //Adding request to the queue
+        requestQueue.add(stringRequest);
+    }
+
+    void loadStationDetails() {
+        stationNameHolder.setText(stationName);
+        stationAddressHolder.setText(stationVicinity);
+
+        gasolineHolder.setText("" + gasolinePrice);
+        dieselHolder.setText("" + dieselPrice);
+        lpgHolder.setText("" + lpgPrice);
+        electricityHolder.setText("" + electricityPrice);
+    }
+
+    private void updateStation() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_UPDATE_STATION),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        if (s != null && s.length() > 0) {
+                            switch (s) {
+                                case "SUCCESS":
+                                    Toast.makeText(MainActivity.this, getString(R.string.stationUpdated), Toast.LENGTH_LONG).show();
+                                    break;
+                                case "FAIL":
+                                    Toast.makeText(MainActivity.this, getString(R.string.stationUpdateFail), Toast.LENGTH_LONG).show();
+                                    break;
+                            }
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(MainActivity.this, getString(R.string.stationUpdateFail), Toast.LENGTH_LONG).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                //Creating parameters
+                Map<String, String> params = new Hashtable<>();
+
+                //Adding parameters
+                params.put("stationID", String.valueOf(stationID));
+                params.put("stationName", stationName);
+                params.put("stationVicinity", stationVicinity);
+                params.put("gasolinePrice", String.valueOf(gasolinePrice));
+                params.put("dieselPrice", String.valueOf(dieselPrice));
+                params.put("lpgPrice", String.valueOf(lpgPrice));
+                params.put("electricityPrice", String.valueOf(electricityPrice));
 
                 //returning parameters
                 return params;
