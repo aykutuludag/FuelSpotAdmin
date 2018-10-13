@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         locLastKnown.setLongitude(Double.parseDouble(userlon));
 
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(60000);
+        mLocationRequest.setInterval(15000);
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
@@ -481,7 +481,11 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             stationName = "";
                             stationVicinity = "";
-                            Snackbar.make(findViewById(R.id.mainContainer), "Şu anda herhangi bir istasyonda değilsiniz.", Snackbar.LENGTH_LONG).show();
+                            gasolinePrice = 0;
+                            dieselPrice = 0;
+                            lpgPrice = 0;
+                            electricityPrice = 0;
+                            loadStationDetails();
                         }
                     }
                 }, new Response.ErrorListener() {
