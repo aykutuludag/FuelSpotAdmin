@@ -45,6 +45,7 @@ import static com.fuelspot.admin.MainActivity.currencyCode;
 import static com.fuelspot.admin.MainActivity.email;
 import static com.fuelspot.admin.MainActivity.gender;
 import static com.fuelspot.admin.MainActivity.getVariables;
+import static com.fuelspot.admin.MainActivity.isNetworkConnected;
 import static com.fuelspot.admin.MainActivity.isSigned;
 import static com.fuelspot.admin.MainActivity.isVerified;
 import static com.fuelspot.admin.MainActivity.location;
@@ -169,7 +170,7 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(i);
                     finish();
                 }
-            }, 2000);
+            }, 1500);
         }
 
         //Layout objects
@@ -217,7 +218,11 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                processTheLogin();
+                if (isNetworkConnected(LoginActivity.this)) {
+                    processTheLogin();
+                } else {
+                    Toast.makeText(LoginActivity.this, getString(R.string.no_internet), Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -288,7 +293,7 @@ public class LoginActivity extends AppCompatActivity {
                                             startActivity(i);
                                             finish();
                                         }
-                                    }, 3000);
+                                    }, 1500);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }

@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
@@ -36,6 +38,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -59,8 +65,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import eu.amirs.JSON;
 
 public class MainActivity extends AppCompatActivity {
@@ -90,12 +99,15 @@ public class MainActivity extends AppCompatActivity {
     Circle circle;
 
     // Current station information
-    String stationName, stationVicinity, stationLocation, lastUpdated, stationLogo, placeID;
-    int stationDistance, stationID;
+    boolean isAtStation;
+    String stationName, stationVicinity, stationCountry, stationLocation, lastUpdated, stationLogo, placeID, sonGuncelleme, istasyonSahibi;
+    int stationDistance, stationID, mesafe, isStationActive, isStationVerified;
     float gasolinePrice, dieselPrice, lpgPrice, electricityPrice;
 
     EditText stationNameHolder, stationAddressHolder, gasolineHolder, dieselHolder, lpgHolder, electricityHolder;
     Button buttonUpdateStation;
+    CircleImageView stationLogoHolder;
+    RequestOptions options;
     BitmapDescriptor verifiedIcon;
 
     public static boolean isNetworkConnected(Context mContext) {
@@ -123,206 +135,26 @@ public class MainActivity extends AppCompatActivity {
         userPhoneNumber = prefs.getString("userPhoneNumber", "");
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        //Window
-        window = this.getWindow();
-
-        // Initializing Toolbar and setting it as the actionbar
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-            getSupportActionBar().setLogo(R.drawable.brand_logo);
+    public static String stationPhotoChooser(String stationName) {
+        String photoURL;
+        if (stationName.contains("Shell")) {
+            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/shell.png";
+        } else if (stationName.contains("Opet")) {
+            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/opet.jpg";
+        } else if (stationName.contains("BP")) {
+            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/bp.png";
+        } else if (stationName.contains("Kadoil")) {
+            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/kadoil.jpg";
+        } else if (stationName.contains("Petrol Ofisi")) {
+            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/petrol-ofisi.png";
+        } else if (stationName.contains("Lukoil")) {
+            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/lukoil.jpg";
+        } else if (stationName.contains("TP")) {
+            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkiye-petrolleri.jpg";
+        } else {
+            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/unknown.png";
         }
-
-        coloredBars(Color.parseColor("#616161"), Color.parseColor("#ffffff"));
-        prefs = getSharedPreferences("AdminInformation", Context.MODE_PRIVATE);
-        requestQueue = Volley.newRequestQueue(this);
-
-        fetchAccount();
-
-        // Activate map
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        MapsInitializer.initialize(this.getApplicationContext());
-        verifiedIcon = BitmapDescriptorFactory.fromResource(R.drawable.verified_station);
-
-        mMapView = findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
-
-        locLastKnown = new Location("");
-        locLastKnown.setLatitude(Double.parseDouble(userlat));
-        locLastKnown.setLongitude(Double.parseDouble(userlon));
-
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(15000);
-        mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                synchronized (this) {
-                    super.onLocationResult(locationResult);
-                    Location locCurrent = locationResult.getLastLocation();
-                    if (locCurrent != null) {
-                        if (locCurrent.getAccuracy() <= mapDefaultStationRange * 10) {
-                            userlat = String.valueOf(locCurrent.getLatitude());
-                            userlon = String.valueOf(locCurrent.getLongitude());
-                            prefs.edit().putString("lat", userlat).apply();
-                            prefs.edit().putString("lon", userlon).apply();
-                            MainActivity.getVariables(prefs);
-
-                            float distanceInMeter = locLastKnown.distanceTo(locCurrent);
-
-                            if (distanceInMeter >= mapDefaultStationRange) {
-                                locLastKnown.setLatitude(Double.parseDouble(userlat));
-                                locLastKnown.setLongitude(Double.parseDouble(userlon));
-                                updateMapObject();
-                            }
-                        }
-                    } else {
-                        Snackbar.make(findViewById(R.id.mainContainer), getString(R.string.error_no_location), Snackbar.LENGTH_LONG).show();
-                    }
-                }
-            }
-        };
-
-
-        // Layout items
-        stationNameHolder = findViewById(R.id.editTextStationName);
-        stationNameHolder.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s != null && s.length() > 0) {
-                    stationName = s.toString();
-                }
-            }
-        });
-        stationAddressHolder = findViewById(R.id.editTextStationAddress);
-        stationAddressHolder.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s != null && s.length() > 0) {
-                    stationVicinity = s.toString();
-                }
-            }
-        });
-        gasolineHolder = findViewById(R.id.editTextGasoline);
-        gasolineHolder.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s != null && s.length() > 0) {
-                    gasolinePrice = Float.parseFloat(s.toString());
-                }
-            }
-        });
-        dieselHolder = findViewById(R.id.editTextDiesel);
-        dieselHolder.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s != null && s.length() > 0) {
-                    dieselPrice = Float.parseFloat(s.toString());
-                }
-            }
-        });
-        lpgHolder = findViewById(R.id.editTextLPG);
-        lpgHolder.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s != null && s.length() > 0) {
-                    lpgPrice = Float.parseFloat(s.toString());
-                }
-            }
-        });
-        electricityHolder = findViewById(R.id.editTextElectricity);
-        electricityHolder.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s != null && s.length() > 0) {
-                    electricityPrice = Float.parseFloat(s.toString());
-                }
-            }
-        });
-
-        buttonUpdateStation = findViewById(R.id.buttonUpdate);
-        buttonUpdateStation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (stationName != null && stationName.length() > 0) {
-                    if (stationVicinity != null && stationVicinity.length() > 0) {
-                        updateStation();
-                    } else {
-                        Toast.makeText(MainActivity.this, getString(R.string.stationAddressEmpty), Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(MainActivity.this, getString(R.string.stationNameEmpty), Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+        return photoURL;
     }
 
     void fetchAccount() {
@@ -452,6 +284,214 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        //Window
+        window = this.getWindow();
+
+        // Initializing Toolbar and setting it as the actionbar
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setLogo(R.drawable.brand_logo);
+        }
+
+        coloredBars(Color.parseColor("#616161"), Color.parseColor("#ffffff"));
+        prefs = getSharedPreferences("AdminInformation", Context.MODE_PRIVATE);
+        requestQueue = Volley.newRequestQueue(this);
+        options = new RequestOptions().centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .priority(Priority.HIGH);
+
+
+        fetchAccount();
+
+        // Activate map
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        MapsInitializer.initialize(this.getApplicationContext());
+        verifiedIcon = BitmapDescriptorFactory.fromResource(R.drawable.verified_station);
+
+        mMapView = findViewById(R.id.mapView);
+        mMapView.onCreate(savedInstanceState);
+
+        locLastKnown = new Location("");
+        locLastKnown.setLatitude(Double.parseDouble(userlat));
+        locLastKnown.setLongitude(Double.parseDouble(userlon));
+
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(5000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                synchronized (this) {
+                    super.onLocationResult(locationResult);
+                    Location locCurrent = locationResult.getLastLocation();
+                    if (locCurrent != null) {
+                        if (locCurrent.getAccuracy() <= mapDefaultStationRange) {
+                            userlat = String.valueOf(locCurrent.getLatitude());
+                            userlon = String.valueOf(locCurrent.getLongitude());
+                            prefs.edit().putString("lat", userlat).apply();
+                            prefs.edit().putString("lon", userlon).apply();
+                            MainActivity.getVariables(prefs);
+
+                            float distanceInMeter = locLastKnown.distanceTo(locCurrent);
+
+                            if (distanceInMeter >= mapDefaultStationRange) {
+                                locLastKnown.setLatitude(Double.parseDouble(userlat));
+                                locLastKnown.setLongitude(Double.parseDouble(userlon));
+                                updateMapObject();
+                            }
+                        }
+                    } else {
+                        Snackbar.make(findViewById(R.id.mainContainer), getString(R.string.error_no_location), Snackbar.LENGTH_LONG).show();
+                    }
+                }
+            }
+        };
+
+        // Layout items
+        stationNameHolder = findViewById(R.id.editTextStationName);
+        stationNameHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    stationName = s.toString();
+                }
+            }
+        });
+        stationAddressHolder = findViewById(R.id.editTextStationAddress);
+        stationAddressHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    stationVicinity = s.toString();
+                }
+            }
+        });
+        stationLogoHolder = findViewById(R.id.stationLogo);
+        Glide.with(this).load(stationLogo).apply(options).into(stationLogoHolder);
+
+        gasolineHolder = findViewById(R.id.editTextGasoline);
+        gasolineHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    gasolinePrice = Float.parseFloat(s.toString());
+                }
+            }
+        });
+        dieselHolder = findViewById(R.id.editTextDiesel);
+        dieselHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    dieselPrice = Float.parseFloat(s.toString());
+                }
+            }
+        });
+        lpgHolder = findViewById(R.id.editTextLPG);
+        lpgHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    lpgPrice = Float.parseFloat(s.toString());
+                }
+            }
+        });
+        electricityHolder = findViewById(R.id.editTextElectricity);
+        electricityHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    electricityPrice = Float.parseFloat(s.toString());
+                }
+            }
+        });
+
+        buttonUpdateStation = findViewById(R.id.buttonUpdate);
+        buttonUpdateStation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (stationName != null && stationName.length() > 0) {
+                    if (stationVicinity != null && stationVicinity.length() > 0) {
+                        updateStation();
+                    } else {
+                        Toast.makeText(MainActivity.this, getString(R.string.stationAddressEmpty), Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, getString(R.string.stationNameEmpty), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
     private void updateMapObject() {
         if (circle != null) {
             circle.remove();
@@ -474,17 +514,43 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        System.out.println("AQ: " + response);
                         JSON json = new JSON(response);
                         if (response != null && response.length() > 0) {
-                            placeID = json.key("results").index(0).key("place_id").stringValue();
-                            fetchStation(placeID);
+                            if (json.key("status").toString().equals("ZERO_RESULTS")) {
+                                isAtStation = false;
+                                loadStationDetails();
+                            } else {
+                                isAtStation = true;
+
+                                stationName = json.key("results").index(0).key("name").stringValue();
+                                stationVicinity = json.key("results").index(0).key("vicinity").stringValue();
+
+                                double lat = json.key("results").index(0).key("geometry").key("location").key("lat").doubleValue();
+                                double lon = json.key("results").index(0).key("geometry").key("location").key("lng").doubleValue();
+
+                                Geocoder geo = new Geocoder(getApplicationContext(), Locale.getDefault());
+                                try {
+                                    List<Address> addresses = geo.getFromLocation(lat, lon, 1);
+                                    if (addresses.size() > 0) {
+                                        stationCountry = addresses.get(0).getCountryCode();
+                                    } else {
+                                        stationCountry = "";
+                                    }
+                                } catch (Exception e) {
+                                    stationCountry = "";
+                                }
+
+                                stationLocation = lat + ";" + lon;
+
+                                placeID = json.key("results").index(0).key("place_id").stringValue();
+
+                                stationLogo = stationPhotoChooser(stationName);
+
+                                addStation(stationName, stationVicinity, stationCountry, stationLocation, placeID, stationLogo);
+                            }
                         } else {
-                            stationName = "";
-                            stationVicinity = "";
-                            gasolinePrice = 0;
-                            dieselPrice = 0;
-                            lpgPrice = 0;
-                            electricityPrice = 0;
+                            isAtStation = false;
                             loadStationDetails();
                         }
                     }
@@ -500,11 +566,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void fetchStation(final String placeID) {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_FETCH_STATION),
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_FETCH_STATION_PLACEID),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         if (response != null && response.length() > 0) {
+                            System.out.println(response);
+
                             try {
                                 JSONArray res = new JSONArray(response);
                                 JSONObject obj = res.getJSONObject(0);
@@ -544,6 +612,7 @@ public class MainActivity extends AppCompatActivity {
                                 circle = googleMap.addCircle(new CircleOptions()
                                         .center(new LatLng(sydney.latitude, sydney.longitude))
                                         .radius(mapDefaultStationRange)
+                                        .fillColor(0x220000FF)
                                         .strokeColor(Color.RED));
 
                                 loadStationDetails();
@@ -575,14 +644,119 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
-    void loadStationDetails() {
-        stationNameHolder.setText(stationName);
-        stationAddressHolder.setText(stationVicinity);
+    private void addStation(final String sName, final String sAddress, final String sCountry, final String sLocation, final String sPlaceID, final String sLogo) {
+        //Showing the progress dialog
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADD_STATION),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            if (response != null && response.length() > 0) {
+                                JSONArray res = new JSONArray(response);
+                                JSONObject obj = res.getJSONObject(0);
 
-        gasolineHolder.setText("" + gasolinePrice);
-        dieselHolder.setText("" + dieselPrice);
-        lpgHolder.setText("" + lpgPrice);
-        electricityHolder.setText("" + electricityPrice);
+                                stationID = obj.getInt("id");
+                                stationName = obj.getString("name");
+                                stationVicinity = obj.getString("vicinity");
+                                stationLocation = obj.getString("location");
+                                placeID = obj.getString("googleID");
+                                gasolinePrice = (float) obj.getDouble("gasolinePrice");
+                                dieselPrice = (float) obj.getDouble("dieselPrice");
+                                lpgPrice = (float) obj.getDouble("lpgPrice");
+                                electricityPrice = (float) obj.getDouble("electricityPrice");
+                                stationLogo = obj.getString("photoURL");
+                                sonGuncelleme = obj.getString("lastUpdated");
+                                istasyonSahibi = obj.getString("owner");
+                                isStationVerified = obj.getInt("isVerified");
+                                isStationActive = obj.getInt("isActive");
+
+                                //DISTANCE START
+                                Location loc = new Location("");
+                                String[] stationKonum = stationLocation.split(";");
+                                loc.setLatitude(Double.parseDouble(stationKonum[0]));
+                                loc.setLongitude(Double.parseDouble(stationKonum[1]));
+                                float uzaklik = locLastKnown.distanceTo(loc);
+                                mesafe = (int) uzaklik;
+                                //DISTANCE END
+
+                                //Add marker
+                                LatLng sydney = new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1]));
+                                if (obj.getInt("isVerified") == 1) {
+                                    googleMap.addMarker(new MarkerOptions().position(sydney).title(obj.getString("name")).snippet(obj.getString("vicinity")).icon(verifiedIcon));
+                                } else {
+                                    googleMap.addMarker(new MarkerOptions().position(sydney).title(obj.getString("name")).snippet(obj.getString("vicinity")));
+                                }
+
+                                //Draw a circle with radius of mapDefaultStationRange
+                                circle = googleMap.addCircle(new CircleOptions()
+                                        .center(new LatLng(sydney.latitude, sydney.longitude))
+                                        .radius(mapDefaultStationRange)
+                                        .fillColor(0x220000FF)
+                                        .strokeColor(Color.RED));
+
+                                loadStationDetails();
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                //Creating parameters
+                Map<String, String> params = new Hashtable<>();
+
+                //Adding parameters
+                params.put("name", sName);
+                params.put("vicinity", sAddress);
+                params.put("country", sCountry);
+                params.put("location", sLocation);
+                params.put("googleID", sPlaceID);
+                params.put("photoURL", sLogo);
+
+                //returning parameters
+                return params;
+            }
+        };
+
+        //Adding request to the queue
+        requestQueue.add(stringRequest);
+    }
+
+    void loadStationDetails() {
+        if (isAtStation) {
+            stationNameHolder.setText(stationName);
+            stationAddressHolder.setText(stationVicinity);
+            Glide.with(this).load(stationLogo).apply(options).into(stationLogoHolder);
+
+            gasolineHolder.setText("" + gasolinePrice);
+            dieselHolder.setText("" + dieselPrice);
+            lpgHolder.setText("" + lpgPrice);
+            electricityHolder.setText("" + electricityPrice);
+        } else {
+            stationName = "";
+            stationVicinity = "";
+            stationLogo = "";
+            gasolinePrice = 0;
+            dieselPrice = 0;
+            lpgPrice = 0;
+            electricityPrice = 0;
+
+            stationNameHolder.setText(stationName);
+            stationAddressHolder.setText(stationVicinity);
+            Glide.with(this).load(stationLogo).apply(options).into(stationLogoHolder);
+
+            gasolineHolder.setText("" + gasolinePrice);
+            dieselHolder.setText("" + dieselPrice);
+            lpgHolder.setText("" + lpgPrice);
+            electricityHolder.setText("" + electricityPrice);
+        }
     }
 
     private void updateStation() {

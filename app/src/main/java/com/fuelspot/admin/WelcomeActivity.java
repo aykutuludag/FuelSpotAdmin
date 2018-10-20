@@ -168,10 +168,10 @@ public class WelcomeActivity extends AppCompatActivity {
                                         startActivity(i);
                                         finish();
                                     }
-                                }, 2000);
+                                }, 1500);
                             } else {
                                 LocationRequest mLocationRequest = new LocationRequest();
-                                mLocationRequest.setInterval(60000);
+                                mLocationRequest.setInterval(5000);
                                 mLocationRequest.setFastestInterval(1000);
                                 mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                             }
