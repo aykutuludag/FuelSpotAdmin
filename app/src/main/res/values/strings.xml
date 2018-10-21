@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FuelSpotAdmin</string>
+    <string name="app_name">FuelSpot Admin</string>
     <string name="unitSystem1">Litre</string>
     <string name="unitSystem2">Galon</string>
     <string name="unitSystem3">Imperial galon</string>

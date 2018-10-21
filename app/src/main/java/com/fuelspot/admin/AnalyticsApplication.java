@@ -9,7 +9,7 @@ import com.google.android.gms.analytics.Tracker;
 
 public class AnalyticsApplication extends MultiDexApplication {
 
-    String trackingId = "UA-120925005-4";
+    String trackingId = "UA-120925005-5";
     private Tracker mTracker;
 
     @Override

@@ -15,6 +15,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -69,11 +71,16 @@ public class LoginActivity extends AppCompatActivity {
     Handler handler = new Handler();
     EditText usernameHolder, passwordHolder;
     Button loginButton;
+    Window window;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // Window
+        window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         //Load background and login layout
         background = findViewById(R.id.animatedBackground);

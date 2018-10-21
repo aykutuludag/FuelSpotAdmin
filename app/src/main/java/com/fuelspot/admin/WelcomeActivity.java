@@ -14,6 +14,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -48,11 +50,16 @@ public class WelcomeActivity extends AppCompatActivity {
     RequestQueue requestQueue;
     SharedPreferences prefs;
     Button continueButton;
+    Window window;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first_time_login);
+
+        // Window
+        window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Analytics
         Tracker t = ((AnalyticsApplication) this.getApplication()).getDefaultTracker();
@@ -154,7 +161,9 @@ public class WelcomeActivity extends AppCompatActivity {
                                 userlon = String.valueOf(location.getLongitude());
                                 prefs.edit().putString("lat", userlat).apply();
                                 prefs.edit().putString("lon", userlon).apply();
+
                                 Localization();
+
                                 //Registration finished
                                 isSigned = true;
                                 prefs.edit().putBoolean("isSigned", isSigned).apply();
@@ -168,7 +177,7 @@ public class WelcomeActivity extends AppCompatActivity {
                                         startActivity(i);
                                         finish();
                                     }
-                                }, 1500);
+                                }, 2000);
                             } else {
                                 LocationRequest mLocationRequest = new LocationRequest();
                                 mLocationRequest.setInterval(5000);

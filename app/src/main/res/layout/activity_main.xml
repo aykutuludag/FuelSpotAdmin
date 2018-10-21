@@ -83,8 +83,31 @@
                     android:layout_height="128dp"
                     android:layout_below="@id/editTextStationAddress"
                     android:layout_centerHorizontal="true"
-                    android:layout_margin="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/default_station"
                     tools:ignore="RtlHardcoded" />
+
+                <CheckBox
+                    android:id="@+id/checkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/stationLogo"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="8dp"
+                    android:text="İstasyonu gizle?" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/checkBox"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:text="İstasyon sahte, yanlış, çift kayıt vb. gibi durumlarda istasyonu gizleyiniz." />
+
             </RelativeLayout>
 
             <RelativeLayout

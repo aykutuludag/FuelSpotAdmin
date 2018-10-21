@@ -22,14 +22,17 @@
             android:name=".LoginActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
-            android:theme="@style/FullScreen">
+            android:theme="@style/FullScreen"
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".WelcomeActivity"
             android:theme="@style/FullScreen" />
@@ -37,7 +40,8 @@
             android:name=".ProfileEditActivity"
             android:label="@string/edit_profile"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateHidden" />
 
         <!-- Google Maps && PlaceAutoComplete -->
         <meta-data

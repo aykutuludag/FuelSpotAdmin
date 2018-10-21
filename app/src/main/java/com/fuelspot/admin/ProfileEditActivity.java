@@ -96,7 +96,11 @@ public class ProfileEditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_edit);
 
-        // Initializing Toolbar and setting it as the actionbar
+        // Window
+        window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        // Toolbar
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
@@ -105,8 +109,6 @@ public class ProfileEditActivity extends AppCompatActivity {
             getSupportActionBar().setIcon(R.drawable.brand_logo);
         }
 
-        //Window
-        window = this.getWindow();
         coloredBars(Color.parseColor("#626262"), Color.parseColor("#ffffff"));
 
         // Analytics
@@ -177,7 +179,7 @@ public class ProfileEditActivity extends AppCompatActivity {
         userPic = findViewById(R.id.userPhoto);
         options = new RequestOptions().centerCrop().placeholder(R.drawable.default_profile).error(R.drawable.default_profile)
                 .diskCacheStrategy(DiskCacheStrategy.ALL).priority(Priority.HIGH);
-        Glide.with(this).load(photo).apply(options).into(userPic);
+        Glide.with(this).load(Uri.parse(photo)).apply(options).into(userPic);
         userPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -449,7 +451,7 @@ public class ProfileEditActivity extends AppCompatActivity {
 
                     UCrop.of(Uri.parse("file://" + aq.get(0)), Uri.fromFile(new File(folder, fileName)))
                             .withAspectRatio(1, 1)
-                            .withMaxResultSize(1080, 1080)
+                            .withMaxResultSize(720, 720)
                             .start(ProfileEditActivity.this);
                 }
                 break;
