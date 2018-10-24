@@ -19,8 +19,7 @@
     <string name="update">Update</string>
     <string name="stationUpdated">Station info updated successfully</string>
     <string name="stationUpdateFail">An error occurred. Please try again later…</string>
-    <string name="stationNameEmpty">Station name can not be empty…</string>
-    <string name="stationAddressEmpty">Station address can not be empty…</string>
+    <string name="uAreNotAtStation">You are not at the gas station…</string>
     <string name="no_internet">There is a problem with your connectivity. Please try again later…</string>
 
 
@@ -31,6 +30,4 @@
     <!-- STATION APIs -->
     <string name="API_ADD_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/station-add.php</string> <!-- Create, return Station object -->
     <string name="API_UPDATE_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/station-update.php</string> <!-- Updates station info, return SUCCESS or FAIL -->
-    <string name="API_FETCH_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/station-fetch.php</string> <!-- stationID, return Station object -->
-    <string name="API_FETCH_STATION_PLACEID" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/station-fetch-placeid.php</string> <!-- placeID (Google), return Station object -->
 </resources>

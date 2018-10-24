@@ -1,6 +1,5 @@
 package com.fuelspot.admin;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -11,8 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -45,22 +42,16 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.yalantis.ucrop.UCrop;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import droidninja.filepicker.FilePickerBuilder;
-import droidninja.filepicker.FilePickerConst;
 
 import static com.fuelspot.admin.MainActivity.PERMISSIONS_STORAGE;
 import static com.fuelspot.admin.MainActivity.REQUEST_PERMISSION;
@@ -186,10 +177,10 @@ public class ProfileEditActivity extends AppCompatActivity {
                 if (ActivityCompat.checkSelfPermission(ProfileEditActivity.this, PERMISSIONS_STORAGE[0]) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ProfileEditActivity.this, PERMISSIONS_STORAGE[1]) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(ProfileEditActivity.this, PERMISSIONS_STORAGE, REQUEST_PERMISSION);
                 } else {
-                    FilePickerBuilder.getInstance().setMaxCount(1)
+                 /*   FilePickerBuilder.getInstance().setMaxCount(1)
                             .setActivityTheme(R.style.AppTheme)
                             .enableCameraSupport(true)
-                            .pickPhoto(ProfileEditActivity.this);
+                            .pickPhoto(ProfileEditActivity.this);*/
                 }
             }
         });
@@ -423,10 +414,10 @@ public class ProfileEditActivity extends AppCompatActivity {
             case REQUEST_PERMISSION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    FilePickerBuilder.getInstance().setMaxCount(1)
+                   /* FilePickerBuilder.getInstance().setMaxCount(1)
                             .setActivityTheme(R.style.AppTheme)
                             .enableCameraSupport(true)
-                            .pickPhoto(ProfileEditActivity.this);
+                            .pickPhoto(ProfileEditActivity.this);*/
                 } else {
                     Snackbar.make(findViewById(R.id.mainContainer), getString(R.string.error_permission_cancel), Snackbar.LENGTH_LONG).show();
                 }
@@ -438,7 +429,7 @@ public class ProfileEditActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        CharSequence now = android.text.format.DateFormat.format("dd-MM-yyyy HH:mm", new Date());
+      /*  CharSequence now = android.text.format.DateFormat.format("dd-MM-yyyy HH:mm", new Date());
         String fileName = now + ".jpg";
 
         switch (requestCode) {
@@ -473,7 +464,7 @@ public class ProfileEditActivity extends AppCompatActivity {
                     }
                 }
                 break;
-        }
+        }*/
     }
 
     @Override

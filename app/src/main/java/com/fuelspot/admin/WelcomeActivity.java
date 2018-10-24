@@ -36,6 +36,7 @@ import static com.fuelspot.admin.MainActivity.PERMISSIONS_LOCATION;
 import static com.fuelspot.admin.MainActivity.PERMISSIONS_STORAGE;
 import static com.fuelspot.admin.MainActivity.REQUEST_PERMISSION;
 import static com.fuelspot.admin.MainActivity.currencyCode;
+import static com.fuelspot.admin.MainActivity.currencySymbol;
 import static com.fuelspot.admin.MainActivity.getVariables;
 import static com.fuelspot.admin.MainActivity.isSigned;
 import static com.fuelspot.admin.MainActivity.userCountry;
@@ -99,6 +100,10 @@ public class WelcomeActivity extends AppCompatActivity {
                         Locale userLocale = new Locale(Locale.getDefault().getISO3Language(), addresses.get(0).getCountryCode());
                         currencyCode = Currency.getInstance(userLocale).getCurrencyCode();
                         prefs.edit().putString("userCurrency", currencyCode).apply();
+
+                        Currency userParaSembolu = Currency.getInstance(currencyCode);
+                        currencySymbol = userParaSembolu.getSymbol(userLocale);
+                        prefs.edit().putString("userCurrencySymbol", currencySymbol).apply();
 
                         switch (userCountry) {
                             // US GALLON COUNTRIES

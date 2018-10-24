@@ -44,6 +44,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -66,6 +67,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
@@ -86,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     public static String[] PERMISSIONS_LOCATION = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     public static boolean isSigned, isVerified, doubleBackToExitPressedOnce;
 
-    public static String userPhoneNumber, userlat, userlon, name, email, password, photo, gender, birthday, location, userCountry, userCountryName, userDisplayLanguage, currencyCode, username, userUnit;
+    public static String userPhoneNumber, userlat, userlon, name, email, password, photo, gender, birthday, location, userCountry, userCountryName, userDisplayLanguage, currencyCode, currencySymbol, username, userUnit;
 
     Window window;
     Toolbar toolbar;
@@ -102,16 +106,149 @@ public class MainActivity extends AppCompatActivity {
 
     // Current station information
     boolean isAtStation;
-    String stationName, stationVicinity, stationCountry, stationLocation, lastUpdated, stationLogo, placeID, sonGuncelleme, istasyonSahibi;
-    int stationDistance, stationID, mesafe, isStationActive, isStationVerified;
+    String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi;
+    int stationID, mesafe, isStationActive, isStationVerified;
     float gasolinePrice, dieselPrice, lpgPrice, electricityPrice;
 
     CheckBox hideStation;
+    RelativeTimeTextView lastUpdateTimeText;
     EditText stationNameHolder, stationAddressHolder, gasolineHolder, dieselHolder, lpgHolder, electricityHolder;
     Button buttonUpdateStation;
     CircleImageView stationLogoHolder;
     RequestOptions options;
     BitmapDescriptor verifiedIcon;
+
+    public static void getVariables(SharedPreferences prefs) {
+        name = prefs.getString("Name", "");
+        email = prefs.getString("Email", "");
+        password = prefs.getString("password", "");
+        photo = prefs.getString("ProfilePhoto", "");
+        gender = prefs.getString("Gender", "");
+        birthday = prefs.getString("Birthday", "");
+        location = prefs.getString("Location", "");
+        username = prefs.getString("UserName", "");
+        userlat = prefs.getString("lat", "39.925054");
+        userlon = prefs.getString("lon", "32.8347552");
+        isSigned = prefs.getBoolean("isSigned", false);
+        userCountry = prefs.getString("userCountry", "");
+        userCountryName = prefs.getString("userCountryName", "");
+        userDisplayLanguage = prefs.getString("userLanguage", "");
+        userUnit = prefs.getString("userUnit", "");
+        currencyCode = prefs.getString("userCurrency", "");
+        userPhoneNumber = prefs.getString("userPhoneNumber", "");
+        currencySymbol = prefs.getString("currencySymbol", "");
+    }
+
+    public static boolean isNetworkConnected(Context mContext) {
+        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return (cm != null ? cm.getActiveNetworkInfo() : null) != null;
+    }
+
+    public static String stationPhotoChooser(String stationName) {
+        String photoURL;
+        switch (stationName) {
+            case "Akpet":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/akpet.jpg";
+                break;
+            case "Alpet":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/alpet.jpg";
+                break;
+            case "Aygaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/aygaz.jpg";
+                break;
+            case "Aytemiz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/aytemiz.jpg";
+                break;
+            case "Best":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/best.jpg";
+                break;
+            case "BP":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/bp.jpg";
+                break;
+            case "Bpet":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/bpet.jpg";
+                break;
+            case "Damla Petrol":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/damla-petrol.jpg";
+                break;
+            case "Energy":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/enegy.jpg";
+                break;
+            case "Euroil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/euroil.jpg";
+                break;
+            case "Exxon":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/exxon.jpg";
+                break;
+            case "GO":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/go.jpg";
+                break;
+            case "İpragaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/ipragaz.jpg";
+                break;
+            case "Jetpet":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/jetpet.jpg";
+                break;
+            case "Kadoil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/kadoil.jpg";
+                break;
+            case "Kalegaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/kalegaz.jpg";
+                break;
+            case "Lukoil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/lukoil.jpg";
+                break;
+            case "Milangaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/milangaz.jpg";
+                break;
+            case "Mobil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/mobil.jpg";
+                break;
+            case "Mogaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/mogaz.jpg";
+                break;
+            case "Moil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/moil.jpg";
+                break;
+            case "Opet":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/opet.jpg";
+                break;
+            case "Petline":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/petline.jpg";
+                break;
+            case "Petrol Ofisi":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/petrol-ofisi.jpg";
+                break;
+            case "Powerwax":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/powerwax.jpg";
+                break;
+            case "Shell":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/shell.jpg";
+                break;
+            case "Sunoco":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/sunoc.jpg";
+                break;
+            case "Termo":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/termo.jpg";
+                break;
+            case "Total":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/total.jpg";
+                break;
+            case "Türkiye Petrolleri":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkiye-petrolleri.jpg";
+                break;
+            case "Turkuaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkuaz.jpg";
+                break;
+            case "Valero":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/valero.jpg";
+                break;
+            default:
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/unknown.jpg";
+                break;
+        }
+        return photoURL;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -233,13 +370,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    // Buradaki değer sql e gidecek değer o yüzden check edilydiyse istasyonu gizle = 0;
-                    isStationActive = 0;
-                } else {
                     isStationActive = 1;
+                } else {
+                    isStationActive = 0;
                 }
             }
         });
+
+        lastUpdateTimeText = findViewById(R.id.stationLastUpdate);
 
         gasolineHolder = findViewById(R.id.editTextGasoline);
         gasolineHolder.addTextChangedListener(new TextWatcher() {
@@ -322,64 +460,13 @@ public class MainActivity extends AppCompatActivity {
         buttonUpdateStation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (stationName != null && stationName.length() > 0) {
-                    if (stationVicinity != null && stationVicinity.length() > 0) {
-                        updateStation();
-                    } else {
-                        Toast.makeText(MainActivity.this, getString(R.string.stationAddressEmpty), Toast.LENGTH_LONG).show();
-                    }
+                if (isAtStation) {
+                    updateStation();
                 } else {
-                    Toast.makeText(MainActivity.this, getString(R.string.stationNameEmpty), Toast.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(android.R.id.content), getString(R.string.uAreNotAtStation), Snackbar.LENGTH_LONG).show();
                 }
             }
         });
-    }
-
-    public static boolean isNetworkConnected(Context mContext) {
-        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        return (cm != null ? cm.getActiveNetworkInfo() : null) != null;
-    }
-
-    public static void getVariables(SharedPreferences prefs) {
-        name = prefs.getString("Name", "");
-        email = prefs.getString("Email", "");
-        password = prefs.getString("password", "");
-        photo = prefs.getString("ProfilePhoto", "http://fuel-spot.com/FUELSPOTAPP/default_icons/profile.png");
-        gender = prefs.getString("Gender", "");
-        birthday = prefs.getString("Birthday", "");
-        location = prefs.getString("Location", "");
-        username = prefs.getString("UserName", "");
-        userlat = prefs.getString("lat", "39.925054");
-        userlon = prefs.getString("lon", "32.8347552");
-        isSigned = prefs.getBoolean("isSigned", false);
-        userCountry = prefs.getString("userCountry", "");
-        userCountryName = prefs.getString("userCountryName", "");
-        userDisplayLanguage = prefs.getString("userLanguage", "");
-        userUnit = prefs.getString("userUnit", "");
-        currencyCode = prefs.getString("userCurrency", "");
-        userPhoneNumber = prefs.getString("userPhoneNumber", "");
-    }
-
-    public static String stationPhotoChooser(String stationName) {
-        String photoURL;
-        if (stationName.contains("Shell")) {
-            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/shell.png";
-        } else if (stationName.contains("Opet")) {
-            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/opet.jpg";
-        } else if (stationName.contains("BP")) {
-            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/bp.png";
-        } else if (stationName.contains("Kadoil")) {
-            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/kadoil.jpg";
-        } else if (stationName.contains("Petrol Ofisi")) {
-            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/petrol-ofisi.png";
-        } else if (stationName.contains("Lukoil")) {
-            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/lukoil.jpg";
-        } else if (stationName.contains("TP")) {
-            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkiye-petrolleri.jpg";
-        } else {
-            photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/unknown.png";
-        }
-        return photoURL;
     }
 
     void fetchAccount() {
@@ -670,38 +757,39 @@ public class MainActivity extends AppCompatActivity {
 
     void loadStationDetails() {
         if (isAtStation) {
-            stationNameHolder.setText(stationName);
-            stationAddressHolder.setText(stationVicinity);
-            Glide.with(this).load(stationLogo).apply(options).into(stationLogoHolder);
-
-            if (isStationActive == 0) {
-                hideStation.setChecked(true);
-            } else {
-                hideStation.setChecked(false);
-            }
-
-            gasolineHolder.setText("" + gasolinePrice);
-            dieselHolder.setText("" + dieselPrice);
-            lpgHolder.setText("" + lpgPrice);
-            electricityHolder.setText("" + electricityPrice);
+            // Values came from server (addStation)
         } else {
             stationName = "";
             stationVicinity = "";
             stationLogo = "";
+            sonGuncelleme = "";
+            isStationActive = 0;
             gasolinePrice = 0;
             dieselPrice = 0;
             lpgPrice = 0;
             electricityPrice = 0;
-
-            stationNameHolder.setText(stationName);
-            stationAddressHolder.setText(stationVicinity);
-            Glide.with(this).load(stationLogo).apply(options).into(stationLogoHolder);
-
-            gasolineHolder.setText("" + gasolinePrice);
-            dieselHolder.setText("" + dieselPrice);
-            lpgHolder.setText("" + lpgPrice);
-            electricityHolder.setText("" + electricityPrice);
         }
+
+        stationNameHolder.setText(stationName);
+        stationAddressHolder.setText(stationVicinity);
+        Glide.with(this).load(stationLogo).apply(options).into(stationLogoHolder);
+        if (isStationActive == 0) {
+            hideStation.setChecked(false);
+        } else {
+            hideStation.setChecked(true);
+        }
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        try {
+            Date date = format.parse(sonGuncelleme);
+            lastUpdateTimeText.setReferenceTime(date.getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        gasolineHolder.setText("" + gasolinePrice);
+        dieselHolder.setText("" + dieselPrice);
+        lpgHolder.setText("" + lpgPrice);
+        electricityHolder.setText("" + electricityPrice);
     }
 
     private void updateStation() {
@@ -713,6 +801,8 @@ public class MainActivity extends AppCompatActivity {
                             switch (s) {
                                 case "Success":
                                     Toast.makeText(MainActivity.this, getString(R.string.stationUpdated), Toast.LENGTH_LONG).show();
+                                    //Re-fetch the data from server to validate and re-update last update time.
+                                    updateMapObject();
                                     break;
                                 case "Fail":
                                     Toast.makeText(MainActivity.this, getString(R.string.stationUpdateFail), Toast.LENGTH_LONG).show();
