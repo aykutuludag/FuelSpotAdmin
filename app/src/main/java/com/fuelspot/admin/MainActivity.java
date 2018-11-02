@@ -32,6 +32,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Current station information
     boolean isAtStation;
-    String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi;
+    String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi, facilitiesOfStation;
     int stationID, mesafe, isStationActive, isStationVerified;
     float gasolinePrice, dieselPrice, lpgPrice, electricityPrice;
 
@@ -117,6 +118,8 @@ public class MainActivity extends AppCompatActivity {
     CircleImageView stationLogoHolder;
     RequestOptions options;
     BitmapDescriptor verifiedIcon;
+    RelativeLayout verifiedLayout;
+    CircleImageView imageViewWC, imageViewMarket, imageViewCarWash, imageViewTireRepair, imageViewMechanic;
 
     public static void getVariables(SharedPreferences prefs) {
         name = prefs.getString("Name", "");
@@ -150,8 +153,17 @@ public class MainActivity extends AppCompatActivity {
             case "Akpet":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/akpet.jpg";
                 break;
+            case "Algaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/algaz.jpg";
+                break;
             case "Alpet":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/alpet.jpg";
+                break;
+            case "Amaco":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/amaco.jpg";
+                break;
+            case "Anadolugaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/anadolugaz.jpg";
                 break;
             case "Aygaz":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/aygaz.jpg";
@@ -162,17 +174,33 @@ public class MainActivity extends AppCompatActivity {
             case "Best":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/best.jpg";
                 break;
+            case "Bizimgaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/bizimgaz.jpg";
+                break;
             case "BP":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/bp.jpg";
                 break;
             case "Bpet":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/bpet.jpg";
                 break;
+            case "Chevron":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/akpet.jpg";
+                break;
+            case "Circle-K":
+            case "Circle K":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/akpet.jpg";
+                break;
+            case "Citgo":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/citgo.jpg";
+                break;
+            case "Class":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/class.jpg";
+                break;
             case "Damla Petrol":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/damla-petrol.jpg";
                 break;
             case "Energy":
-                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/enegy.jpg";
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/energy.jpg";
                 break;
             case "Euroil":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/euroil.jpg";
@@ -183,7 +211,14 @@ public class MainActivity extends AppCompatActivity {
             case "GO":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/go.jpg";
                 break;
+            case "Gulf":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/gulf.jpg";
+                break;
+            case "Güvenal Gaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/guvenalgaz.jpg";
+                break;
             case "İpragaz":
+            case "Ipragaz":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/ipragaz.jpg";
                 break;
             case "Jetpet":
@@ -195,8 +230,18 @@ public class MainActivity extends AppCompatActivity {
             case "Kalegaz":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/kalegaz.jpg";
                 break;
+            case "K-pet":
+            case "Kpet":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/kpet.jpg";
+                break;
+            case "Lipetgaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/lipetgaz.jpg";
+                break;
             case "Lukoil":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/lukoil.jpg";
+                break;
+            case "Marathon":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/marathon.jpg";
                 break;
             case "Milangaz":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/milangaz.jpg";
@@ -210,13 +255,20 @@ public class MainActivity extends AppCompatActivity {
             case "Moil":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/moil.jpg";
                 break;
+            case "Mola":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/mola.jpg";
+                break;
             case "Opet":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/opet.jpg";
+                break;
+            case "Pacific":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/pacific.jpg";
                 break;
             case "Petline":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/petline.jpg";
                 break;
             case "Petrol Ofisi":
+            case "PO":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/petrol-ofisi.jpg";
                 break;
             case "Powerwax":
@@ -225,16 +277,27 @@ public class MainActivity extends AppCompatActivity {
             case "Shell":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/shell.jpg";
                 break;
+            case "S Oil":
+            case "S-Oil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/s-oil.jpg";
+                break;
+            case "Starpet":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/starpet.jpg";
+                break;
             case "Sunoco":
-                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/sunoc.jpg";
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/sunoco.jpg";
                 break;
             case "Termo":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/termo.jpg";
+                break;
+            case "Texaco":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/texaco.jpg";
                 break;
             case "Total":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/total.jpg";
                 break;
             case "Türkiye Petrolleri":
+            case "TP":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkiye-petrolleri.jpg";
                 break;
             case "Turkuaz":
@@ -247,6 +310,7 @@ public class MainActivity extends AppCompatActivity {
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/unknown.jpg";
                 break;
         }
+
         return photoURL;
     }
 
@@ -379,6 +443,9 @@ public class MainActivity extends AppCompatActivity {
 
         lastUpdateTimeText = findViewById(R.id.stationLastUpdate);
 
+        // if stationVerified == 1, this section shows up!
+        verifiedLayout = findViewById(R.id.verifiedSection);
+
         gasolineHolder = findViewById(R.id.editTextGasoline);
         gasolineHolder.addTextChangedListener(new TextWatcher() {
             @Override
@@ -452,6 +519,87 @@ public class MainActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 if (s != null && s.length() > 0) {
                     electricityPrice = Float.parseFloat(s.toString());
+                }
+            }
+        });
+
+        // Facilities
+        imageViewWC = findViewById(R.id.WC);
+        imageViewWC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isAtStation) {
+                    if (imageViewWC.getAlpha() == 1.0f) {
+                        facilitiesOfStation = facilitiesOfStation.replace("WC;", "");
+                        imageViewWC.setAlpha(0.5f);
+                    } else {
+                        facilitiesOfStation = facilitiesOfStation + "WC;";
+                        imageViewWC.setAlpha(1.0f);
+                    }
+                }
+            }
+        });
+
+        imageViewMarket = findViewById(R.id.Market);
+        imageViewMarket.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isAtStation) {
+                    if (imageViewMarket.getAlpha() == 1.0f) {
+                        facilitiesOfStation = facilitiesOfStation.replace("Market;", "");
+                        imageViewMarket.setAlpha(0.5f);
+                    } else {
+                        facilitiesOfStation = facilitiesOfStation + "Market;";
+                        imageViewMarket.setAlpha(1.0f);
+                    }
+                }
+            }
+        });
+
+        imageViewCarWash = findViewById(R.id.CarWash);
+        imageViewCarWash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isAtStation) {
+                    if (imageViewCarWash.getAlpha() == 1.0f) {
+                        facilitiesOfStation = facilitiesOfStation.replace("CarWash;", "");
+                        imageViewCarWash.setAlpha(0.5f);
+                    } else {
+                        facilitiesOfStation = facilitiesOfStation + "CarWash;";
+                        imageViewCarWash.setAlpha(1.0f);
+                    }
+                }
+            }
+        });
+
+        imageViewTireRepair = findViewById(R.id.TireRepair);
+        imageViewTireRepair.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isAtStation) {
+                    if (imageViewTireRepair.getAlpha() == 1.0f) {
+                        facilitiesOfStation = facilitiesOfStation.replace("TireRepair;", "");
+                        imageViewTireRepair.setAlpha(0.5f);
+                    } else {
+                        facilitiesOfStation = facilitiesOfStation + "TireRepair;";
+                        imageViewTireRepair.setAlpha(1.0f);
+                    }
+                }
+            }
+        });
+
+        imageViewMechanic = findViewById(R.id.Mechanic);
+        imageViewMechanic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isAtStation) {
+                    if (imageViewMechanic.getAlpha() == 1.0f) {
+                        facilitiesOfStation = facilitiesOfStation.replace("Mechanic;", "");
+                        imageViewMechanic.setAlpha(0.5f);
+                    } else {
+                        facilitiesOfStation = facilitiesOfStation + "Mechanic;";
+                        imageViewMechanic.setAlpha(1.0f);
+                    }
                 }
             }
         });
@@ -692,6 +840,7 @@ public class MainActivity extends AppCompatActivity {
                                 electricityPrice = (float) obj.getDouble("electricityPrice");
                                 stationLogo = obj.getString("photoURL");
                                 sonGuncelleme = obj.getString("lastUpdated");
+                                facilitiesOfStation = obj.getString("facilities");
                                 istasyonSahibi = obj.getString("owner");
                                 isStationVerified = obj.getInt("isVerified");
                                 isStationActive = obj.getInt("isActive");
@@ -704,6 +853,43 @@ public class MainActivity extends AppCompatActivity {
                                 float uzaklik = locLastKnown.distanceTo(loc);
                                 mesafe = (int) uzaklik;
                                 //DISTANCE END
+
+                                if (isStationVerified == 1) {
+                                    verifiedLayout.setVisibility(View.VISIBLE);
+                                } else {
+                                    verifiedLayout.setVisibility(View.GONE);
+                                }
+
+                                // Facilities
+                                if (facilitiesOfStation.contains("WC")) {
+                                    imageViewWC.setAlpha(1.0f);
+                                } else {
+                                    imageViewWC.setAlpha(0.5f);
+                                }
+
+                                if (facilitiesOfStation.contains("Market")) {
+                                    imageViewMarket.setAlpha(1.0f);
+                                } else {
+                                    imageViewMarket.setAlpha(0.5f);
+                                }
+
+                                if (facilitiesOfStation.contains("CarWash")) {
+                                    imageViewCarWash.setAlpha(1.0f);
+                                } else {
+                                    imageViewCarWash.setAlpha(0.5f);
+                                }
+
+                                if (facilitiesOfStation.contains("TireRepair")) {
+                                    imageViewTireRepair.setAlpha(1.0f);
+                                } else {
+                                    imageViewTireRepair.setAlpha(0.5f);
+                                }
+
+                                if (facilitiesOfStation.contains("Mechanic")) {
+                                    imageViewMechanic.setAlpha(1.0f);
+                                } else {
+                                    imageViewMechanic.setAlpha(0.5f);
+                                }
 
                                 //Add marker
                                 LatLng sydney = new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1]));
@@ -756,9 +942,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void loadStationDetails() {
-        if (isAtStation) {
-            // Values came from server (addStation)
-        } else {
+        if (!isAtStation) {
             stationName = "";
             stationVicinity = "";
             stationLogo = "";
@@ -768,6 +952,13 @@ public class MainActivity extends AppCompatActivity {
             dieselPrice = 0;
             lpgPrice = 0;
             electricityPrice = 0;
+
+            // Facilities
+            imageViewWC.setAlpha(0.5f);
+            imageViewMarket.setAlpha(0.5f);
+            imageViewCarWash.setAlpha(0.5f);
+            imageViewTireRepair.setAlpha(0.5f);
+            imageViewMechanic.setAlpha(0.5f);
         }
 
         stationNameHolder.setText(stationName);
@@ -826,6 +1017,7 @@ public class MainActivity extends AppCompatActivity {
                 params.put("stationID", String.valueOf(stationID));
                 params.put("stationName", stationName);
                 params.put("stationVicinity", stationVicinity);
+                params.put("facilities", facilitiesOfStation);
                 params.put("gasolinePrice", String.valueOf(gasolinePrice));
                 params.put("dieselPrice", String.valueOf(dieselPrice));
                 params.put("lpgPrice", String.valueOf(lpgPrice));

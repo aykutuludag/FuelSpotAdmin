@@ -124,10 +124,42 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/priceSec"
+                android:id="@+id/verifiedSection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/baseInfo"
+                android:layout_margin="8dp"
+                android:background="#fafafa"
+                android:visibility="gone">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/verifiedStation"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/verified_station" />
+
+                <TextView
+                    android:id="@+id/textView25"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="4dp"
+                    android:layout_toEndOf="@+id/verifiedStation"
+                    android:text="Bu istasyon FuelSpot tarafından onaylanmıştır." />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/priceSec"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/verifiedSection"
                 android:layout_margin="8dp"
                 android:background="#60ffffff"
                 android:gravity="center">
@@ -220,11 +252,98 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
             </RelativeLayout>
 
+            <RelativeLayout
+                android:id="@+id/facilitiesSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/priceSec"
+                android:layout_margin="8dp"
+                android:background="#60ffffff">
+
+                <TextView
+                    android:id="@+id/title_facilities"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="8dp"
+                    android:gravity="center"
+                    android:text="Tesisler"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Inverse" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/title_facilities"
+                    android:gravity="center">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/WC"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:alpha="0.5"
+                        android:src="@drawable/wc" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/Market"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_toEndOf="@id/WC"
+                        android:alpha="0.5"
+                        android:src="@drawable/market" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/CarWash"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_toEndOf="@id/Market"
+                        android:alpha="0.5"
+                        android:src="@drawable/carwash" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/TireRepair"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_toEndOf="@id/CarWash"
+                        android:alpha="0.5"
+                        android:src="@drawable/tirerepair" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/Mechanic"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_toEndOf="@id/TireRepair"
+                        android:alpha="0.5"
+                        android:src="@drawable/mechanic" />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
             <Button
                 android:id="@+id/buttonUpdate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/priceSec"
+                android:layout_below="@id/facilitiesSection"
                 android:layout_centerHorizontal="true"
                 android:layout_margin="16dp"
                 android:background="@drawable/green_box"
