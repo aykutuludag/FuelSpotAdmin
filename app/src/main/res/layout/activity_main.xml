@@ -53,35 +53,10 @@
                 android:layout_margin="8dp"
                 android:background="#60ffffff">
 
-                <EditText
-                    android:id="@+id/editTextStationName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-
-                    android:layout_centerHorizontal="true"
-                    android:ems="10"
-                    android:gravity="center"
-                    android:hint="STATION NAME"
-                    android:inputType="textPersonName"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
-
-                <EditText
-                    android:id="@+id/editTextStationAddress"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/editTextStationName"
-                    android:layout_centerHorizontal="true"
-                    android:ems="10"
-                    android:gravity="center"
-                    android:hint="ADDRESS"
-                    android:inputType="textPostalAddress"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
-
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/stationLogo"
                     android:layout_width="128dp"
                     android:layout_height="128dp"
-                    android:layout_below="@id/editTextStationAddress"
                     android:layout_centerHorizontal="true"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
@@ -90,14 +65,68 @@
                     android:src="@drawable/default_station"
                     tools:ignore="RtlHardcoded" />
 
+                <Spinner
+                    android:id="@+id/simpleSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/stationLogo"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="8dp"
+                    android:gravity="center" />
+
+                <EditText
+                    android:id="@+id/editTextStationAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/simpleSpinner"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="8dp"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="ADDRESS"
+                    android:inputType="textPostalAddress"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+                <EditText
+                    android:id="@+id/editTextStationLicense"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/editTextStationAddress"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="8dp"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="LICENSE NO"
+                    android:inputType="textPostalAddress"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+                <CheckBox
+                    android:id="@+id/checkBox2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/editTextStationLicense"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="4dp"
+                    android:text="Mobil ödeme?" />
+
+                <CheckBox
+                    android:id="@+id/checkBox3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/checkBox2"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="4dp"
+                    android:text="Alo yakıt?" />
+
                 <CheckBox
                     android:id="@+id/checkBox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/stationLogo"
+                    android:layout_below="@+id/checkBox3"
                     android:layout_centerHorizontal="true"
-                    android:layout_margin="8dp"
+                    android:layout_marginTop="4dp"
                     android:text="İstasyon aktif?" />
+
 
                 <TextView
                     android:id="@+id/textView"
@@ -105,6 +134,9 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/checkBox"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
                     android:gravity="center"
                     android:text="İstasyon sahte, yanlış, çift kayıt vb. gibi durumlarda istasyonu gizleyiniz." />
 
@@ -114,7 +146,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/textView"
                     android:layout_centerHorizontal="true"
-                    android:layout_margin="4dp"
+                    android:layout_marginTop="4dp"
                     android:fontFamily="@font/gotham_book"
                     android:gravity="center"
                     android:padding="4dp"

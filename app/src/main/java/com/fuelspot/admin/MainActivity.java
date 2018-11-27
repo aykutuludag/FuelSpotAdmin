@@ -28,11 +28,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -45,6 +47,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.fuelspot.admin.adapter.CompanyAdapter;
+import com.fuelspot.admin.model.CompanyItem;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -70,6 +74,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -79,7 +84,7 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 import eu.amirs.JSON;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     public static final int REQUEST_PERMISSION = 0;
 
@@ -92,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     public static boolean isSigned, isVerified, doubleBackToExitPressedOnce;
 
     public static String userPhoneNumber, userlat, userlon, name, email, password, photo, gender, birthday, location, userCountry, userCountryName, userDisplayLanguage, currencyCode, currencySymbol, username, userUnit;
-
+    public static List<CompanyItem> companyList = new ArrayList<>();
     Window window;
     Toolbar toolbar;
     RequestQueue requestQueue;
@@ -107,19 +112,20 @@ public class MainActivity extends AppCompatActivity {
 
     // Current station information
     boolean isAtStation;
-    String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi, facilitiesOfStation;
-    int stationID, mesafe, isStationActive, isStationVerified;
+    String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi, facilitiesOfStation, stationLicense;
+    int stationID, mesafe, isStationActive, isStationVerified, hasMobilePayment, hasFuelDelivery;
     float gasolinePrice, dieselPrice, lpgPrice, electricityPrice;
 
-    CheckBox hideStation;
+    CheckBox hideStation, mobilOdeme, aloyakit;
     RelativeTimeTextView lastUpdateTimeText;
-    EditText stationNameHolder, stationAddressHolder, gasolineHolder, dieselHolder, lpgHolder, electricityHolder;
+    EditText stationAddressHolder, gasolineHolder, dieselHolder, lpgHolder, electricityHolder, stationLicenseHolder;
     Button buttonUpdateStation;
     CircleImageView stationLogoHolder;
     RequestOptions options;
     BitmapDescriptor verifiedIcon;
     RelativeLayout verifiedLayout;
     CircleImageView imageViewWC, imageViewMarket, imageViewCarWash, imageViewTireRepair, imageViewMechanic;
+    Spinner spinner;
 
     public static void getVariables(SharedPreferences prefs) {
         name = prefs.getString("Name", "");
@@ -147,14 +153,15 @@ public class MainActivity extends AppCompatActivity {
         return (cm != null ? cm.getActiveNetworkInfo() : null) != null;
     }
 
+    // Updated on Nov 27, 2018
     public static String stationPhotoChooser(String stationName) {
         String photoURL;
         switch (stationName) {
+            case "Akçagaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/akcagaz.jpg";
+                break;
             case "Akpet":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/akpet.jpg";
-                break;
-            case "Algaz":
-                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/algaz.jpg";
                 break;
             case "Alpet":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/alpet.jpg";
@@ -165,6 +172,9 @@ public class MainActivity extends AppCompatActivity {
             case "Anadolugaz":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/anadolugaz.jpg";
                 break;
+            case "Antoil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/antoil.jpg";
+                break;
             case "Aygaz":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/aygaz.jpg";
                 break;
@@ -172,10 +182,8 @@ public class MainActivity extends AppCompatActivity {
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/aytemiz.jpg";
                 break;
             case "Best":
+            case "Best Oil":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/best.jpg";
-                break;
-            case "Bizimgaz":
-                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/bizimgaz.jpg";
                 break;
             case "BP":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/bp.jpg";
@@ -183,12 +191,15 @@ public class MainActivity extends AppCompatActivity {
             case "Bpet":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/bpet.jpg";
                 break;
+            case "Çekoil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/cekoil.jpg";
+                break;
             case "Chevron":
-                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/akpet.jpg";
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/chevron.jpg";
                 break;
             case "Circle-K":
             case "Circle K":
-                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/akpet.jpg";
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/circle-k.jpg";
                 break;
             case "Citgo":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/citgo.jpg";
@@ -199,8 +210,14 @@ public class MainActivity extends AppCompatActivity {
             case "Damla Petrol":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/damla-petrol.jpg";
                 break;
+            case "Ecogaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/ecogaz.jpg";
+                break;
             case "Energy":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/energy.jpg";
+                break;
+            case "Erk":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/erk.jpg";
                 break;
             case "Euroil":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/euroil.jpg";
@@ -214,8 +231,14 @@ public class MainActivity extends AppCompatActivity {
             case "Gulf":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/gulf.jpg";
                 break;
+            case "Güneygaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/guneygaz.jpg";
+                break;
             case "Güvenal Gaz":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/guvenalgaz.jpg";
+                break;
+            case "Habaş":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/habas.jpg";
                 break;
             case "İpragaz":
             case "Ipragaz":
@@ -229,6 +252,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "Kalegaz":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/kalegaz.jpg";
+                break;
+            case "Kalepet":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/kalepet.jpg";
                 break;
             case "K-pet":
             case "Kpet":
@@ -264,6 +290,9 @@ public class MainActivity extends AppCompatActivity {
             case "Pacific":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/pacific.jpg";
                 break;
+            case "Parkoil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/parkoil.jpg";
+                break;
             case "Petline":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/petline.jpg";
                 break;
@@ -271,8 +300,23 @@ public class MainActivity extends AppCompatActivity {
             case "PO":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/petrol-ofisi.jpg";
                 break;
+            case "Petrotürk":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/petroturk.jpg";
+                break;
             case "Powerwax":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/powerwax.jpg";
+                break;
+            case "Qplus":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/qplus.jpg";
+                break;
+            case "Quicktrip":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/quicktrip.jpg";
+                break;
+            case "Remoil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/remoil.jpg";
+                break;
+            case "Sanoil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/sanoil.jpg";
                 break;
             case "Shell":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/shell.jpg";
@@ -287,6 +331,12 @@ public class MainActivity extends AppCompatActivity {
             case "Sunoco":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/sunoco.jpg";
                 break;
+            case "Sunpet":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/sunpet.jpg";
+                break;
+            case "Teco":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/teco.jpg";
+                break;
             case "Termo":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/termo.jpg";
                 break;
@@ -296,12 +346,27 @@ public class MainActivity extends AppCompatActivity {
             case "Total":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/total.jpg";
                 break;
+            case "Türkiş":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkis.jpg";
+                break;
             case "Türkiye Petrolleri":
             case "TP":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkiye-petrolleri.jpg";
                 break;
+            case "Türkoil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkoil.jpg";
+                break;
+            case "Türkpetrol":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkpetrol.jpg";
+                break;
             case "Turkuaz":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkuaz.jpg";
+                break;
+            case "United":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/united.jpg";
+                break;
+            case "Uspet":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/uspet.jpg";
                 break;
             case "Valero":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/valero.jpg";
@@ -338,8 +403,8 @@ public class MainActivity extends AppCompatActivity {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .priority(Priority.HIGH);
 
-
-        fetchAccount();
+        spinner = findViewById(R.id.simpleSpinner);
+        spinner.setOnItemSelectedListener(this);
 
         // Activate map
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -354,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
         locLastKnown.setLongitude(Double.parseDouble(userlon));
 
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(5000);
+        mLocationRequest.setInterval(2500);
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
@@ -388,25 +453,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
         // Layout items
-        stationNameHolder = findViewById(R.id.editTextStationName);
-        stationNameHolder.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s != null && s.length() > 0) {
-                    stationName = s.toString();
-                }
-            }
-        });
         stationAddressHolder = findViewById(R.id.editTextStationAddress);
         stationAddressHolder.addTextChangedListener(new TextWatcher() {
             @Override
@@ -426,6 +472,26 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        stationLicenseHolder = findViewById(R.id.editTextStationLicense);
+        stationLicenseHolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    stationLicense = s.toString();
+                }
+            }
+        });
+
         stationLogoHolder = findViewById(R.id.stationLogo);
         Glide.with(this).load(stationLogo).apply(options).into(stationLogoHolder);
 
@@ -437,6 +503,30 @@ public class MainActivity extends AppCompatActivity {
                     isStationActive = 1;
                 } else {
                     isStationActive = 0;
+                }
+            }
+        });
+
+        mobilOdeme = findViewById(R.id.checkBox2);
+        mobilOdeme.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    hasMobilePayment = 1;
+                } else {
+                    hasMobilePayment = 0;
+                }
+            }
+        });
+
+        aloyakit = findViewById(R.id.checkBox3);
+        aloyakit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    hasFuelDelivery = 1;
+                } else {
+                    hasFuelDelivery = 0;
                 }
             }
         });
@@ -615,6 +705,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        checkLocationPermission();
+        fetchAccount();
+        fetchCompanies();
     }
 
     void fetchAccount() {
@@ -624,11 +718,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         switch (response) {
-                            case "Fail":
-                                Snackbar.make(findViewById(android.R.id.content), getString(R.string.login_fail), Snackbar.LENGTH_SHORT).show();
-                                prefs.edit().putBoolean("isSigned", false).apply();
-                                break;
-                            default:
+                            case "Success":
                                 try {
                                     JSONArray res = new JSONArray(response);
                                     JSONObject obj = res.getJSONObject(0);
@@ -671,9 +761,7 @@ public class MainActivity extends AppCompatActivity {
 
                                     getVariables(prefs);
 
-                                    if (isVerified) {
-                                        checkLocationPermission();
-                                    } else {
+                                    if (!isVerified) {
                                         AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                                         alertDialog.setTitle(getString(R.string.waiting_approval));
                                         alertDialog.setMessage(getString(R.string.waiting_approval_text));
@@ -690,6 +778,11 @@ public class MainActivity extends AppCompatActivity {
                                     e.printStackTrace();
                                 }
                                 break;
+                            case "Fail":
+                                Snackbar.make(findViewById(android.R.id.content), getString(R.string.login_fail), Snackbar.LENGTH_SHORT).show();
+                                prefs.edit().putBoolean("isSigned", false).apply();
+                                finish();
+                                break;
                         }
                     }
                 },
@@ -697,6 +790,67 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Snackbar.make(findViewById(android.R.id.content), getString(R.string.login_fail), Snackbar.LENGTH_SHORT).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                //Creating parameters
+                Map<String, String> params = new Hashtable<>();
+
+                //Adding parameters
+                params.put("username", username);
+                params.put("password", password);
+
+                //returning parameters
+                return params;
+            }
+        };
+
+        //Adding request to the queue
+        requestQueue.add(stringRequest);
+    }
+
+    void fetchCompanies() {
+        //Showing the progress dialog
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_COMPANY_FETCH),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        if (response != null && response.length() > 0) {
+                            CompanyItem item2 = new CompanyItem();
+                            item2.setID(0);
+                            item2.setCompanyName("Bilinmiyor");
+                            item2.setCompanyLogo("http://fuel-spot.com/FUELSPOTAPP/station_icons/unknown.jpg");
+                            companyList.add(item2);
+
+                            try {
+                                JSONArray res = new JSONArray(response);
+                                for (int i = 0; i < res.length(); i++) {
+                                    JSONObject obj = res.getJSONObject(i);
+
+                                    CompanyItem item = new CompanyItem();
+                                    item.setID(obj.getInt("id"));
+                                    item.setCompanyName(obj.getString("companyName"));
+                                    item.setCompanyLogo(obj.getString("companyLogo"));
+                                    item.setCompanyWebsite(obj.getString("companyWebsite"));
+                                    item.setCompanyPhone(obj.getString("companyPhone"));
+                                    item.setCompanyAddress(obj.getString("companyAddress"));
+                                    item.setNumOfStations(obj.getInt("numOfStations"));
+                                    companyList.add(item);
+                                }
+
+                                CompanyAdapter customAdapter = new CompanyAdapter(MainActivity.this, companyList);
+                                spinner.setAdapter(customAdapter);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Snackbar.make(findViewById(android.R.id.content), getString(R.string.connection_error), Snackbar.LENGTH_SHORT).show();
                     }
                 }) {
             @Override
@@ -738,7 +892,7 @@ public class MainActivity extends AppCompatActivity {
                 googleMap.getUiSettings().setMyLocationButtonEnabled(true);
                 googleMap.getUiSettings().setZoomControlsEnabled(true);
                 googleMap.getUiSettings().setMapToolbarEnabled(false);
-                googleMap.getUiSettings().setScrollGesturesEnabled(false);
+                googleMap.getUiSettings().setScrollGesturesEnabled(true);
                 updateMapObject();
             }
         });
@@ -767,40 +921,46 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        System.out.println("AQ: " + response);
                         JSON json = new JSON(response);
                         if (response != null && response.length() > 0) {
                             if (json.key("status").toString().equals("ZERO_RESULTS")) {
                                 isAtStation = false;
                                 loadStationDetails();
                             } else {
-                                isAtStation = true;
+                                if (json.key("results").count() > 0) {
+                                    for (int i = 0; i < json.key("results").count(); i++) {
+                                        isAtStation = true;
 
-                                stationName = json.key("results").index(0).key("name").stringValue();
-                                stationVicinity = json.key("results").index(0).key("vicinity").stringValue();
+                                        stationName = json.key("results").index(0).key("name").stringValue();
+                                        stationVicinity = json.key("results").index(0).key("vicinity").stringValue();
 
-                                double lat = json.key("results").index(0).key("geometry").key("location").key("lat").doubleValue();
-                                double lon = json.key("results").index(0).key("geometry").key("location").key("lng").doubleValue();
+                                        double lat = json.key("results").index(0).key("geometry").key("location").key("lat").doubleValue();
+                                        double lon = json.key("results").index(0).key("geometry").key("location").key("lng").doubleValue();
 
-                                Geocoder geo = new Geocoder(getApplicationContext(), Locale.getDefault());
-                                try {
-                                    List<Address> addresses = geo.getFromLocation(lat, lon, 1);
-                                    if (addresses.size() > 0) {
-                                        stationCountry = addresses.get(0).getCountryCode();
-                                    } else {
-                                        stationCountry = "";
+                                        Geocoder geo = new Geocoder(getApplicationContext(), Locale.getDefault());
+                                        try {
+                                            List<Address> addresses = geo.getFromLocation(lat, lon, 1);
+                                            if (addresses.size() > 0) {
+                                                stationCountry = addresses.get(0).getCountryCode();
+                                            } else {
+                                                stationCountry = "";
+                                            }
+                                        } catch (Exception e) {
+                                            stationCountry = "";
+                                        }
+
+                                        stationLocation = String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon);
+
+                                        placeID = json.key("results").index(0).key("place_id").stringValue();
+
+                                        stationLogo = stationPhotoChooser(stationName);
+
+                                        addStation(stationName, stationVicinity, stationCountry, stationLocation, placeID, stationLogo);
                                     }
-                                } catch (Exception e) {
-                                    stationCountry = "";
+                                } else {
+                                    isAtStation = false;
+                                    loadStationDetails();
                                 }
-
-                                stationLocation = lat + ";" + lon;
-
-                                placeID = json.key("results").index(0).key("place_id").stringValue();
-
-                                stationLogo = stationPhotoChooser(stationName);
-
-                                addStation(stationName, stationVicinity, stationCountry, stationLocation, placeID, stationLogo);
                             }
                         } else {
                             isAtStation = false;
@@ -838,12 +998,15 @@ public class MainActivity extends AppCompatActivity {
                                 dieselPrice = (float) obj.getDouble("dieselPrice");
                                 lpgPrice = (float) obj.getDouble("lpgPrice");
                                 electricityPrice = (float) obj.getDouble("electricityPrice");
-                                stationLogo = obj.getString("photoURL");
-                                sonGuncelleme = obj.getString("lastUpdated");
                                 facilitiesOfStation = obj.getString("facilities");
+                                stationLogo = obj.getString("photoURL");
+                                stationLicense = obj.getString("licenseNo");
                                 istasyonSahibi = obj.getString("owner");
                                 isStationVerified = obj.getInt("isVerified");
+                                hasMobilePayment = obj.getInt("isMobilePaymentAvailable");
+                                hasFuelDelivery = obj.getInt("isDeliveryAvailable");
                                 isStationActive = obj.getInt("isActive");
+                                sonGuncelleme = obj.getString("lastUpdated");
 
                                 //DISTANCE START
                                 Location loc = new Location("");
@@ -947,6 +1110,7 @@ public class MainActivity extends AppCompatActivity {
             stationVicinity = "";
             stationLogo = "";
             sonGuncelleme = "";
+            stationLicense = "";
             isStationActive = 0;
             gasolinePrice = 0;
             dieselPrice = 0;
@@ -959,15 +1123,42 @@ public class MainActivity extends AppCompatActivity {
             imageViewCarWash.setAlpha(0.5f);
             imageViewTireRepair.setAlpha(0.5f);
             imageViewMechanic.setAlpha(0.5f);
+
+            verifiedLayout.setVisibility(View.GONE);
+            spinner.setSelection(companyList.size() - 1);
         }
 
-        stationNameHolder.setText(stationName);
+        if (companyList != null && companyList.size() > 0) {
+            for (int i = 0; i < companyList.size(); i++) {
+                if (companyList.get(i).getCompanyName().equals(stationName)) {
+                    spinner.setSelection(i, true);
+                    break;
+                } else {
+                    // Doesn't know
+                    spinner.setSelection(0);
+                }
+            }
+        }
+
         stationAddressHolder.setText(stationVicinity);
+        stationLicenseHolder.setText(stationLicense);
         Glide.with(this).load(stationLogo).apply(options).into(stationLogoHolder);
         if (isStationActive == 0) {
             hideStation.setChecked(false);
         } else {
             hideStation.setChecked(true);
+        }
+
+        if (hasMobilePayment == 1) {
+            mobilOdeme.setChecked(true);
+        } else {
+            mobilOdeme.setChecked(false);
+        }
+
+        if (hasFuelDelivery == 1) {
+            aloyakit.setChecked(true);
+        } else {
+            aloyakit.setChecked(false);
         }
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         try {
@@ -975,6 +1166,7 @@ public class MainActivity extends AppCompatActivity {
             lastUpdateTimeText.setReferenceTime(date.getTime());
         } catch (ParseException e) {
             e.printStackTrace();
+            lastUpdateTimeText.setText("");
         }
 
         gasolineHolder.setText("" + gasolinePrice);
@@ -984,7 +1176,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateStation() {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_UPDATE_STATION),
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_UPDATE_STATION),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {
@@ -1018,10 +1210,15 @@ public class MainActivity extends AppCompatActivity {
                 params.put("stationName", stationName);
                 params.put("stationVicinity", stationVicinity);
                 params.put("facilities", facilitiesOfStation);
+                params.put("stationLogo", stationLogo);
                 params.put("gasolinePrice", String.valueOf(gasolinePrice));
                 params.put("dieselPrice", String.valueOf(dieselPrice));
                 params.put("lpgPrice", String.valueOf(lpgPrice));
                 params.put("electricityPrice", String.valueOf(electricityPrice));
+                params.put("licenseNo", stationLicense);
+                params.put("owner", istasyonSahibi);
+                params.put("mobilePayment", String.valueOf(hasMobilePayment));
+                params.put("fuelDelivery", String.valueOf(hasFuelDelivery));
                 params.put("isActive", String.valueOf(isStationActive));
 
                 //returning parameters
@@ -1042,6 +1239,19 @@ public class MainActivity extends AppCompatActivity {
         } else {
             toolbar.setBackgroundColor(color2);
         }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        stationName = companyList.get(position).getCompanyName();
+
+        stationLogo = companyList.get(position).getCompanyLogo();
+        Glide.with(this).load(stationLogo).apply(options).into(stationLogoHolder);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        spinner.setSelection(0);
     }
 
     @Override
