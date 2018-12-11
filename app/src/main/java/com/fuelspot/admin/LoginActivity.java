@@ -325,6 +325,7 @@ public class LoginActivity extends AppCompatActivity {
                 //Adding parameters
                 params.put("username", username);
                 params.put("password", password);
+                params.put("AUTH_KEY", getString(R.string.fuelspot_api_key));
 
                 //returning parameters
                 return params;

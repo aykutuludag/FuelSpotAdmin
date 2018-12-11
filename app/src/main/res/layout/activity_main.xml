@@ -38,7 +38,7 @@
             <com.google.android.gms.maps.MapView
                 android:id="@+id/mapView"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="450dp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 map:cameraTargetLat="39.925054"
@@ -51,7 +51,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/mapView"
                 android:layout_margin="8dp"
-                android:background="#60ffffff">
+                android:background="@drawable/round_layout_white"
+                android:padding="4dp">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/stationLogo"
@@ -100,11 +101,31 @@
                     android:inputType="textPostalAddress"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
+                <TextView
+                    android:id="@+id/editTextOwner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/editTextStationLicense"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="8dp"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+                <CheckBox
+                    android:id="@+id/checkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/editTextOwner"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="4dp"
+                    android:text="İstasyon onaylı?" />
+
                 <CheckBox
                     android:id="@+id/checkBox2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/editTextStationLicense"
+                    android:layout_below="@+id/checkBox"
                     android:layout_centerHorizontal="true"
                     android:layout_margin="4dp"
                     android:text="Mobil ödeme?" />
@@ -118,33 +139,12 @@
                     android:layout_marginTop="4dp"
                     android:text="Alo yakıt?" />
 
-                <CheckBox
-                    android:id="@+id/checkBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/checkBox3"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="4dp"
-                    android:text="İstasyon aktif?" />
-
-
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/checkBox"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginEnd="8dp"
-                    android:gravity="center"
-                    android:text="İstasyon sahte, yanlış, çift kayıt vb. gibi durumlarda istasyonu gizleyiniz." />
 
                 <com.github.curioustechizen.ago.RelativeTimeTextView
                     android:id="@+id/stationLastUpdate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/textView"
+                    android:layout_below="@+id/checkBox3"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/gotham_book"
@@ -161,7 +161,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/baseInfo"
                 android:layout_margin="8dp"
-                android:background="#fafafa"
+                android:background="@drawable/round_layout_white"
+                android:padding="4dp"
                 android:visibility="gone">
 
                 <de.hdodenhof.circleimageview.CircleImageView
@@ -193,8 +194,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/verifiedSection"
                 android:layout_margin="8dp"
-                android:background="#60ffffff"
-                android:gravity="center">
+                android:background="@drawable/round_layout_white"
+                android:gravity="center"
+                android:padding="4dp">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/gasolineIcon"
@@ -290,7 +292,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/priceSec"
                 android:layout_margin="8dp"
-                android:background="#60ffffff">
+                android:background="@drawable/round_layout_white"
+                android:padding="4dp">
 
                 <TextView
                     android:id="@+id/title_facilities"
@@ -302,7 +305,7 @@
                     android:text="Tesisler"
                     android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Inverse" />
 
-                <RelativeLayout
+                <android.support.percent.PercentRelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/title_facilities"
@@ -310,64 +313,81 @@
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/WC"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginBottom="8dp"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentStart="true"
                         android:alpha="0.5"
-                        android:src="@drawable/wc" />
+                        android:src="@drawable/wc"
+                        app:layout_marginEndPercent="0.5%"
+                        app:layout_marginStartPercent="0.5%"
+                        app:layout_widthPercent="13%" />
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/Market"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginBottom="8dp"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
                         android:layout_toEndOf="@id/WC"
                         android:alpha="0.5"
-                        android:src="@drawable/market" />
+                        android:src="@drawable/market"
+                        app:layout_marginEndPercent="0.5%"
+                        app:layout_marginStartPercent="0.5%"
+                        app:layout_widthPercent="13%" />
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/CarWash"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginBottom="8dp"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
                         android:layout_toEndOf="@id/Market"
                         android:alpha="0.5"
-                        android:src="@drawable/carwash" />
+                        android:src="@drawable/carwash"
+                        app:layout_marginEndPercent="0.5%"
+                        app:layout_marginStartPercent="0.5%"
+                        app:layout_widthPercent="13%" />
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/TireRepair"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginBottom="8dp"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
                         android:layout_toEndOf="@id/CarWash"
                         android:alpha="0.5"
-                        android:src="@drawable/tirerepair" />
+                        android:src="@drawable/tirerepair"
+                        app:layout_marginEndPercent="0.5%"
+                        app:layout_marginStartPercent="0.5%"
+                        app:layout_widthPercent="13%" />
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/Mechanic"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginBottom="8dp"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
                         android:layout_toEndOf="@id/TireRepair"
                         android:alpha="0.5"
-                        android:src="@drawable/mechanic" />
+                        android:src="@drawable/mechanic"
+                        app:layout_marginEndPercent="0.5%"
+                        app:layout_marginStartPercent="0.5%"
+                        app:layout_widthPercent="13%" />
 
-                </RelativeLayout>
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/Restaurant"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_toEndOf="@id/Mechanic"
+                        android:alpha="0.5"
+                        android:src="@drawable/restaurant"
+                        app:layout_marginEndPercent="0.5%"
+                        app:layout_marginStartPercent="0.5%"
+                        app:layout_widthPercent="13%" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/ParkSpot"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_toEndOf="@id/Restaurant"
+                        android:alpha="0.5"
+                        android:src="@drawable/parkspot"
+                        app:layout_marginEndPercent="0.5%"
+                        app:layout_marginStartPercent="0.5%"
+                        app:layout_widthPercent="13%" />
+                </android.support.percent.PercentRelativeLayout>
 
             </RelativeLayout>
 

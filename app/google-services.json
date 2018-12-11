@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "1064609527514-h1a4dudkvqq6mvegneumq522ohqagaqm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fuelspot.admin",
+            "certificate_hash": "775c32ea463b73fd7ce185fdfe7111ff5aaf176b"
+          }
+        },
+        {
           "client_id": "1064609527514-4upn1b79sfsdkrphcokb2jt8cmor5ri5.apps.googleusercontent.com",
           "client_type": 3
         }

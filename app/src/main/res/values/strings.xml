@@ -11,7 +11,7 @@
     <string name="edit_profile">Edit profile</string>
     <string name="error_no_location">We couldn\'t determine your location. Please try again.</string>
     <string name="error_permission_cancel">Permission denied&#8230;</string>
-    <string name="g_api_key" translatable="false">AIzaSyDSBqfNOMG6e0wS3zNvSKDwmwdg1bZL9ME</string>
+    <string name="g_api_key" translatable="false">AIzaSyAxBaDtIoC8T8SFKAVmEMvWAbph_ChSD1E</string>
     <string name="save">Save</string>
     <string name="connection_error">There is a connection error between you and our servers. Please try again later…</string>
     <string name="waiting_approval">Waiting approval</string>
@@ -27,7 +27,6 @@
     <string name="API_ADMIN_UPDATE" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-update.php</string>
     <string name="API_ADMIN_UPDATE_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-station-update.php</string> <!-- Updates station info, return SUCCESS or FAIL -->
     <string name="API_ADMIN_COMPANY_FETCH" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-company-fetch.php</string>
-
-    <!-- STATION APIs -->
+    <string name="fuelspot_api_key" translatable="false">FPh76g0MSZ2okeWQmShYDlXakjgjhbej</string>
     <string name="API_ADD_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/station-add.php</string> <!-- Create, return Station object -->
 </resources>
