@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,6 +41,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.esafirm.imagepicker.features.ImagePicker;
+import com.esafirm.imagepicker.model.Image;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
@@ -95,9 +98,8 @@ public class ProfileEditActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-            getSupportActionBar().setIcon(R.drawable.brand_logo);
         }
 
         coloredBars(Color.parseColor("#626262"), Color.parseColor("#ffffff"));
@@ -174,13 +176,10 @@ public class ProfileEditActivity extends AppCompatActivity {
         userPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ActivityCompat.checkSelfPermission(ProfileEditActivity.this, PERMISSIONS_STORAGE[0]) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ProfileEditActivity.this, PERMISSIONS_STORAGE[1]) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(ProfileEditActivity.this, PERMISSIONS_STORAGE, REQUEST_PERMISSION);
+                if (MainActivity.verifyFilePickerPermission(ProfileEditActivity.this)) {
+                    ImagePicker.create(ProfileEditActivity.this).single().start();
                 } else {
-                 /*   FilePickerBuilder.getInstance().setMaxCount(1)
-                            .setActivityTheme(R.style.AppTheme)
-                            .enableCameraSupport(true)
-                            .pickPhoto(ProfileEditActivity.this);*/
+                    ActivityCompat.requestPermissions(ProfileEditActivity.this, PERMISSIONS_STORAGE, REQUEST_PERMISSION);
                 }
             }
         });
@@ -320,12 +319,15 @@ public class ProfileEditActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        if (response.equals("Success")) {
-                            editor.apply();
-                            Toast.makeText(ProfileEditActivity.this, response, Toast.LENGTH_LONG).show();
-                            finish();
-                        } else {
-                            Toast.makeText(ProfileEditActivity.this, getString(R.string.connection_error), Toast.LENGTH_LONG).show();
+                        switch (response) {
+                            case "Success":
+                                editor.apply();
+                                Toast.makeText(ProfileEditActivity.this, getString(R.string.profileUpdated), Toast.LENGTH_LONG).show();
+                                finish();
+                                break;
+                            case "Fail":
+                                Toast.makeText(ProfileEditActivity.this, getString(R.string.connection_error), Toast.LENGTH_LONG).show();
+                                break;
                         }
                     }
                 },
@@ -346,15 +348,16 @@ public class ProfileEditActivity extends AppCompatActivity {
                 params.put("name", name);
                 params.put("email", email);
                 params.put("password", password);
+                params.put("phoneNumber", userPhoneNumber);
                 if (bitmap != null) {
                     params.put("photo", getStringImage(bitmap));
                 }
                 params.put("gender", gender);
                 params.put("birthday", birthday);
-                params.put("phoneNumber", userPhoneNumber);
                 params.put("location", location);
                 params.put("country", userCountry);
                 params.put("language", userDisplayLanguage);
+                params.put("AUTH_KEY", getString(R.string.fuelspot_api_key));
 
                 //returning parameters
                 return params;
@@ -414,10 +417,7 @@ public class ProfileEditActivity extends AppCompatActivity {
             case REQUEST_PERMISSION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                   /* FilePickerBuilder.getInstance().setMaxCount(1)
-                            .setActivityTheme(R.style.AppTheme)
-                            .enableCameraSupport(true)
-                            .pickPhoto(ProfileEditActivity.this);*/
+                    ImagePicker.create(ProfileEditActivity.this).single().start();
                 } else {
                     Snackbar.make(findViewById(R.id.mainContainer), getString(R.string.error_permission_cancel), Snackbar.LENGTH_LONG).show();
                 }
@@ -429,42 +429,16 @@ public class ProfileEditActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-      /*  CharSequence now = android.text.format.DateFormat.format("dd-MM-yyyy HH:mm", new Date());
-        String fileName = now + ".jpg";
-
-        switch (requestCode) {
-            case FilePickerConst.REQUEST_CODE_PHOTO:
-                if (resultCode == Activity.RESULT_OK && data != null) {
-                    ArrayList<String> aq = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA);
-
-                    File folder = new File(Environment.getExternalStorageDirectory() + "/FuelSpotAdmin");
-                    folder.mkdirs();
-
-                    UCrop.of(Uri.parse("file://" + aq.get(0)), Uri.fromFile(new File(folder, fileName)))
-                            .withAspectRatio(1, 1)
-                            .withMaxResultSize(720, 720)
-                            .start(ProfileEditActivity.this);
-                }
-                break;
-            case UCrop.REQUEST_CROP:
-                if (resultCode == RESULT_OK) {
-                    final Uri resultUri = UCrop.getOutput(data);
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
-                        Glide.with(this).load(bitmap).apply(options).into(userPic);
-                        photo = Environment.getExternalStorageDirectory() + "/FuelSpotAdmin/" + fileName;
-                        editor.putString("ProfilePhoto", photo);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else if (resultCode == UCrop.RESULT_ERROR) {
-                    final Throwable cropError = UCrop.getError(data);
-                    if (cropError != null) {
-                        Toast.makeText(ProfileEditActivity.this, cropError.toString(), Toast.LENGTH_LONG).show();
-                    }
-                }
-                break;
-        }*/
+        // Imagepicker
+        if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
+            Image image = ImagePicker.getFirstImageOrNull(data);
+            if (image != null) {
+                bitmap = BitmapFactory.decodeFile(image.getPath());
+                Glide.with(this).load(bitmap).apply(options).into(userPic);
+                photo = "http://fuel-spot.com/FUELSPOTAPP/uploads/admin/" + username + ".jpg";
+                editor.putString("ProfilePhoto", photo);
+            }
+        }
     }
 
     @Override

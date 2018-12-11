@@ -66,6 +66,15 @@
                     android:src="@drawable/default_station"
                     tools:ignore="RtlHardcoded" />
 
+                <TextView
+                    android:id="@+id/textViewStationID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_margin="8dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
                 <Spinner
                     android:id="@+id/simpleSpinner"
                     android:layout_width="match_parent"
@@ -84,7 +93,7 @@
                     android:layout_margin="8dp"
                     android:ems="10"
                     android:gravity="center"
-                    android:hint="ADDRESS"
+                    android:hint="@string/address"
                     android:inputType="textPostalAddress"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
@@ -97,7 +106,7 @@
                     android:layout_margin="8dp"
                     android:ems="10"
                     android:gravity="center"
-                    android:hint="LICENSE NO"
+                    android:hint="@string/licenseNO"
                     android:inputType="textPostalAddress"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
@@ -119,7 +128,7 @@
                     android:layout_below="@+id/editTextOwner"
                     android:layout_centerHorizontal="true"
                     android:layout_margin="4dp"
-                    android:text="İstasyon onaylı?" />
+                    android:text="@string/stationVerified" />
 
                 <CheckBox
                     android:id="@+id/checkBox2"
@@ -128,7 +137,7 @@
                     android:layout_below="@+id/checkBox"
                     android:layout_centerHorizontal="true"
                     android:layout_margin="4dp"
-                    android:text="Mobil ödeme?" />
+                    android:text="@string/mobilePayment" />
 
                 <CheckBox
                     android:id="@+id/checkBox3"
@@ -137,7 +146,7 @@
                     android:layout_below="@+id/checkBox2"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
-                    android:text="Alo yakıt?" />
+                    android:text="@string/fuelDelivery" />
 
 
                 <com.github.curioustechizen.ago.RelativeTimeTextView
@@ -184,7 +193,7 @@
                     android:layout_centerVertical="true"
                     android:layout_margin="4dp"
                     android:layout_toEndOf="@+id/verifiedStation"
-                    android:text="Bu istasyon FuelSpot tarafından onaylanmıştır." />
+                    android:text="@string/stationVerifiedText" />
 
             </RelativeLayout>
 
@@ -215,7 +224,6 @@
                     android:layout_alignEnd="@id/gasolineIcon"
                     android:ems="10"
                     android:gravity="center"
-                    android:hint="7.00"
                     android:inputType="numberDecimal"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -237,7 +245,6 @@
                     android:layout_alignEnd="@id/dieselIcon"
                     android:ems="10"
                     android:gravity="center"
-                    android:hint="6.00"
                     android:inputType="numberDecimal"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -259,7 +266,6 @@
                     android:layout_alignEnd="@id/lpgIcon"
                     android:ems="10"
                     android:gravity="center"
-                    android:hint="5.00"
                     android:inputType="numberDecimal"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -281,7 +287,6 @@
                     android:layout_alignEnd="@id/electricityIcon"
                     android:ems="10"
                     android:gravity="center"
-                    android:hint="4.00"
                     android:inputType="numberDecimal"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
             </RelativeLayout>
@@ -302,7 +307,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_margin="8dp"
                     android:gravity="center"
-                    android:text="Tesisler"
+                    android:text="@string/facilities"
                     android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Inverse" />
 
                 <android.support.percent.PercentRelativeLayout

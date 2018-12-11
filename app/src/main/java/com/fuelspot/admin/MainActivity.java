@@ -13,6 +13,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -113,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     // for isAtStation
     public static int mapDefaultStationRange = 50;
-    public static float mapStationZoom = 17.5f;
+    public static float mapStationZoom = 18f;
 
     static List<Integer> stationIDs = new ArrayList<>();
     static List<String> stationNameList = new ArrayList<>();
@@ -155,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     CheckBox onayliIstasyon, mobilOdeme, aloyakit;
     RelativeTimeTextView lastUpdateTimeText;
     EditText stationAddressHolder, gasolineHolder, dieselHolder, lpgHolder, electricityHolder, stationLicenseHolder;
-    TextView textViewOwnerHolder;
+    TextView textViewOwnerHolder, textViewStationIDHolder;
     Button buttonUpdateStation;
     CircleImageView stationLogoHolder;
     RequestOptions options;
@@ -187,12 +188,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         currencySymbol = prefs.getString("currencySymbol", "");
     }
 
+    public static boolean verifyFilePickerPermission(Context context) {
+        boolean hasStorage = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED && (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) {
+                hasStorage = true;
+            }
+        } else {
+            hasStorage = true;
+        }
+        return hasStorage;
+    }
+
     public static boolean isNetworkConnected(Context mContext) {
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         return (cm != null ? cm.getActiveNetworkInfo() : null) != null;
     }
 
-    // Updated on Nov 27, 2018
+    // Updated on Dec 11, 2018
     public static String stationPhotoChooser(String stationName) {
         String photoURL;
         switch (stationName) {
@@ -261,6 +274,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             case "Euroil":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/euroil.jpg";
                 break;
+            case "Exengaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/exengaz.jpg";
+                break;
             case "Exxon":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/exxon.jpg";
                 break;
@@ -278,6 +294,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case "Habaş":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/habas.jpg";
+                break;
+            case "Hisarpet":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/hisarpet.jpg";
                 break;
             case "İpragaz":
             case "Ipragaz":
@@ -299,6 +318,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             case "Kpet":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/kpet.jpg";
                 break;
+            case "Ligoil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/ligoil.jpg";
+                break;
             case "Lipetgaz":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/lipetgaz.jpg";
                 break;
@@ -307,6 +329,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case "Marathon":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/marathon.jpg";
+                break;
+            case "Memoil":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/memoil.jpg";
                 break;
             case "Milangaz":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/milangaz.jpg";
@@ -385,6 +410,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             case "Total":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/total.jpg";
                 break;
+            case "Turkuaz":
+                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkuaz.jpg";
+                break;
             case "Türkiş":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkis.jpg";
                 break;
@@ -397,9 +425,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case "Türkpetrol":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkpetrol.jpg";
-                break;
-            case "Turkuaz":
-                photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/turkuaz.jpg";
                 break;
             case "United":
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/station_icons/united.jpg";
@@ -414,7 +439,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 photoURL = "http://fuel-spot.com/FUELSPOTAPP/default_icons/station.jpg";
                 break;
         }
-
         return photoURL;
     }
 
@@ -485,6 +509,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 } else {
                                     if (locationList != null && locationList.size() > 0) {
                                         distanceInMeters.clear();
+
                                         for (int i = 0; i < locationList.size(); i++) {
                                             String[] stationLocation = locationList.get(i).split(";");
                                             double stationLat = Double.parseDouble(stationLocation[0]);
@@ -499,6 +524,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                         }
 
                                         isAtStation = isWorkerAtStation();
+
                                         if (isAtStation) {
                                             if (stationAddressHolder.getText() != null && stationAddressHolder.getText().length() == 0) {
                                                 // For zooming automatically to the location of the marker
@@ -511,6 +537,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                             }
                                         } else {
                                             if (stationAddressHolder.getText() != null && stationAddressHolder.getText().length() > 0) {
+                                                stationID = 0;
                                                 stationName = "Bilinmiyor";
                                                 stationVicinity = "";
                                                 stationLocation = "";
@@ -555,6 +582,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         stationAddressHolder = findViewById(R.id.editTextStationAddress);
         stationLicenseHolder = findViewById(R.id.editTextStationLicense);
         textViewOwnerHolder = findViewById(R.id.editTextOwner);
+        textViewStationIDHolder = findViewById(R.id.textViewStationID);
         onayliIstasyon = findViewById(R.id.checkBox);
         mobilOdeme = findViewById(R.id.checkBox2);
         aloyakit = findViewById(R.id.checkBox3);
@@ -597,6 +625,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     break;
                 }
             }
+        }
+
+        if (stationID != 0) {
+            String dummyId = "" + stationID;
+            textViewStationIDHolder.setText(dummyId);
         }
 
         // Layout items
@@ -643,7 +676,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (istasyonSahibi != null && istasyonSahibi.length() > 0) {
             textViewOwnerHolder.setText(istasyonSahibi);
         } else {
-            textViewOwnerHolder.setText("NOBODY");
+            textViewOwnerHolder.setText(getString(R.string.noOwner));
         }
 
 
@@ -670,7 +703,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     onayliIstasyon.setChecked(false);
                     verifiedLayout.setVisibility(View.GONE);
                 }
-                Toast.makeText(MainActivity.this, "AQ:" + isStationVerified, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -717,7 +749,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         }
 
-        gasolineHolder.setText("" + gasolinePrice);
+        String dummyG = "" + gasolinePrice;
+        gasolineHolder.setText(dummyG);
         gasolineHolder.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -736,7 +769,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         });
-        dieselHolder.setText("" + dieselPrice);
+
+        String dummyD = "" + dieselPrice;
+        dieselHolder.setText(dummyD);
         dieselHolder.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -755,7 +790,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         });
-        lpgHolder.setText("" + lpgPrice);
+
+        String dummyL = "" + lpgPrice;
+        lpgHolder.setText(dummyL);
         lpgHolder.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -774,7 +811,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         });
-        electricityHolder.setText("" + electricityPrice);
+
+        String dummyE = "" + electricityPrice;
+        electricityHolder.setText(dummyE);
         electricityHolder.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -851,13 +890,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if (isAtStation) {
                         try {
                             if (facilitiesObj.getInt("WC") == 1) {
-                                facilitiesObj.put("WC", 0);
+                                facilitiesObj.put("WC", "0");
                                 imageViewWC.setAlpha(0.5f);
                             } else {
-                                facilitiesObj.put("WC", 1);
+                                facilitiesObj.put("WC", "1");
                                 imageViewWC.setAlpha(1.0f);
                             }
-                            facilitiesOfStation = facilitiesObj.toString();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -871,13 +909,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if (isAtStation) {
                         try {
                             if (facilitiesObj.getInt("Market") == 1) {
-                                facilitiesObj.put("Market", 0);
+                                facilitiesObj.put("Market", "0");
                                 imageViewMarket.setAlpha(0.5f);
                             } else {
-                                facilitiesObj.put("Market", 1);
+                                facilitiesObj.put("Market", "1");
                                 imageViewMarket.setAlpha(1.0f);
                             }
-                            facilitiesOfStation = facilitiesObj.toString();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -891,13 +928,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if (isAtStation) {
                         try {
                             if (facilitiesObj.getInt("CarWash") == 1) {
-                                facilitiesObj.put("CarWash", 0);
+                                facilitiesObj.put("CarWash", "0");
                                 imageViewCarWash.setAlpha(0.5f);
                             } else {
-                                facilitiesObj.put("CarWash", 1);
+                                facilitiesObj.put("CarWash", "1");
                                 imageViewCarWash.setAlpha(1.0f);
                             }
-                            facilitiesOfStation = facilitiesObj.toString();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -911,13 +947,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if (isAtStation) {
                         try {
                             if (facilitiesObj.getInt("TireRepair") == 1) {
-                                facilitiesObj.put("TireRepair", 0);
+                                facilitiesObj.put("TireRepair", "0");
                                 imageViewTireRepair.setAlpha(0.5f);
                             } else {
-                                facilitiesObj.put("TireRepair", 1);
+                                facilitiesObj.put("TireRepair", "1");
                                 imageViewTireRepair.setAlpha(1.0f);
                             }
-                            facilitiesOfStation = facilitiesObj.toString();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -931,13 +966,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if (isAtStation) {
                         try {
                             if (facilitiesObj.getInt("Mechanic") == 1) {
-                                facilitiesObj.put("Mechanic", 0);
+                                facilitiesObj.put("Mechanic", "0");
                                 imageViewMechanic.setAlpha(0.5f);
                             } else {
-                                facilitiesObj.put("Mechanic", 1);
+                                facilitiesObj.put("Mechanic", "1");
                                 imageViewMechanic.setAlpha(1.0f);
                             }
-                            facilitiesOfStation = facilitiesObj.toString();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -951,13 +985,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if (isAtStation) {
                         try {
                             if (facilitiesObj.getInt("Restaurant") == 1) {
-                                facilitiesObj.put("Restaurant", 0);
+                                facilitiesObj.put("Restaurant", "0");
                                 imageViewRestaurant.setAlpha(0.5f);
                             } else {
-                                facilitiesObj.put("Restaurant", 1);
+                                facilitiesObj.put("Restaurant", "1");
                                 imageViewRestaurant.setAlpha(1.0f);
                             }
-                            facilitiesOfStation = facilitiesObj.toString();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -971,13 +1004,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if (isAtStation) {
                         try {
                             if (facilitiesObj.getInt("ParkSpot") == 1) {
-                                facilitiesObj.put("ParkSpot", 0);
+                                facilitiesObj.put("ParkSpot", "0");
                                 imageViewParkSpot.setAlpha(0.5f);
                             } else {
-                                facilitiesObj.put("ParkSpot", 1);
+                                facilitiesObj.put("ParkSpot", "1");
                                 imageViewParkSpot.setAlpha(1.0f);
                             }
-                            facilitiesOfStation = facilitiesObj.toString();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -1073,17 +1105,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         if (response != null && response.length() > 0) {
                             if (json.key("results").count() > 0) {
                                 for (int i = 0; i < json.key("results").count(); i++) {
-                                    dummyGoogleID.add(json.key("results").index(i).key("place_id").stringValue());
                                     dummysName.add(json.key("results").index(i).key("name").stringValue());
-
                                     dummyVicinity.add(json.key("results").index(i).key("vicinity").stringValue());
-
                                     double lat = json.key("results").index(i).key("geometry").key("location").key("lat").doubleValue();
                                     double lon = json.key("results").index(i).key("geometry").key("location").key("lng").doubleValue();
-                                    dummyLocation.add(String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon));
-
-                                    dummyLogo.add(stationPhotoChooser(json.key("results").index(i).key("name").stringValue()));
                                     dummyCountry.add(countryFinder(lat, lon));
+                                    dummyLocation.add(String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon));
+                                    dummyGoogleID.add(json.key("results").index(i).key("place_id").stringValue());
+                                    dummyLogo.add(stationPhotoChooser(json.key("results").index(i).key("name").stringValue()));
+
                                 }
 
                                 if (!json.key("next_page_token").isNull() && json.key("next_page_token").stringValue().length() > 0) {
@@ -1153,8 +1183,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         requestQueue.add(stringRequest);
     }
 
-    private void addStations(final String name, final String vicinity, final String country,
-                             final String location, final String googleID, final String logo) {
+    private void addStations(final String name, final String vicinity, final String country, final String location, final String googleID, final String logo) {
         //Showing the progress dialog
         StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADD_STATION),
                 new Response.Listener<String>() {
@@ -1244,6 +1273,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Toast.makeText(MainActivity.this, facilitiesOfStation, Toast.LENGTH_LONG).show();
                         if (response != null && response.length() > 0) {
                             loading.dismiss();
                             switch (response) {
@@ -1275,6 +1305,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 params.put("stationVicinity", stationVicinity);
                 params.put("country", stationCountry);
                 params.put("location", stationLocation);
+                facilitiesOfStation = "[" + String.valueOf(facilitiesObj) + "]";
                 params.put("facilities", facilitiesOfStation);
                 params.put("stationLogo", stationLogo);
                 params.put("gasolinePrice", String.valueOf(gasolinePrice));
@@ -1471,26 +1502,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     boolean isWorkerAtStation() {
-        for (int i = 0; i < distanceInMeters.size(); i++) {
+        for (int i = 0; i < locationList.size(); i++) {
             if (distanceInMeters.get(i) <= 50) {
-                stationID = stationIDs.get(i);
-                stationName = stationNameList.get(i);
-                stationVicinity = vicinityList.get(i);
-                stationLocation = locationList.get(i);
-                stationCountry = stationCountryList.get(i);
-                placeID = googleIDList.get(i);
-                facilitiesOfStation = facilitiesList.get(i);
-                stationLogo = stationLogoList.get(i);
-                gasolinePrice = gasolinePrices.get(i);
-                dieselPrice = dieselPrices.get(i);
-                lpgPrice = lpgPrices.get(i);
-                electricityPrice = electricityPrices.get(i);
-                stationLicense = licenseNOs.get(i);
-                istasyonSahibi = ownerList.get(i);
-                isStationVerified = isVerifieds.get(i);
-                hasMobilePayment = isMobilePayments.get(i);
-                hasFuelDelivery = isDeliverys.get(i);
-                sonGuncelleme = lastUpdates.get(i);
+                if (stationID == 0) {
+                    stationID = stationIDs.get(i);
+                    stationName = stationNameList.get(i);
+                    stationVicinity = vicinityList.get(i);
+                    stationLocation = locationList.get(i);
+                    stationCountry = stationCountryList.get(i);
+                    placeID = googleIDList.get(i);
+                    facilitiesOfStation = facilitiesList.get(i);
+                    stationLogo = stationLogoList.get(i);
+                    gasolinePrice = gasolinePrices.get(i);
+                    dieselPrice = dieselPrices.get(i);
+                    lpgPrice = lpgPrices.get(i);
+                    electricityPrice = electricityPrices.get(i);
+                    stationLicense = licenseNOs.get(i);
+                    istasyonSahibi = ownerList.get(i);
+                    isStationVerified = isVerifieds.get(i);
+                    hasMobilePayment = isMobilePayments.get(i);
+                    hasFuelDelivery = isDeliverys.get(i);
+                    sonGuncelleme = lastUpdates.get(i);
+                }
                 return true;
             }
         }

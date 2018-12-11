@@ -1,32 +1,62 @@
 <resources>
-    <string name="app_name">FuelSpot Admin</string>
+
     <string name="unitSystem1">Litre</string>
     <string name="unitSystem2">Galon</string>
     <string name="unitSystem3">Imperial galon</string>
-    <string name="exit">Touch again to exit the application.</string>
-    <string name="login">Login</string>
-    <string name="login_fail">Username or password incorrect</string>
-    <string name="login_success">Login successful. Welcome on board!</string>
-    <string name="settings_saved">Settings saved</string>
-    <string name="edit_profile">Edit profile</string>
-    <string name="error_no_location">We couldn\'t determine your location. Please try again.</string>
-    <string name="error_permission_cancel">Permission denied&#8230;</string>
-    <string name="g_api_key" translatable="false">AIzaSyAxBaDtIoC8T8SFKAVmEMvWAbph_ChSD1E</string>
-    <string name="save">Save</string>
-    <string name="connection_error">There is a connection error between you and our servers. Please try again later…</string>
-    <string name="waiting_approval">Waiting approval</string>
-    <string name="waiting_approval_text">Your account hasn\'t been verified. We are reviewing your account. You can\'t use the application until your account approved by us.</string>
-    <string name="update">Update</string>
-    <string name="stationUpdated">Station info updated successfully</string>
-    <string name="stationUpdateFail">An error occurred. Please try again later…</string>
-    <string name="uAreNotAtStation">You are not at the gas station…</string>
-    <string name="no_internet">There is a problem with your connectivity. Please try again later…</string>
+    <string name="exit">Tekrar çıkmak için dokunun</string>
+    <string name="login">Giriş</string>
+    <string name="username">kullanıcıadı</string>
+    <string name="signinIn">Giriş yapılıyor</string>
+    <string name="pleaseWait">Lütfen bekleyiniz…</string>
+    <string name="login_fail">Kullanıcı adı ya da şifre yanlış</string>
+    <string name="login_success">Giriş başarılı. Ekibe hoşgeldin!</string>
+    <string name="welcome">FuelSpot ekibine hoşgeldin !</string>
+    <string name="welcomeText">FuelSpot ekibine katıldığın için oldukça mutluyuz. Bu ve sonraki ekranlarda sana ne yapman gerektiğini anlatacak infografikler göreceksin…</string>
+    <string name="welcomeSubText">Giriş işlemi başarıyla tamamlandı. Halletmemiz gereken son bir şey kaldı…</string>
+    <string name="continueTo">Devam</string>
+    <string name="fullname">Ad - Soyad</string>
+    <string name="email">E-posta</string>
+    <string name="phone">Telefon</string>
+    <string name="location">Konum</string>
+    <string name="birthday">Doğum günü</string>
+    <string name="sex">Cinsiyet</string>
+    <string name="male">Erkek</string>
+    <string name="female">Kadın</string>
+    <string name="transsexual">Other</string>
+    <string name="passwordTitle">Şifre</string>
+    <string name="settings_saved">Ayarlar kaydedildi</string>
+    <string name="edit_profile">Profili düzenle</string>
+    <string name="error_no_location">Konumunu tespit edemedik. Lütfen ayarlarını kontrol et ve tekrar dene.</string>
+    <string name="error_permission_cancel">İzinler reddedildi&#8230;</string>
+    <string name="save">Kaydet</string>
+    <string name="connection_error">Sunucuyla olan bağlantın koptu. Lütfen tekrar dene…</string>
+    <string name="waiting_approval">Onay bekleniyor</string>
+    <string name="waiting_approval_text">Hesabınız henüz onaylanmamış. Lütfen yöneticiniz ile iletişime geçiniz.</string>
+    <string name="update">Güncelle</string>
+    <string name="stationUpdated">İstasyon bilgileri başarıyla güncelleni.</string>
+    <string name="stationUpdateFail">Bir hata oluştu. Lütfen tekrar deneyiniz…</string>
+    <string name="uAreNotAtStation">Şu an bir istayonda değilsiniz…</string>
+    <string name="no_internet">İnternet bağlantınızda bir sorun bulunmakta. Lütfen ayarlarınızı kontrol edip tekrar deneyiniz…</string>
+    <string name="address">Adres</string>
+    <string name="licenseNO">Lisans no</string>
+    <string name="stationVerified">Onaylı istasyon</string>
+    <string name="mobilePayment">Mobil ödeme</string>
+    <string name="fuelDelivery">Alo yakıt</string>
+    <string name="stationVerifiedText">Bu istasyon FuelSpot tarafından onaylanmıştır.</string>
+    <string name="facilities">Tesisler</string>
+    <string name="profileUpdated">Profil güncellendi…</string>
+    <string name="noOwner">SAHİP YOK</string>
 
     <!-- ADMIN APIs -->
     <string name="API_ADMIN_LOGIN" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-login.php</string>
     <string name="API_ADMIN_UPDATE" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-update.php</string>
     <string name="API_ADMIN_UPDATE_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-station-update.php</string> <!-- Updates station info, return SUCCESS or FAIL -->
     <string name="API_ADMIN_COMPANY_FETCH" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-company-fetch.php</string>
-    <string name="fuelspot_api_key" translatable="false">FPh76g0MSZ2okeWQmShYDlXakjgjhbej</string>
     <string name="API_ADD_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/station-add.php</string> <!-- Create, return Station object -->
+
+    <string name="fuelspot_api_key" translatable="false">FPh76g0MSZ2okeWQmShYDlXakjgjhbej</string>
+    <string name="g_api_key" translatable="false">AIzaSyAxBaDtIoC8T8SFKAVmEMvWAbph_ChSD1E</string>
+
+    <string name="app_name" translatable="false">FuelSpotAdmin</string>
+    <string name="password" translatable="false">******</string>
 </resources>

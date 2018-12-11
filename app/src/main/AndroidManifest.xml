@@ -43,7 +43,7 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateHidden" />
 
-        <!-- Google Maps && PlaceAutoComplete -->
+        <!-- Google Maps -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/g_api_key" />
@@ -81,12 +81,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-
-        <!-- ImageCrop -->
-        <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
 
 </manifest>

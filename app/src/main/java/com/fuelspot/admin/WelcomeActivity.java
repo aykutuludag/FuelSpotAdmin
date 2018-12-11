@@ -148,6 +148,21 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
             }
         }
+
+        //Registration finished
+        isSigned = true;
+        prefs.edit().putBoolean("isSigned", isSigned).apply();
+        getVariables(prefs);
+
+        Toast.makeText(WelcomeActivity.this, getString(R.string.settings_saved), Toast.LENGTH_LONG).show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent i = new Intent(WelcomeActivity.this, MainActivity.class);
+                startActivity(i);
+                finish();
+            }
+        }, 1500);
     }
 
     @SuppressLint("MissingPermission")
@@ -166,23 +181,7 @@ public class WelcomeActivity extends AppCompatActivity {
                                 userlon = String.valueOf(location.getLongitude());
                                 prefs.edit().putString("lat", userlat).apply();
                                 prefs.edit().putString("lon", userlon).apply();
-
                                 Localization();
-
-                                //Registration finished
-                                isSigned = true;
-                                prefs.edit().putBoolean("isSigned", isSigned).apply();
-                                getVariables(prefs);
-
-                                Toast.makeText(WelcomeActivity.this, getString(R.string.settings_saved), Toast.LENGTH_LONG).show();
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Intent i = new Intent(WelcomeActivity.this, MainActivity.class);
-                                        startActivity(i);
-                                        finish();
-                                    }
-                                }, 2000);
                             } else {
                                 LocationRequest mLocationRequest = new LocationRequest();
                                 mLocationRequest.setInterval(5000);

@@ -236,7 +236,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void processTheLogin() {
         //Showing the progress dialog
-        final ProgressDialog loading = ProgressDialog.show(LoginActivity.this, "Signing in...", "Please wait...", false, false);
+        final ProgressDialog loading = ProgressDialog.show(LoginActivity.this, getString(R.string.signinIn), getString(R.string.pleaseWait), false, false);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_LOGIN),
                 new Response.Listener<String>() {
                     @Override
