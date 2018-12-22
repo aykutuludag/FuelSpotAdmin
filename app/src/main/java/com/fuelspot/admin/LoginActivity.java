@@ -242,12 +242,8 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         loading.dismiss();
-                        switch (response) {
-                            case "Fail":
-                                Snackbar.make(background, getString(R.string.login_fail), Snackbar.LENGTH_SHORT).show();
-                                prefs.edit().putBoolean("isSigned", false).apply();
-                                break;
-                            default:
+                        if (response != null && response.length() > 0) {
+                            if (!response.equals("Fail")) {
                                 try {
                                     loading.dismiss();
                                     JSONArray res = new JSONArray(response);
@@ -304,7 +300,10 @@ public class LoginActivity extends AppCompatActivity {
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                break;
+                            } else {
+                                Snackbar.make(background, getString(R.string.login_fail), Snackbar.LENGTH_SHORT).show();
+                                prefs.edit().putBoolean("isSigned", false).apply();
+                            }
                         }
                     }
                 },
@@ -313,7 +312,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError volleyError) {
                         //Dismissing the progress dialog
                         loading.dismiss();
-                        Snackbar.make(background, getString(R.string.login_fail), Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(background, volleyError.toString(), Snackbar.LENGTH_SHORT).show();
                         prefs.edit().putBoolean("isSigned", false).apply();
                     }
                 }) {

@@ -1,5 +1,6 @@
 <resources>
-
+    <string name="app_name" translatable="false">FuelSpotAdmin</string>
+    <string name="password" translatable="false">******</string>
     <string name="unitSystem1">Litre</string>
     <string name="unitSystem2">Galon</string>
     <string name="unitSystem3">Imperial galon</string>
@@ -48,15 +49,14 @@
     <string name="noOwner">SAHİP YOK</string>
 
     <!-- ADMIN APIs -->
-    <string name="API_ADMIN_LOGIN" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-login.php</string>
-    <string name="API_ADMIN_UPDATE" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-update.php</string>
-    <string name="API_ADMIN_UPDATE_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-station-update.php</string> <!-- Updates station info, return SUCCESS or FAIL -->
-    <string name="API_ADMIN_COMPANY_FETCH" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/admin-company-fetch.php</string>
-    <string name="API_ADD_STATION" translatable="false">http://fuel-spot.com/FUELSPOTAPP/api/station-add.php</string> <!-- Create, return Station object -->
+    <string name="API_ADMIN_LOGIN" translatable="false">https://fuel-spot.com/api/admin/login.php</string>
+    <string name="API_ADMIN_UPDATE" translatable="false">https://fuel-spot.com/api/admin/update.php</string>
+    <string name="API_ADMIN_UPDATE_STATION" translatable="false">https://fuel-spot.com/api/admin/station-update.php</string> <!-- Updates station info, return SUCCESS or FAIL -->
+    <string name="API_ADMIN_COMPANY_FETCH" translatable="false">https://fuel-spot.com/api/admin/company-fetch.php</string>
+
+    <!-- Station APIs -->
+    <string name="API_ADD_STATION" translatable="false">https://fuel-spot.com/api/station-add.php</string> <!-- Create, return Station object -->
 
     <string name="fuelspot_api_key" translatable="false">FPh76g0MSZ2okeWQmShYDlXakjgjhbej</string>
     <string name="g_api_key" translatable="false">AIzaSyAxBaDtIoC8T8SFKAVmEMvWAbph_ChSD1E</string>
-
-    <string name="app_name" translatable="false">FuelSpotAdmin</string>
-    <string name="password" translatable="false">******</string>
 </resources>

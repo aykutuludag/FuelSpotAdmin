@@ -435,7 +435,7 @@ public class ProfileEditActivity extends AppCompatActivity {
             if (image != null) {
                 bitmap = BitmapFactory.decodeFile(image.getPath());
                 Glide.with(this).load(bitmap).apply(options).into(userPic);
-                photo = "http://fuel-spot.com/FUELSPOTAPP/uploads/admin/" + username + ".jpg";
+                photo = "https://fuel-spot.com/uploads/admin/" + username + ".jpg";
                 editor.putString("ProfilePhoto", photo);
             }
         }
