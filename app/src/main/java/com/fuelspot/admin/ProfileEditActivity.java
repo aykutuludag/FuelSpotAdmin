@@ -2,7 +2,9 @@ package com.fuelspot.admin;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -25,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -47,6 +50,7 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -61,6 +65,7 @@ import static com.fuelspot.admin.MainActivity.REQUEST_PERMISSION;
 import static com.fuelspot.admin.MainActivity.birthday;
 import static com.fuelspot.admin.MainActivity.email;
 import static com.fuelspot.admin.MainActivity.gender;
+import static com.fuelspot.admin.MainActivity.isNetworkConnected;
 import static com.fuelspot.admin.MainActivity.location;
 import static com.fuelspot.admin.MainActivity.name;
 import static com.fuelspot.admin.MainActivity.password;
@@ -84,6 +89,7 @@ public class ProfileEditActivity extends AppCompatActivity {
     Bitmap bitmap;
     RequestQueue requestQueue;
     RequestOptions options;
+    Button logOutFromAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -312,6 +318,34 @@ public class ProfileEditActivity extends AppCompatActivity {
                 }
             }
         });
+
+        logOutFromAccount = findViewById(R.id.button5);
+        logOutFromAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog alertDialog = new AlertDialog.Builder(ProfileEditActivity.this).create();
+                alertDialog.setTitle("ÇIKIŞ YAP");
+                alertDialog.setMessage("Hesaptan çıkılacak ve bu cihaza kaydedilmiş veriler silinecek?");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                File sharedPreferenceFile = new File("/data/data/" + getPackageName() + "/shared_prefs/");
+                                File[] listFiles = sharedPreferenceFile.listFiles();
+                                for (File file : listFiles) {
+                                    file.delete();
+                                }
+
+                                PackageManager packageManager = ProfileEditActivity.this.getPackageManager();
+                                Intent intent = packageManager.getLaunchIntentForPackage(ProfileEditActivity.this.getPackageName());
+                                ComponentName componentName = intent.getComponent();
+                                Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+                                ProfileEditActivity.this.startActivity(mainIntent);
+                                Runtime.getRuntime().exit(0);
+                            }
+                        });
+                alertDialog.show();
+            }
+        });
     }
 
     private void updateUserInfo() {
@@ -400,7 +434,7 @@ public class ProfileEditActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.navigation_save:
-                if (MainActivity.isNetworkConnected(this)) {
+                if (isNetworkConnected(this)) {
                     updateUserInfo();
                 } else {
                     Toast.makeText(ProfileEditActivity.this, "İnternet bağlantısında bir sorun var", Toast.LENGTH_SHORT).show();

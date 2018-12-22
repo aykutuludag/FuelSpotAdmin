@@ -177,7 +177,7 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(i);
                     finish();
                 }
-            }, 1500);
+            }, 2000);
         }
 
         //Layout objects
@@ -243,67 +243,64 @@ public class LoginActivity extends AppCompatActivity {
                     public void onResponse(String response) {
                         loading.dismiss();
                         if (response != null && response.length() > 0) {
-                            if (!response.equals("Fail")) {
-                                try {
-                                    loading.dismiss();
-                                    JSONArray res = new JSONArray(response);
-                                    JSONObject obj = res.getJSONObject(0);
+                            try {
+                                loading.dismiss();
+                                JSONArray res = new JSONArray(response);
+                                JSONObject obj = res.getJSONObject(0);
 
-                                    username = obj.getString("username");
-                                    prefs.edit().putString("UserName", username).apply();
+                                username = obj.getString("username");
+                                prefs.edit().putString("UserName", username).apply();
 
-                                    name = obj.getString("name");
-                                    prefs.edit().putString("Name", name).apply();
+                                name = obj.getString("name");
+                                prefs.edit().putString("Name", name).apply();
 
-                                    email = obj.getString("email");
-                                    prefs.edit().putString("Email", email).apply();
+                                email = obj.getString("email");
+                                prefs.edit().putString("Email", email).apply();
 
-                                    password = obj.getString("password");
-                                    prefs.edit().putString("password", password).apply();
+                                password = obj.getString("password");
+                                prefs.edit().putString("password", password).apply();
 
-                                    photo = obj.getString("photo");
-                                    prefs.edit().putString("ProfilePhoto", photo).apply();
+                                photo = obj.getString("photo");
+                                prefs.edit().putString("ProfilePhoto", photo).apply();
 
-                                    gender = obj.getString("gender");
-                                    prefs.edit().putString("Gender", gender).apply();
+                                gender = obj.getString("gender");
+                                prefs.edit().putString("Gender", gender).apply();
 
-                                    birthday = obj.getString("birthday");
-                                    prefs.edit().putString("Birthday", birthday).apply();
+                                birthday = obj.getString("birthday");
+                                prefs.edit().putString("Birthday", birthday).apply();
 
-                                    userPhoneNumber = obj.getString("phoneNumber");
-                                    prefs.edit().putString("userPhoneNumber", userPhoneNumber).apply();
+                                userPhoneNumber = obj.getString("phoneNumber");
+                                prefs.edit().putString("userPhoneNumber", userPhoneNumber).apply();
 
-                                    location = obj.getString("location");
-                                    prefs.edit().putString("Location", location).apply();
+                                location = obj.getString("location");
+                                prefs.edit().putString("Location", location).apply();
 
-                                    userCountry = obj.getString("country");
-                                    prefs.edit().putString("userCountry", userCountry).apply();
+                                userCountry = obj.getString("country");
+                                prefs.edit().putString("userCountry", userCountry).apply();
 
-                                    userDisplayLanguage = obj.getString("language");
-                                    prefs.edit().putString("userLanguage", userDisplayLanguage).apply();
+                                userDisplayLanguage = obj.getString("language");
+                                prefs.edit().putString("userLanguage", userDisplayLanguage).apply();
 
-                                    isVerified = obj.getInt("isVerified") == 1;
-                                    prefs.edit().putBoolean("isVerified", isVerified).apply();
+                                isVerified = obj.getInt("isVerified") == 1;
+                                prefs.edit().putBoolean("isVerified", isVerified).apply();
+                                getVariables(prefs);
 
-                                    getVariables(prefs);
-
-                                    Toast.makeText(LoginActivity.this, getString(R.string.login_success), Toast.LENGTH_LONG).show();
-                                    notLogged.setVisibility(View.GONE);
-                                    new Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Intent i = new Intent(LoginActivity.this, WelcomeActivity.class);
-                                            startActivity(i);
-                                            finish();
-                                        }
-                                    }, 1500);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                Snackbar.make(background, getString(R.string.login_fail), Snackbar.LENGTH_SHORT).show();
-                                prefs.edit().putBoolean("isSigned", false).apply();
+                                Toast.makeText(LoginActivity.this, getString(R.string.login_success), Toast.LENGTH_LONG).show();
+                                notLogged.setVisibility(View.GONE);
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Intent i = new Intent(LoginActivity.this, WelcomeActivity.class);
+                                        startActivity(i);
+                                        finish();
+                                    }
+                                }, 2000);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
+                        } else {
+                            Snackbar.make(background, getString(R.string.login_fail), Snackbar.LENGTH_SHORT).show();
+                            prefs.edit().putBoolean("isSigned", false).apply();
                         }
                     }
                 },

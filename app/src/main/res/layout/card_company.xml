@@ -23,6 +23,7 @@
         android:fontFamily="@font/gotham_black"
         android:gravity="center"
         android:padding="4dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textColor="#212121" />
 
 </RelativeLayout>

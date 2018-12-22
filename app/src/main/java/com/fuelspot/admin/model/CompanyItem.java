@@ -3,59 +3,68 @@ package com.fuelspot.admin.model;
 public class CompanyItem {
 
     private int ID;
-    private String companyName;
-    private String companyLogo;
-    private String companyWebsite;
-    private String companyPhone;
-    private String companyAddress;
+    private String name;
+    private String logo;
+    private String website;
+    private String phone;
+    private String address;
+    private int numOfVerifieds;
     private int numOfStations;
 
-    public int getID() {
+    public Integer getID() {
         return ID;
     }
 
-    public void setID(int id) {
-        this.ID = id;
+    public void setID(int ID) {
+        this.ID = ID;
     }
 
-    public String getCompanyName() {
-        return companyName;
+    public String getName() {
+        return name;
     }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getCompanyLogo() {
-        return companyLogo;
+    public String getLogo() {
+        return logo;
     }
 
-    public void setCompanyLogo(String companyLogo) {
-        this.companyLogo = companyLogo;
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 
-    public String getCompanyWebsite() {
-        return companyWebsite;
+    public String getWebsite() {
+        return website;
     }
 
-    public void setCompanyWebsite(String companyWebsite) {
-        this.companyWebsite = companyWebsite;
+    public void setWebsite(String website) {
+        this.website = website;
     }
 
-    public String getCompanyPhone() {
-        return companyPhone;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setCompanyPhone(String companyPhone) {
-        this.companyPhone = companyPhone;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    public String getCompanyAddress() {
-        return companyAddress;
+    public String getAddress() {
+        return address;
     }
 
-    public void setCompanyAddress(String companyAddress) {
-        this.companyAddress = companyAddress;
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getNumOfVerifieds() {
+        return numOfVerifieds;
+    }
+
+    public void setNumOfVerifieds(int numOfVerifieds) {
+        this.numOfVerifieds = numOfVerifieds;
     }
 
     public int getNumOfStations() {
@@ -65,5 +74,4 @@ public class CompanyItem {
     public void setNumOfStations(int numOfStations) {
         this.numOfStations = numOfStations;
     }
-
 }

@@ -52,6 +52,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.fuelspot.admin.adapter.CompanyAdapter;
 import com.fuelspot.admin.model.CompanyItem;
+import com.fuelspot.admin.model.StationItem;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -91,13 +92,42 @@ import eu.amirs.JSON;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     public static final int REQUEST_PERMISSION = 0;
-    public static String[] PERMISSIONS_LOCATION = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-    public static boolean isSigned, isVerified, doubleBackToExitPressedOnce;
-    // Application variables
     public static String[] PERMISSIONS_STORAGE = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
-
+    public static String[] PERMISSIONS_LOCATION = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    public static boolean isSigned;
+    public static boolean isVerified;
+    public static boolean doubleBackToExitPressedOnce;
+    // Admin variables
     public static String userPhoneNumber, userlat, userlon, name, email, password, photo, gender, birthday, location, userCountry, userCountryName, userDisplayLanguage, currencyCode, currencySymbol, username, userUnit;
     public static List<CompanyItem> companyList = new ArrayList<>();
+
+    // for isNotStation
+    public static int mapDefaultRange = 2500;
+    public static float mapDefaultZoom = 14.5f;
+
+    // for isAtStation
+    public static int mapDefaultStationRange = 50;
+    public static float mapStationZoom = 18f;
+    static List<StationItem> stationList = new ArrayList<>();
+    boolean mapIsUpdating;
+    static ArrayList<Circle> circles = new ArrayList<>();
+    static ArrayList<Marker> markers = new ArrayList<>();
+
+    // Current station information
+    boolean isAtStation;
+    int stationID, isStationVerified, hasMobilePayment, hasFuelDelivery;
+    String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi, facilitiesOfStation, stationLicense;
+    float gasolinePrice, dieselPrice, lpgPrice, electricityPrice;
+
+    // Temp variables
+    int currentID;
+    ArrayList<String> dummysName = new ArrayList<>();
+    ArrayList<String> dummyVicinity = new ArrayList<>();
+    ArrayList<String> dummyLocation = new ArrayList<>();
+    ArrayList<String> dummyCountry = new ArrayList<>();
+    ArrayList<String> dummyGoogleID = new ArrayList<>();
+    ArrayList<String> dummyLogo = new ArrayList<>();
+
     Window window;
     Toolbar toolbar;
     RequestQueue requestQueue;
@@ -108,49 +138,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     LocationCallback mLocationCallback;
     GoogleMap googleMap;
     FusedLocationProviderClient mFusedLocationClient;
-    // for isNotStation
-    public static int mapDefaultRange = 2500;
-    public static float mapDefaultZoom = 14.5f;
-
-    // for isAtStation
-    public static int mapDefaultStationRange = 50;
-    public static float mapStationZoom = 18f;
-
-    static List<Integer> stationIDs = new ArrayList<>();
-    static List<String> stationNameList = new ArrayList<>();
-    static List<String> vicinityList = new ArrayList<>();
-    static List<String> locationList = new ArrayList<>();
-    static List<String> stationCountryList = new ArrayList<>();
-    static List<String> googleIDList = new ArrayList<>();
-    static List<String> stationLogoList = new ArrayList<>();
-    static List<String> facilitiesList = new ArrayList<>();
-    static List<Float> gasolinePrices = new ArrayList<>();
-    static List<Float> dieselPrices = new ArrayList<>();
-    static List<Float> lpgPrices = new ArrayList<>();
-    static List<Float> electricityPrices = new ArrayList<>();
-    static List<String> licenseNOs = new ArrayList<>();
-    static List<String> ownerList = new ArrayList<>();
-    static List<Integer> isMobilePayments = new ArrayList<>();
-    static List<Integer> isDeliverys = new ArrayList<>();
-    static List<Integer> isVerifieds = new ArrayList<>();
-    static List<String> lastUpdates = new ArrayList<>();
-    static List<Integer> distanceInMeters = new ArrayList<>();
-    static ArrayList<Circle> circles = new ArrayList<>();
-    static ArrayList<Marker> markers = new ArrayList<>();
-
-    // Current station information
-    boolean isAtStation;
-    String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi, facilitiesOfStation, stationLicense;
-    int stationID, isStationVerified, hasMobilePayment, hasFuelDelivery;
-    float gasolinePrice, dieselPrice, lpgPrice, electricityPrice;
-
-    // Temp variables
-    ArrayList<String> dummysName = new ArrayList<>();
-    ArrayList<String> dummyVicinity = new ArrayList<>();
-    ArrayList<String> dummyLocation = new ArrayList<>();
-    ArrayList<String> dummyCountry = new ArrayList<>();
-    ArrayList<String> dummyGoogleID = new ArrayList<>();
-    ArrayList<String> dummyLogo = new ArrayList<>();
 
     //Layout items
     CheckBox onayliIstasyon, mobilOdeme, aloyakit;
@@ -164,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     RelativeLayout verifiedLayout;
     CircleImageView imageViewWC, imageViewMarket, imageViewCarWash, imageViewTireRepair, imageViewMechanic, imageViewRestaurant, imageViewParkSpot;
     Spinner spinner;
-    boolean mapIsUpdating;
     JSONObject facilitiesObj;
 
     public static void getVariables(SharedPreferences prefs) {
@@ -179,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         userlat = prefs.getString("lat", "39.925054");
         userlon = prefs.getString("lon", "32.8347552");
         isSigned = prefs.getBoolean("isSigned", false);
+        isVerified = prefs.getBoolean("isVerified", false);
         userCountry = prefs.getString("userCountry", "");
         userCountryName = prefs.getString("userCountryName", "");
         userDisplayLanguage = prefs.getString("userLanguage", "");
@@ -456,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         super.onLocationResult(locationResult);
                         Location locCurrent = locationResult.getLastLocation();
                         if (locCurrent != null) {
-                            if (locCurrent.getAccuracy() <= mapDefaultStationRange) {
+                            if (locCurrent.getAccuracy() <= mapDefaultStationRange * 2) {
                                 userlat = String.valueOf(locCurrent.getLatitude());
                                 userlon = String.valueOf(locCurrent.getLongitude());
                                 prefs.edit().putString("lat", userlat).apply();
@@ -472,11 +459,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                         updateMapObject();
                                     }
                                 } else {
-                                    if (locationList != null && locationList.size() > 0) {
-                                        distanceInMeters.clear();
-
-                                        for (int i = 0; i < locationList.size(); i++) {
-                                            String[] stationLocation = locationList.get(i).split(";");
+                                    if (stationList != null && stationList.size() > 0) {
+                                        for (int i = 0; i < stationList.size(); i++) {
+                                            String[] stationLocation = stationList.get(i).getLocation().split(";");
                                             double stationLat = Double.parseDouble(stationLocation[0]);
                                             double stationLon = Double.parseDouble(stationLocation[1]);
 
@@ -485,23 +470,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                             locStation.setLongitude(stationLon);
 
                                             float newDistance = locCurrent.distanceTo(locStation);
-                                            distanceInMeters.add(i, (int) newDistance);
+                                            stationList.get(i).setDistance((int) newDistance);
                                         }
 
                                         isAtStation = isWorkerAtStation();
 
                                         if (isAtStation) {
-                                            if (stationAddressHolder.getText() != null && stationAddressHolder.getText().length() == 0) {
+                                            if (stationID != currentID) {
+                                                loadLayoutItems();
+
                                                 // For zooming automatically to the location of the marker
                                                 if (googleMap != null) {
                                                     LatLng mCurrentLocation = new LatLng(Double.parseDouble(stationLocation.split(";")[0]), Double.parseDouble(stationLocation.split(";")[1]));
                                                     CameraPosition cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapStationZoom).build();
                                                     googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                                                 }
-                                                loadLayoutItems();
                                             }
                                         } else {
-                                            if (stationAddressHolder.getText() != null && stationAddressHolder.getText().length() > 0) {
+                                            if (stationID != 0) {
                                                 stationID = 0;
                                                 stationName = "Bilinmiyor";
                                                 stationVicinity = "";
@@ -585,17 +571,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinner.setOnItemSelectedListener(MainActivity.this);
         if (companyList != null && companyList.size() > 0) {
             for (int i = 0; i < companyList.size(); i++) {
-                if (companyList.get(i).getCompanyName().equals(stationName)) {
+                if (companyList.get(i).getName().equals(stationName)) {
                     spinner.setSelection(i, true);
                     break;
                 }
             }
         }
 
-        if (stationID != 0) {
-            String dummyId = "" + stationID;
-            textViewStationIDHolder.setText(dummyId);
-        }
+        String dummyId = "" + stationID;
+        textViewStationIDHolder.setText(dummyId);
 
         // Layout items
         stationAddressHolder.setText(stationVicinity);
@@ -993,10 +977,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    @SuppressLint("MissingPermission")
     void loadMap() {
         //Detect location and set on map
         mMapView.getMapAsync(new OnMapReadyCallback() {
-            @SuppressLint("MissingPermission")
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
@@ -1016,31 +1000,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void updateMapObject() {
         mapIsUpdating = true;
+        stationList.clear();
+        if (circles != null && circles.size() > 0) {
+            for (int i = 0; i < circles.size(); i++) {
+                circles.get(i).remove();
+            }
+            circles.clear();
+        }
 
-        stationNameList.clear();
-        vicinityList.clear();
-        stationCountryList.clear();
-        markers.clear();
-        googleIDList.clear();
-        locationList.clear();
-        stationLogoList.clear();
+        if (markers != null && markers.size() > 0) {
+            if (googleMap != null) {
+                googleMap.clear();
+            }
+            markers.clear();
+        }
 
+        // Temp variables
         dummysName.clear();
         dummyVicinity.clear();
         dummyLocation.clear();
         dummyCountry.clear();
         dummyGoogleID.clear();
         dummyLogo.clear();
-
-        if (circles != null && circles.size() > 0) {
-            for (int i = 0; i < circles.size(); i++) {
-                circles.get(i).remove();
-            }
-        }
-
-        if (googleMap != null) {
-            googleMap.clear();
-        }
 
         // For zooming automatically to the location of the marker
         LatLng mCurrentLocation = new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon));
@@ -1078,7 +1059,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     dummyLocation.add(String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon));
                                     dummyGoogleID.add(json.key("results").index(i).key("place_id").stringValue());
                                     dummyLogo.add(stationPhotoChooser(json.key("results").index(i).key("name").stringValue()));
-
                                 }
 
                                 if (!json.key("next_page_token").isNull() && json.key("next_page_token").stringValue().length() > 0) {
@@ -1112,13 +1092,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 } else if (mapDefaultRange == 10000) {
                                     mapIsUpdating = false;
 
-                                    mapDefaultRange = 20000;
+                                    mapDefaultRange = 25000;
                                     mapDefaultZoom = 10f;
                                     Toast.makeText(MainActivity.this, "İstasyon bulunamadı. YENİ MENZİL: " + mapDefaultRange + " metre", Toast.LENGTH_SHORT).show();
                                     if (!mapIsUpdating) {
                                         updateMapObject();
                                     }
-                                } else if (mapDefaultRange == 20000) {
+                                } else if (mapDefaultRange == 25000) {
                                     mapIsUpdating = false;
 
                                     mapDefaultRange = 50000;
@@ -1157,32 +1137,38 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         if (response != null && response.length() > 0) {
                             try {
                                 JSONArray res = new JSONArray(response);
-
                                 JSONObject obj = res.getJSONObject(0);
 
-                                stationIDs.add(obj.getInt("id"));
-                                stationNameList.add(obj.getString("name"));
-                                vicinityList.add(obj.getString("vicinity"));
-                                stationCountryList.add(obj.getString("country"));
-                                locationList.add(obj.getString("location"));
-                                googleIDList.add(obj.getString("googleID"));
-                                facilitiesList.add(obj.getString("facilities"));
-                                stationLogoList.add(obj.getString("logoURL"));
-                                gasolinePrices.add((float) obj.getDouble("gasolinePrice"));
-                                dieselPrices.add((float) obj.getDouble("dieselPrice"));
-                                lpgPrices.add((float) obj.getDouble("lpgPrice"));
-                                electricityPrices.add((float) obj.getDouble("electricityPrice"));
-                                licenseNOs.add(obj.getString("licenseNo"));
-                                ownerList.add(obj.getString("owner"));
-                                isVerifieds.add(obj.getInt("isVerified"));
-                                isMobilePayments.add(obj.getInt("isMobilePaymentAvailable"));
-                                isDeliverys.add(obj.getInt("isDeliveryAvailable"));
-                                lastUpdates.add(obj.getString("lastUpdated"));
+                                StationItem item = new StationItem();
+                                item.setID(obj.getInt("id"));
+                                item.setStationName(obj.getString("name"));
+                                item.setVicinity(obj.getString("vicinity"));
+                                item.setCountryCode(obj.getString("country"));
+                                item.setLocation(obj.getString("location"));
+                                item.setGoogleMapID(obj.getString("googleID"));
+                                item.setFacilities(obj.getString("facilities"));
+                                item.setLicenseNo(obj.getString("licenseNo"));
+                                item.setOwner(obj.getString("owner"));
+                                item.setPhotoURL(obj.getString("logoURL"));
+                                item.setGasolinePrice((float) obj.getDouble("gasolinePrice"));
+                                item.setDieselPrice((float) obj.getDouble("dieselPrice"));
+                                item.setLpgPrice((float) obj.getDouble("lpgPrice"));
+                                item.setElectricityPrice((float) obj.getDouble("electricityPrice"));
+                                item.setIsVerified(obj.getInt("isVerified"));
+                                item.setHasSupportMobilePayment(obj.getInt("isMobilePaymentAvailable"));
+                                item.setHasFuelDelivery(obj.getInt("isDeliveryAvailable"));
+                                item.setLastUpdated(obj.getString("lastUpdated"));
 
+                                //DISTANCE START
                                 Location loc = new Location("");
-                                String[] stationKonum = obj.getString("location").split(";");
+                                String[] stationKonum = item.getLocation().split(";");
                                 loc.setLatitude(Double.parseDouble(stationKonum[0]));
                                 loc.setLongitude(Double.parseDouble(stationKonum[1]));
+                                float uzaklik = locLastKnown.distanceTo(loc);
+                                item.setDistance((int) uzaklik);
+                                //DISTANCE END
+
+                                stationList.add(item);
 
                                 // Add marker
                                 LatLng sydney = new LatLng(loc.getLatitude(), loc.getLongitude());
@@ -1408,15 +1394,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     void fetchCompanies() {
         //Showing the progress dialog
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_COMPANY_FETCH),
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_COMPANY),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         if (response != null && response.length() > 0) {
                             CompanyItem item2 = new CompanyItem();
                             item2.setID(0);
-                            item2.setCompanyName("Bilinmiyor");
-                            item2.setCompanyLogo("https://fuel-spot.com/default_icons/station.jpg");
+                            item2.setName("Bilinmiyor");
+                            item2.setLogo("https://fuel-spot.com/default_icons/station.jpg");
                             companyList.add(item2);
                             try {
                                 JSONArray res = new JSONArray(response);
@@ -1425,11 +1411,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                     CompanyItem item = new CompanyItem();
                                     item.setID(obj.getInt("id"));
-                                    item.setCompanyName(obj.getString("companyName"));
-                                    item.setCompanyLogo(obj.getString("companyLogo"));
-                                    item.setCompanyWebsite(obj.getString("companyWebsite"));
-                                    item.setCompanyPhone(obj.getString("companyPhone"));
-                                    item.setCompanyAddress(obj.getString("companyAddress"));
+                                    item.setName(obj.getString("companyName"));
+                                    item.setLogo(obj.getString("companyLogo"));
+                                    item.setWebsite(obj.getString("companyWebsite"));
+                                    item.setPhone(obj.getString("companyPhone"));
+                                    item.setAddress(obj.getString("companyAddress"));
+                                    item.setNumOfVerifieds(obj.getInt("numOfVerifieds"));
                                     item.setNumOfStations(obj.getInt("numOfStations"));
                                     companyList.add(item);
                                 }
@@ -1437,7 +1424,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 CompanyAdapter customAdapter = new CompanyAdapter(MainActivity.this, companyList);
                                 spinner.setAdapter(customAdapter);
                             } catch (JSONException e) {
-                                e.printStackTrace();
+                                Snackbar.make(findViewById(android.R.id.content), e.toString(), Snackbar.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -1466,27 +1453,33 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     boolean isWorkerAtStation() {
-        for (int i = 0; i < locationList.size(); i++) {
-            if (distanceInMeters.get(i) <= 50) {
-                if (stationID == 0) {
-                    stationID = stationIDs.get(i);
-                    stationName = stationNameList.get(i);
-                    stationVicinity = vicinityList.get(i);
-                    stationLocation = locationList.get(i);
-                    stationCountry = stationCountryList.get(i);
-                    placeID = googleIDList.get(i);
-                    facilitiesOfStation = facilitiesList.get(i);
-                    stationLogo = stationLogoList.get(i);
-                    gasolinePrice = gasolinePrices.get(i);
-                    dieselPrice = dieselPrices.get(i);
-                    lpgPrice = lpgPrices.get(i);
-                    electricityPrice = electricityPrices.get(i);
-                    stationLicense = licenseNOs.get(i);
-                    istasyonSahibi = ownerList.get(i);
-                    isStationVerified = isVerifieds.get(i);
-                    hasMobilePayment = isMobilePayments.get(i);
-                    hasFuelDelivery = isDeliverys.get(i);
-                    sonGuncelleme = lastUpdates.get(i);
+        if (textViewStationIDHolder.getText() != null && textViewStationIDHolder.getText().length() > 0) {
+            currentID = Integer.parseInt(textViewStationIDHolder.getText().toString());
+        } else {
+            currentID = 0;
+        }
+
+        for (int i = 0; i < stationList.size(); i++) {
+            if (stationList.get(i).getDistance() <= 50) {
+                if (stationList.get(i).getID() == 0 || stationList.get(i).getID() != currentID) {
+                    stationID = stationList.get(i).getID();
+                    stationName = stationList.get(i).getStationName();
+                    stationVicinity = stationList.get(i).getVicinity();
+                    stationLocation = stationList.get(i).getLocation();
+                    stationCountry = stationList.get(i).getCountryCode();
+                    placeID = stationList.get(i).getGoogleMapID();
+                    facilitiesOfStation = stationList.get(i).getFacilities();
+                    stationLogo = stationList.get(i).getPhotoURL();
+                    gasolinePrice = stationList.get(i).getGasolinePrice();
+                    dieselPrice = stationList.get(i).getDieselPrice();
+                    lpgPrice = stationList.get(i).getLpgPrice();
+                    electricityPrice = stationList.get(i).getElectricityPrice();
+                    stationLicense = stationList.get(i).getLicenseNo();
+                    istasyonSahibi = stationList.get(i).getOwner();
+                    isStationVerified = stationList.get(i).getIsVerified();
+                    hasMobilePayment = stationList.get(i).getHasSupportMobilePayment();
+                    hasFuelDelivery = stationList.get(i).getHasFuelDelivery();
+                    sonGuncelleme = stationList.get(i).getLastUpdated();
                 }
                 return true;
             }
@@ -1507,8 +1500,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        stationName = companyList.get(position).getCompanyName();
-        stationLogo = companyList.get(position).getCompanyLogo();
+        stationName = companyList.get(position).getName();
+        stationLogo = companyList.get(position).getLogo();
         Glide.with(this).load(stationLogo).apply(options).into(stationLogoHolder);
     }
 
@@ -1536,8 +1529,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_PERMISSION: {
                 // If request is cancelled, the result arrays are car_placeholder.

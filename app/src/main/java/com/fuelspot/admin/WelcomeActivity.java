@@ -9,7 +9,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -155,14 +154,9 @@ public class WelcomeActivity extends AppCompatActivity {
         getVariables(prefs);
 
         Toast.makeText(WelcomeActivity.this, getString(R.string.settings_saved), Toast.LENGTH_LONG).show();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent i = new Intent(WelcomeActivity.this, MainActivity.class);
-                startActivity(i);
-                finish();
-            }
-        }, 1500);
+        Intent i = new Intent(WelcomeActivity.this, MainActivity.class);
+        startActivity(i);
+        finish();
     }
 
     @SuppressLint("MissingPermission")

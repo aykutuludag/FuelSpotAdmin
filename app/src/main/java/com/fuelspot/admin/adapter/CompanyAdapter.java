@@ -20,7 +20,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CompanyAdapter extends BaseAdapter {
-    LayoutInflater inflter;
+    private LayoutInflater inflter;
     private List<CompanyItem> feedItemList;
     private Context mContext;
 
@@ -56,10 +56,10 @@ public class CompanyAdapter extends BaseAdapter {
                 .error(R.drawable.default_station)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .priority(Priority.HIGH);
-        Glide.with(mContext).load(feedItemList.get(position).getCompanyLogo()).apply(options).into(circleImageViewCompanyLogo);
+        Glide.with(mContext).load(feedItemList.get(position).getLogo()).apply(options).into(circleImageViewCompanyLogo);
 
         TextView textViewCompanyName = convertView.findViewById(R.id.company_name);
-        textViewCompanyName.setText(feedItemList.get(position).getCompanyName());
+        textViewCompanyName.setText(feedItemList.get(position).getName());
         return convertView;
     }
 }
