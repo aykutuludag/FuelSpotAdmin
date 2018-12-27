@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -72,10 +73,33 @@ public class WelcomeActivity extends AppCompatActivity {
 
         continueButton = findViewById(R.id.permissionButton);
         continueButton.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("MissingPermission")
             @Override
             public void onClick(View v) {
-                ActivityCompat.requestPermissions(WelcomeActivity.this, new String[]
-                        {PERMISSIONS_STORAGE[0], PERMISSIONS_STORAGE[1], PERMISSIONS_LOCATION[0], PERMISSIONS_LOCATION[1]}, REQUEST_PERMISSION);
+                if (Build.VERSION.SDK_INT >= 23) {
+                    ActivityCompat.requestPermissions(WelcomeActivity.this, new String[]
+                            {PERMISSIONS_STORAGE[0], PERMISSIONS_STORAGE[1], PERMISSIONS_LOCATION[0], PERMISSIONS_LOCATION[1]}, REQUEST_PERMISSION);
+                } else {
+                    FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(WelcomeActivity.this);
+                    mFusedLocationClient.getLastLocation().addOnSuccessListener(WelcomeActivity.this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                userlat = String.valueOf(location.getLatitude());
+                                userlon = String.valueOf(location.getLongitude());
+                                prefs.edit().putString("lat", userlat).apply();
+                                prefs.edit().putString("lon", userlon).apply();
+                                Localization();
+                            } else {
+                                LocationRequest mLocationRequest = new LocationRequest();
+                                mLocationRequest.setInterval(5000);
+                                mLocationRequest.setFastestInterval(1000);
+                                mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                            }
+                        }
+                    });
+                }
             }
         });
     }

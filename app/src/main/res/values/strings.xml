@@ -54,10 +54,8 @@
     <string name="API_ADMIN_UPDATE_STATION" translatable="false">https://fuel-spot.com/api/admin/station-update.php</string>
 
     <!-- OTHER APIs -->
+    <string name="API_ADMIN_ADD_STATION" translatable="false">https://fuel-spot.com/api/station-add.php</string>
     <string name="API_COMPANY" translatable="false">https://fuel-spot.com/api/other-company.php</string>
-
-    <!-- Station APIs -->
-    <string name="API_ADD_STATION" translatable="false">https://fuel-spot.com/api/station-add.php</string> <!-- Create, return Station object -->
 
     <string name="fuelspot_api_key" translatable="false">FPh76g0MSZ2okeWQmShYDlXakjgjhbej</string>
     <string name="g_api_key" translatable="false">AIzaSyAxBaDtIoC8T8SFKAVmEMvWAbph_ChSD1E</string>

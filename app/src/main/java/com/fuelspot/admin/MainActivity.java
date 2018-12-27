@@ -1023,6 +1023,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         dummyGoogleID.clear();
         dummyLogo.clear();
 
+        googleMap.addCircle(new CircleOptions()
+                .center(new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon)))
+                .radius(mapDefaultRange)
+                .fillColor(0x220000FF)
+                .strokeColor(Color.parseColor("#FF5635")));
+
         // For zooming automatically to the location of the marker
         LatLng mCurrentLocation = new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon));
         CameraPosition cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapDefaultZoom).build();
@@ -1067,7 +1073,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     for (int i = 0; i < dummyGoogleID.size(); i++) {
                                         addStations(dummysName.get(i), dummyVicinity.get(i), dummyCountry.get(i), dummyLocation.get(i), dummyGoogleID.get(i), dummyLogo.get(i));
                                     }
-                                    mapIsUpdating = false;
+                                    mapIsUpdating = true;
                                 }
                             } else {
                                 // Maybe s/he is in the countryside. Increase mapDefaultRange, decrease mapDefaultZoom
@@ -1130,7 +1136,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void addStations(final String name, final String vicinity, final String country, final String location, final String googleID, final String logo) {
         //Showing the progress dialog
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADD_STATION),
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_ADD_STATION),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
