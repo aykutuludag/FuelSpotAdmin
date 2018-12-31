@@ -51,6 +51,7 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.fuelspot.admin.adapter.CompanyAdapter;
+import com.fuelspot.admin.adapter.MarkerAdapter;
 import com.fuelspot.admin.model.CompanyItem;
 import com.fuelspot.admin.model.StationItem;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
@@ -87,7 +88,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import eu.amirs.JSON;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -121,12 +121,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     // Temp variables
     int currentID;
-    ArrayList<String> dummysName = new ArrayList<>();
-    ArrayList<String> dummyVicinity = new ArrayList<>();
-    ArrayList<String> dummyLocation = new ArrayList<>();
-    ArrayList<String> dummyCountry = new ArrayList<>();
-    ArrayList<String> dummyGoogleID = new ArrayList<>();
-    ArrayList<String> dummyLogo = new ArrayList<>();
 
     Window window;
     Toolbar toolbar;
@@ -449,6 +443,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 prefs.edit().putString("lat", userlat).apply();
                                 prefs.edit().putString("lon", userlon).apply();
                                 MainActivity.getVariables(prefs);
+
+                                if (stationList != null && stationList.size() == 0) {
+                                    if (!mapIsUpdating) {
+                                        updateMapObject();
+                                    }
+                                }
 
                                 float distanceInMeter = locLastKnown.distanceTo(locCurrent);
 
@@ -991,9 +991,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 googleMap.getUiSettings().setMapToolbarEnabled(false);
                 googleMap.getUiSettings().setScrollGesturesEnabled(true);
                 googleMap.setTrafficEnabled(true);
-                if (!mapIsUpdating) {
-                    updateMapObject();
-                }
             }
         });
     }
@@ -1015,190 +1012,99 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             markers.clear();
         }
 
-        // Temp variables
-        dummysName.clear();
-        dummyVicinity.clear();
-        dummyLocation.clear();
-        dummyCountry.clear();
-        dummyGoogleID.clear();
-        dummyLogo.clear();
+        markers.clear();
+        if (googleMap != null) {
+            googleMap.clear();
 
-        googleMap.addCircle(new CircleOptions()
-                .center(new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon)))
-                .radius(mapDefaultRange)
-                .fillColor(0x220000FF)
-                .strokeColor(Color.parseColor("#FF5635")));
+            //Draw a circle with radius of mapDefaultRange
+            googleMap.addCircle(new CircleOptions()
+                    .center(new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon)))
+                    .radius(mapDefaultRange)
+                    .fillColor(0x220000FF)
+                    .strokeColor(Color.parseColor("#FF5635")));
+        }
 
         // For zooming automatically to the location of the marker
         LatLng mCurrentLocation = new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon));
         CameraPosition cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapDefaultZoom).build();
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-        searchStations("");
+        fetchStations();
     }
 
-    void searchStations(String token) {
-        String url;
-
-        if (token != null && token.length() > 0) {
-            // For getting next 20 stations
-            url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + mapDefaultRange + "&type=gas_station&pagetoken=" + token + "&key=" + getString(R.string.g_api_key);
-        } else {
-            // For getting first 20 stations
-            url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + mapDefaultRange + "&type=gas_station" + "&key=" + getString(R.string.g_api_key);
-        }
-
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        JSON json = new JSON(response);
-                        if (response != null && response.length() > 0) {
-                            if (json.key("results").count() > 0) {
-                                for (int i = 0; i < json.key("results").count(); i++) {
-                                    dummysName.add(json.key("results").index(i).key("name").stringValue());
-                                    dummyVicinity.add(json.key("results").index(i).key("vicinity").stringValue());
-                                    double lat = json.key("results").index(i).key("geometry").key("location").key("lat").doubleValue();
-                                    double lon = json.key("results").index(i).key("geometry").key("location").key("lng").doubleValue();
-                                    dummyCountry.add(countryFinder(lat, lon));
-                                    dummyLocation.add(String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon));
-                                    dummyGoogleID.add(json.key("results").index(i).key("place_id").stringValue());
-                                    dummyLogo.add(stationPhotoChooser(json.key("results").index(i).key("name").stringValue()));
-                                }
-
-                                if (!json.key("next_page_token").isNull() && json.key("next_page_token").stringValue().length() > 0) {
-                                    searchStations(json.key("next_page_token").stringValue());
-                                } else {
-                                    for (int i = 0; i < dummyGoogleID.size(); i++) {
-                                        addStations(dummysName.get(i), dummyVicinity.get(i), dummyCountry.get(i), dummyLocation.get(i), dummyGoogleID.get(i), dummyLogo.get(i));
-                                    }
-                                    mapIsUpdating = true;
-                                }
-                            } else {
-                                // Maybe s/he is in the countryside. Increase mapDefaultRange, decrease mapDefaultZoom
-                                if (mapDefaultRange == 2500) {
-                                    mapIsUpdating = false;
-
-                                    mapDefaultRange = 5000;
-                                    mapDefaultZoom = 12f;
-                                    Toast.makeText(MainActivity.this, "İstasyon bulunamadı. YENİ MENZİL: " + mapDefaultRange + " metre", Toast.LENGTH_SHORT).show();
-                                    if (!mapIsUpdating) {
-                                        updateMapObject();
-                                    }
-                                } else if (mapDefaultRange == 5000) {
-                                    mapIsUpdating = false;
-
-                                    mapDefaultRange = 10000;
-                                    mapDefaultZoom = 11f;
-                                    Toast.makeText(MainActivity.this, "İstasyon bulunamadı. YENİ MENZİL: " + mapDefaultRange + " metre", Toast.LENGTH_SHORT).show();
-                                    if (!mapIsUpdating) {
-                                        updateMapObject();
-                                    }
-                                } else if (mapDefaultRange == 10000) {
-                                    mapIsUpdating = false;
-
-                                    mapDefaultRange = 25000;
-                                    mapDefaultZoom = 10f;
-                                    Toast.makeText(MainActivity.this, "İstasyon bulunamadı. YENİ MENZİL: " + mapDefaultRange + " metre", Toast.LENGTH_SHORT).show();
-                                    if (!mapIsUpdating) {
-                                        updateMapObject();
-                                    }
-                                } else if (mapDefaultRange == 25000) {
-                                    mapIsUpdating = false;
-
-                                    mapDefaultRange = 50000;
-                                    mapDefaultZoom = 8.75f;
-                                    Toast.makeText(MainActivity.this, "İstasyon bulunamadı. YENİ MENZİL: " + mapDefaultRange + " metre", Toast.LENGTH_SHORT).show();
-                                    if (!mapIsUpdating) {
-                                        updateMapObject();
-                                    }
-                                } else {
-                                    mapIsUpdating = false;
-                                    Snackbar.make(findViewById(android.R.id.content), "İstasyon bulunamadı...", Snackbar.LENGTH_LONG).show();
-                                }
-                            }
-                        } else {
-                            Snackbar.make(findViewById(android.R.id.content), getString(R.string.error_no_location), Snackbar.LENGTH_LONG).show();
-                        }
-                    }
-
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Snackbar.make(findViewById(android.R.id.content), error.toString(), Snackbar.LENGTH_LONG).show();
-            }
-        });
-
-        // Add the request to the RequestQueue.
-        requestQueue.add(stringRequest);
-    }
-
-    private void addStations(final String name, final String vicinity, final String country, final String location, final String googleID, final String logo) {
+    private void fetchStations() {
         //Showing the progress dialog
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_ADD_STATION),
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_SEARCH_STATION),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         if (response != null && response.length() > 0) {
                             try {
                                 JSONArray res = new JSONArray(response);
-                                JSONObject obj = res.getJSONObject(0);
 
-                                StationItem item = new StationItem();
-                                item.setID(obj.getInt("id"));
-                                item.setStationName(obj.getString("name"));
-                                item.setVicinity(obj.getString("vicinity"));
-                                item.setCountryCode(obj.getString("country"));
-                                item.setLocation(obj.getString("location"));
-                                item.setGoogleMapID(obj.getString("googleID"));
-                                item.setFacilities(obj.getString("facilities"));
-                                item.setLicenseNo(obj.getString("licenseNo"));
-                                item.setOwner(obj.getString("owner"));
-                                item.setPhotoURL(obj.getString("logoURL"));
-                                item.setGasolinePrice((float) obj.getDouble("gasolinePrice"));
-                                item.setDieselPrice((float) obj.getDouble("dieselPrice"));
-                                item.setLpgPrice((float) obj.getDouble("lpgPrice"));
-                                item.setElectricityPrice((float) obj.getDouble("electricityPrice"));
-                                item.setIsVerified(obj.getInt("isVerified"));
-                                item.setHasSupportMobilePayment(obj.getInt("isMobilePaymentAvailable"));
-                                item.setHasFuelDelivery(obj.getInt("isDeliveryAvailable"));
-                                item.setLastUpdated(obj.getString("lastUpdated"));
+                                for (int i = 0; i < res.length(); i++) {
+                                    JSONObject obj = res.getJSONObject(i);
+                                    StationItem item = new StationItem();
+                                    item.setID(obj.getInt("id"));
+                                    item.setStationName(obj.getString("name"));
+                                    item.setVicinity(obj.getString("vicinity"));
+                                    item.setCountryCode(obj.getString("country"));
+                                    item.setLocation(obj.getString("location"));
+                                    item.setGoogleMapID(obj.getString("googleID"));
+                                    item.setFacilities(obj.getString("facilities"));
+                                    item.setLicenseNo(obj.getString("licenseNo"));
+                                    item.setOwner(obj.getString("owner"));
+                                    item.setPhotoURL(obj.getString("logoURL"));
+                                    item.setGasolinePrice((float) obj.getDouble("gasolinePrice"));
+                                    item.setDieselPrice((float) obj.getDouble("dieselPrice"));
+                                    item.setLpgPrice((float) obj.getDouble("lpgPrice"));
+                                    item.setElectricityPrice((float) obj.getDouble("electricityPrice"));
+                                    item.setIsVerified(obj.getInt("isVerified"));
+                                    item.setHasSupportMobilePayment(obj.getInt("isMobilePaymentAvailable"));
+                                    item.setHasFuelDelivery(obj.getInt("isDeliveryAvailable"));
+                                    item.setLastUpdated(obj.getString("lastUpdated"));
+                                    item.setIsActive(obj.getInt("isActive"));
+                                    item.setLastUpdated(obj.getString("lastUpdated"));
+                                    item.setDistance((int) obj.getDouble("distance"));
 
-                                //DISTANCE START
-                                Location loc = new Location("");
-                                String[] stationKonum = item.getLocation().split(";");
-                                loc.setLatitude(Double.parseDouble(stationKonum[0]));
-                                loc.setLongitude(Double.parseDouble(stationKonum[1]));
-                                float uzaklik = locLastKnown.distanceTo(loc);
-                                item.setDistance((int) uzaklik);
-                                //DISTANCE END
+                                    stationList.add(item);
 
-                                stationList.add(item);
+                                    // Add marker
+                                    Location loc = new Location("");
+                                    String[] stationKonum = item.getLocation().split(";");
+                                    loc.setLatitude(Double.parseDouble(stationKonum[0]));
+                                    loc.setLongitude(Double.parseDouble(stationKonum[1]));
+                                    LatLng sydney = new LatLng(loc.getLatitude(), loc.getLongitude());
+                                    if (obj.getInt("isVerified") == 1) {
+                                        markers.add(googleMap.addMarker(new MarkerOptions().position(sydney).title(obj.getString("name")).snippet(obj.getString("vicinity")).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station))));
+                                    } else {
+                                        markers.add(googleMap.addMarker(new MarkerOptions().position(sydney).title(obj.getString("name")).snippet(obj.getString("vicinity")).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station))));
+                                    }
 
-                                // Add marker
-                                LatLng sydney = new LatLng(loc.getLatitude(), loc.getLongitude());
-                                if (obj.getInt("isVerified") == 1) {
-                                    markers.add(googleMap.addMarker(new MarkerOptions().position(sydney).title(obj.getString("name")).snippet(obj.getString("vicinity")).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station))));
-                                } else {
-                                    markers.add(googleMap.addMarker(new MarkerOptions().position(sydney).title(obj.getString("name")).snippet(obj.getString("vicinity")).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station))));
+                                    // Draw a circle with radius of mapDefaultStationRange
+                                    circles.add(googleMap.addCircle(new CircleOptions()
+                                            .center(new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1])))
+                                            .radius(mapDefaultStationRange)
+                                            .fillColor(0x220000FF)
+                                            .strokeColor(Color.parseColor("#FF5635"))));
                                 }
 
-                                // Draw a circle with radius of mapDefaultStationRange
-                                circles.add(googleMap.addCircle(new CircleOptions()
-                                        .center(new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1])))
-                                        .radius(mapDefaultStationRange)
-                                        .fillColor(0x220000FF)
-                                        .strokeColor(Color.parseColor("#FF5635"))));
+                                MarkerAdapter customInfoWindow = new MarkerAdapter(MainActivity.this);
+                                googleMap.setInfoWindowAdapter(customInfoWindow);
+                                mapIsUpdating = false;
                             } catch (JSONException e) {
+                                Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
                             }
+                        } else {
+                            reTry();
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(MainActivity.this, volleyError.toString(), Toast.LENGTH_SHORT).show();
                         volleyError.printStackTrace();
                     }
                 }) {
@@ -1207,12 +1113,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 //Creating parameters
                 Map<String, String> params = new Hashtable<>();
 
-                params.put("name", name);
-                params.put("vicinity", vicinity);
-                params.put("country", country);
-                params.put("location", location);
-                params.put("googleID", googleID);
-                params.put("logoURL", logo);
+                params.put("location", userlat + ";" + userlon);
+                params.put("radius", String.valueOf(mapDefaultRange));
                 params.put("AUTH_KEY", getString(R.string.fuelspot_api_key));
 
                 //returning parameters
@@ -1222,6 +1124,50 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Adding request to the queue
         requestQueue.add(stringRequest);
+    }
+
+    void reTry() {
+        // Maybe s/he is in the countryside. Increase mapDefaultRange, decrease mapDefaultZoom
+        if (mapDefaultRange == 2500) {
+            mapIsUpdating = false;
+
+            mapDefaultRange = 5000;
+            mapDefaultZoom = 12f;
+            Toast.makeText(MainActivity.this, "İstasyon bulunamadı. YENİ MENZİL: " + mapDefaultRange + " metre", Toast.LENGTH_SHORT).show();
+            if (!mapIsUpdating) {
+                updateMapObject();
+            }
+        } else if (mapDefaultRange == 5000) {
+            mapIsUpdating = false;
+
+            mapDefaultRange = 10000;
+            mapDefaultZoom = 11f;
+            Toast.makeText(MainActivity.this, "İstasyon bulunamadı. YENİ MENZİL: " + mapDefaultRange + " metre", Toast.LENGTH_SHORT).show();
+            if (!mapIsUpdating) {
+                updateMapObject();
+            }
+        } else if (mapDefaultRange == 10000) {
+            mapIsUpdating = false;
+
+            mapDefaultRange = 25000;
+            mapDefaultZoom = 10f;
+            Toast.makeText(MainActivity.this, "İstasyon bulunamadı. YENİ MENZİL: " + mapDefaultRange + " metre", Toast.LENGTH_SHORT).show();
+            if (!mapIsUpdating) {
+                updateMapObject();
+            }
+        } else if (mapDefaultRange == 25000) {
+            mapIsUpdating = false;
+
+            mapDefaultRange = 50000;
+            mapDefaultZoom = 8.75f;
+            Toast.makeText(MainActivity.this, "İstasyon bulunamadı. YENİ MENZİL: " + mapDefaultRange + " metre", Toast.LENGTH_SHORT).show();
+            if (!mapIsUpdating) {
+                updateMapObject();
+            }
+        } else {
+            mapIsUpdating = false;
+            Snackbar.make(findViewById(android.R.id.content), "İstasyon bulunamadı...", Snackbar.LENGTH_LONG).show();
+        }
     }
 
     private void updateStation() {

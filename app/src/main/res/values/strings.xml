@@ -51,12 +51,13 @@
     <!-- ADMIN APIs -->
     <string name="API_ADMIN_LOGIN" translatable="false">https://fuel-spot.com/api/admin/login.php</string>
     <string name="API_ADMIN_UPDATE" translatable="false">https://fuel-spot.com/api/admin/update.php</string>
+    <string name="API_ADMIN_ADD_STATION" translatable="false">https://fuel-spot.com/api/admin/station-add.php</string>
     <string name="API_ADMIN_UPDATE_STATION" translatable="false">https://fuel-spot.com/api/admin/station-update.php</string>
 
     <!-- OTHER APIs -->
-    <string name="API_ADMIN_ADD_STATION" translatable="false">https://fuel-spot.com/api/station-add.php</string>
+    <string name="API_SEARCH_STATION" translatable="false">https://fuel-spot.com/api/station-search.php</string>
     <string name="API_COMPANY" translatable="false">https://fuel-spot.com/api/other-company.php</string>
 
-    <string name="fuelspot_api_key" translatable="false">FPh76g0MSZ2okeWQmShYDlXakjgjhbej</string>
+    <string name="fuelspot_api_key" translatable="false">Ph76g0MSZ2okeWQmShYDlXakjgjhbe</string>
     <string name="g_api_key" translatable="false">AIzaSyAxBaDtIoC8T8SFKAVmEMvWAbph_ChSD1E</string>
 </resources>

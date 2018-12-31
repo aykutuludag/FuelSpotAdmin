@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/round_layout_white"
+    android:gravity="center"
+    android:padding="8dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/station_logo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentStart="true"
+        android:layout_margin="4dp"
+        android:padding="4dp"
+        android:src="@drawable/default_station" />
+
+    <ImageView
+        android:id="@+id/gasoline"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_margin="4dp"
+        android:layout_toEndOf="@+id/station_logo"
+        android:padding="4dp"
+        android:src="@drawable/gasoline"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+    <TextView
+        android:id="@+id/priceGasoline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/gasoline"
+        android:layout_alignStart="@id/gasoline"
+        android:layout_alignEnd="@id/gasoline"
+        android:fontFamily="@font/gotham_medium"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textColor="#212121" />
+
+    <ImageView
+        android:id="@+id/diesel"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_margin="4dp"
+        android:layout_toEndOf="@+id/gasoline"
+        android:gravity="center"
+        android:padding="4dp"
+        android:src="@drawable/diesel"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+    <TextView
+        android:id="@+id/priceDiesel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/diesel"
+        android:layout_alignStart="@id/diesel"
+        android:layout_alignEnd="@id/diesel"
+        android:fontFamily="@font/gotham_medium"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textColor="#212121" />
+
+    <ImageView
+        android:id="@+id/lpg"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_margin="4dp"
+        android:layout_toEndOf="@+id/diesel"
+        android:padding="4dp"
+        android:src="@drawable/lpg"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+    <TextView
+        android:id="@+id/priceLPG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lpg"
+        android:layout_alignStart="@id/lpg"
+        android:layout_alignEnd="@id/lpg"
+        android:fontFamily="@font/gotham_medium"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textColor="#212121" />
+
+    <TextView
+        android:id="@+id/station_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/station_logo"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="@font/gotham_black"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textColor="#212121" />
+
+</RelativeLayout>
