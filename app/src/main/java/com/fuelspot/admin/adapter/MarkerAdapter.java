@@ -18,11 +18,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MarkerAdapter implements GoogleMap.InfoWindowAdapter {
 
-    RequestOptions options;
-    private Context context;
+    private Context mContext;
 
     public MarkerAdapter(Context ctx) {
-        context = ctx;
+        mContext = ctx;
     }
 
     @Override
@@ -32,7 +31,7 @@ public class MarkerAdapter implements GoogleMap.InfoWindowAdapter {
 
     @Override
     public View getInfoContents(Marker marker) {
-        View view = ((Activity) context).getLayoutInflater().inflate(R.layout.popup_marker, null);
+        View view = ((Activity) mContext).getLayoutInflater().inflate(R.layout.popup_marker, null);
 
         MarkerItem infoWindowData = (MarkerItem) marker.getTag();
 
@@ -50,7 +49,7 @@ public class MarkerAdapter implements GoogleMap.InfoWindowAdapter {
                 .error(R.drawable.default_station)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .priority(Priority.HIGH);
-        Glide.with(context).load(infoWindowData.getPhotoURL()).apply(options).into(sLogo);
+        Glide.with(mContext).load(infoWindowData.getPhotoURL()).apply(options).into(sLogo);
 
         priceOne.setText("" + infoWindowData.getGasolinePrice());
         priceTwo.setText("" + infoWindowData.getDieselPrice());

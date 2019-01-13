@@ -2,11 +2,20 @@ package com.fuelspot.admin.model;
 
 public class MarkerItem {
 
+    private int ID;
     private String stationName;
     private String photoURL;
     private float gasolinePrice;
     private float dieselPrice;
     private float lpgPrice;
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
 
     public String getStationName() {
         return stationName;

@@ -53,6 +53,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.fuelspot.admin.adapter.CompanyAdapter;
 import com.fuelspot.admin.adapter.MarkerAdapter;
 import com.fuelspot.admin.model.CompanyItem;
+import com.fuelspot.admin.model.MarkerItem;
 import com.fuelspot.admin.model.StationItem;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -1070,20 +1071,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     stationList.add(item);
 
                                     // Add marker
-                                    Location loc = new Location("");
-                                    String[] stationKonum = item.getLocation().split(";");
-                                    loc.setLatitude(Double.parseDouble(stationKonum[0]));
-                                    loc.setLongitude(Double.parseDouble(stationKonum[1]));
-                                    LatLng sydney = new LatLng(loc.getLatitude(), loc.getLongitude());
-                                    if (obj.getInt("isVerified") == 1) {
-                                        markers.add(googleMap.addMarker(new MarkerOptions().position(sydney).title(obj.getString("name")).snippet(obj.getString("vicinity")).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station))));
-                                    } else {
-                                        markers.add(googleMap.addMarker(new MarkerOptions().position(sydney).title(obj.getString("name")).snippet(obj.getString("vicinity")).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station))));
-                                    }
+                                    addMarker(item);
 
                                     // Draw a circle with radius of mapDefaultStationRange
                                     circles.add(googleMap.addCircle(new CircleOptions()
-                                            .center(new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1])))
+                                            .center(new LatLng(Double.parseDouble(item.getLocation().split(";")[0]), Double.parseDouble(item.getLocation().split(";")[1])))
                                             .radius(mapDefaultStationRange)
                                             .fillColor(0x220000FF)
                                             .strokeColor(Color.parseColor("#FF5635"))));
@@ -1167,6 +1159,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else {
             mapIsUpdating = false;
             Snackbar.make(findViewById(android.R.id.content), "İstasyon bulunamadı...", Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    private void addMarker(final StationItem sItem) {
+        // Add marker
+        MarkerItem info = new MarkerItem();
+        info.setID(sItem.getID());
+        info.setStationName(sItem.getStationName());
+        info.setPhotoURL(sItem.getPhotoURL());
+        info.setGasolinePrice(sItem.getGasolinePrice());
+        info.setDieselPrice(sItem.getDieselPrice());
+        info.setLpgPrice(sItem.getLpgPrice());
+
+        String[] stationKonum = sItem.getLocation().split(";");
+        LatLng sydney = new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1]));
+
+        if (sItem.getIsVerified() == 1) {
+            MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station));
+            Marker m = googleMap.addMarker(mOptions);
+            m.setTag(info);
+            markers.add(m);
+        } else {
+            MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station));
+            Marker m = googleMap.addMarker(mOptions);
+            m.setTag(info);
+            markers.add(m);
         }
     }
 
