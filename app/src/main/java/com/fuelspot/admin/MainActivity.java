@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.os.Build;
@@ -187,208 +185,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return (cm != null ? cm.getActiveNetworkInfo() : null) != null;
     }
 
-    // Updated on Dec 22, 2018
-    public static String stationPhotoChooser(String stationName) {
-        String photoURL;
-        switch (stationName) {
-            case "Akçagaz":
-                photoURL = "https://fuel-spot.com/station_icons/akcagaz.jpg";
-                break;
-            case "Akpet":
-                photoURL = "https://fuel-spot.com/station_icons/akpet.jpg";
-                break;
-            case "Alpet":
-                photoURL = "https://fuel-spot.com/station_icons/alpet.jpg";
-                break;
-            case "Anadolugaz":
-                photoURL = "https://fuel-spot.com/station_icons/anadolugaz.jpg";
-                break;
-            case "Antoil":
-                photoURL = "https://fuel-spot.com/station_icons/antoil.jpg";
-                break;
-            case "Aygaz":
-                photoURL = "https://fuel-spot.com/station_icons/aygaz.jpg";
-                break;
-            case "Aytemiz":
-                photoURL = "https://fuel-spot.com/station_icons/aytemiz.jpg";
-                break;
-            case "Best":
-                photoURL = "https://fuel-spot.com/station_icons/best.jpg";
-                break;
-            case "BP":
-                photoURL = "https://fuel-spot.com/station_icons/bp.jpg";
-                break;
-            case "Bpet":
-                photoURL = "https://fuel-spot.com/station_icons/bpet.jpg";
-                break;
-            case "Çekoil":
-                photoURL = "https://fuel-spot.com/station_icons/cekoil.jpg";
-                break;
-            case "Class":
-                photoURL = "https://fuel-spot.com/station_icons/class.jpg";
-                break;
-            case "Damla Petrol":
-                photoURL = "https://fuel-spot.com/station_icons/damla-petrol.jpg";
-                break;
-            case "Ecogaz":
-                photoURL = "https://fuel-spot.com/station_icons/ecogaz.jpg";
-                break;
-            case "Energy":
-                photoURL = "https://fuel-spot.com/station_icons/energy.jpg";
-                break;
-            case "Erk":
-                photoURL = "https://fuel-spot.com/station_icons/erk.jpg";
-                break;
-            case "Euroil":
-                photoURL = "https://fuel-spot.com/station_icons/euroil.jpg";
-                break;
-            case "Exengaz":
-                photoURL = "https://fuel-spot.com/station_icons/exengaz.jpg";
-                break;
-            case "GO":
-                photoURL = "https://fuel-spot.com/station_icons/go.jpg";
-                break;
-            case "Gulf":
-                photoURL = "https://fuel-spot.com/station_icons/gulf.jpg";
-                break;
-            case "Güneygaz":
-                photoURL = "https://fuel-spot.com/station_icons/guneygaz.jpg";
-                break;
-            case "Güvenal Gaz":
-                photoURL = "https://fuel-spot.com/station_icons/guvenalgaz.jpg";
-                break;
-            case "Habaş":
-                photoURL = "https://fuel-spot.com/station_icons/habas.jpg";
-                break;
-            case "Hisarpet":
-                photoURL = "https://fuel-spot.com/station_icons/hisarpet.jpg";
-                break;
-            case "İpragaz":
-            case "Ipragaz":
-                photoURL = "https://fuel-spot.com/station_icons/ipragaz.jpg";
-                break;
-            case "Jetpet":
-                photoURL = "https://fuel-spot.com/station_icons/jetpet.jpg";
-                break;
-            case "Kadoil":
-                photoURL = "https://fuel-spot.com/station_icons/kadoil.jpg";
-                break;
-            case "Kalegaz":
-                photoURL = "https://fuel-spot.com/station_icons/kalegaz.jpg";
-                break;
-            case "Kalepet":
-                photoURL = "https://fuel-spot.com/station_icons/kalepet.jpg";
-                break;
-            case "K-pet":
-            case "Kpet":
-                photoURL = "https://fuel-spot.com/station_icons/kpet.jpg";
-                break;
-            case "Ligoil":
-                photoURL = "https://fuel-spot.com/station_icons/ligoil.jpg";
-                break;
-            case "Lipetgaz":
-                photoURL = "https://fuel-spot.com/station_icons/lipetgaz.jpg";
-                break;
-            case "Lukoil":
-                photoURL = "https://fuel-spot.com/station_icons/lukoil.jpg";
-                break;
-            case "Memoil":
-                photoURL = "https://fuel-spot.com/station_icons/memoil.jpg";
-                break;
-            case "Milangaz":
-                photoURL = "https://fuel-spot.com/station_icons/milangaz.jpg";
-                break;
-            case "Mogaz":
-                photoURL = "https://fuel-spot.com/station_icons/mogaz.jpg";
-                break;
-            case "Moil":
-                photoURL = "https://fuel-spot.com/station_icons/moil.jpg";
-                break;
-            case "Mola":
-                photoURL = "https://fuel-spot.com/station_icons/mola.jpg";
-                break;
-            case "Onex":
-                photoURL = "https://fuel-spot.com/station_icons/opet.jpg";
-                break;
-            case "Opet":
-                photoURL = "https://fuel-spot.com/station_icons/opet.jpg";
-                break;
-            case "Pacific":
-                photoURL = "https://fuel-spot.com/station_icons/pacific.jpg";
-                break;
-            case "Parkoil":
-                photoURL = "https://fuel-spot.com/station_icons/parkoil.jpg";
-                break;
-            case "Petline":
-                photoURL = "https://fuel-spot.com/station_icons/petline.jpg";
-                break;
-            case "Petrol Ofisi":
-                photoURL = "https://fuel-spot.com/station_icons/petrol-ofisi.jpg";
-                break;
-            case "Petrotürk":
-                photoURL = "https://fuel-spot.com/station_icons/petroturk.jpg";
-                break;
-            case "Powerwax":
-                photoURL = "https://fuel-spot.com/station_icons/powerwax.jpg";
-                break;
-            case "Qplus":
-                photoURL = "https://fuel-spot.com/station_icons/qplus.jpg";
-                break;
-            case "Remoil":
-                photoURL = "https://fuel-spot.com/station_icons/remoil.jpg";
-                break;
-            case "Sanoil":
-                photoURL = "https://fuel-spot.com/station_icons/sanoil.jpg";
-                break;
-            case "Shell":
-                photoURL = "https://fuel-spot.com/station_icons/shell.jpg";
-                break;
-            case "S-Oil":
-                photoURL = "https://fuel-spot.com/station_icons/s-oil.jpg";
-                break;
-            case "Starpet":
-                photoURL = "https://fuel-spot.com/station_icons/starpet.jpg";
-                break;
-            case "Sunpet":
-                photoURL = "https://fuel-spot.com/station_icons/sunpet.jpg";
-                break;
-            case "Teco":
-                photoURL = "https://fuel-spot.com/station_icons/teco.jpg";
-                break;
-            case "Termo":
-                photoURL = "https://fuel-spot.com/station_icons/termo.jpg";
-                break;
-            case "Total":
-                photoURL = "https://fuel-spot.com/station_icons/total.jpg";
-                break;
-            case "Turkuaz":
-                photoURL = "https://fuel-spot.com/station_icons/turkuaz.jpg";
-                break;
-            case "Türkiş":
-                photoURL = "https://fuel-spot.com/station_icons/turkis.jpg";
-                break;
-            case "Türkiye Petrolleri":
-                photoURL = "https://fuel-spot.com/station_icons/turkiye-petrolleri.jpg";
-                break;
-            case "Türkoil":
-                photoURL = "https://fuel-spot.com/station_icons/turkoil.jpg";
-                break;
-            case "Türkpetrol":
-                photoURL = "https://fuel-spot.com/station_icons/turkpetrol.jpg";
-                break;
-            case "United":
-                photoURL = "https://fuel-spot.com/station_icons/united.jpg";
-                break;
-            case "Uspet":
-                photoURL = "https://fuel-spot.com/station_icons/uspet.jpg";
-                break;
-            default:
-                photoURL = "https://fuel-spot.com/default_icons/station.jpg";
-                break;
-        }
-        return photoURL;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -490,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                         } else {
                                             if (stationID != 0) {
                                                 stationID = 0;
-                                                stationName = "Bilinmiyor";
+                                                stationName = "";
                                                 stationVicinity = "";
                                                 stationLocation = "";
                                                 stationCountry = "";
@@ -1013,7 +809,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             markers.clear();
         }
 
-        markers.clear();
         if (googleMap != null) {
             googleMap.clear();
 
@@ -1248,20 +1043,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         requestQueue.add(stringRequest);
     }
 
-    private String countryFinder(double lat, double lon) {
-        Geocoder geo = new Geocoder(getApplicationContext(), Locale.getDefault());
-        try {
-            List<Address> addresses = geo.getFromLocation(lat, lon, 1);
-            if (addresses.size() > 0) {
-                return addresses.get(0).getCountryCode();
-            } else {
-                return "";
-            }
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
     void fetchAccount() {
         //Showing the progress dialog
         StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_LOGIN),
@@ -1364,7 +1145,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     void fetchCompanies() {
         //Showing the progress dialog
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_COMPANY),
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.OTHER_COMPANY),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
