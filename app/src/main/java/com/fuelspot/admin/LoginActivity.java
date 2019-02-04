@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
@@ -341,14 +343,15 @@ public class LoginActivity extends AppCompatActivity {
         if (background != null) {
             String uriPath = "android.resource://" + getPackageName() + "/" + R.raw.background_login;
             Uri uri = Uri.parse(uriPath);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                background.setAudioFocusRequest(AudioManager.AUDIOFOCUS_NONE);
+            }
             background.setVideoURI(uri);
-            background.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
+            background.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                public void onPrepared(MediaPlayer mp) {
                     background.start();
                 }
             });
-            background.start();
         }
     }
 }

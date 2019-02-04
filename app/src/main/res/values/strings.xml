@@ -62,5 +62,6 @@
 
     <!-- OTHER APIs -->
     <string name="OTHER_COMPANY" translatable="false">https://fuel-spot.com/api/other/company.php</string>
+    <string name="title_activity_add_stations">AddStations</string>
 
 </resources>
