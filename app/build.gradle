@@ -9,7 +9,7 @@ android {
         applicationId "com.fuelspot.admin"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 17
+        versionCode 18
         versionName "1.0"
         multiDexEnabled true
         useLibrary 'org.apache.http.legacy'
@@ -36,12 +36,12 @@ dependencies {
 
     // PLAY-SERVICES
     implementation 'com.google.android.gms:play-services-location:16.0.0'
-    implementation 'com.google.android.gms:play-services-maps:16.0.0'
-    implementation 'com.google.android.gms:play-services-analytics:16.0.6'
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.8'
+    implementation 'com.google.android.gms:play-services-maps:16.1.0'
+    implementation 'com.google.android.gms:play-services-analytics:16.0.7'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.9'
 
     // FIREBASE
-    implementation 'com.google.firebase:firebase-core:16.0.6'
+    implementation 'com.google.firebase:firebase-core:16.0.7'
     implementation 'com.google.firebase:firebase-messaging:17.3.4'
 
     // 3RD PARTY

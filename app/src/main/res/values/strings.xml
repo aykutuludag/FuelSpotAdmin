@@ -50,6 +50,10 @@
     <string name="facilities">Tesisler</string>
     <string name="profileUpdated">Profil güncellendi…</string>
     <string name="noOwner">SAHİP YOK</string>
+    <string name="gasoline">Benzin</string>
+    <string name="diesel">Dizel</string>
+    <string name="lpg">LPG</string>
+    <string name="electricity">Elektrik</string>
 
     <!-- ADMIN APIs -->
     <string name="API_ADMIN_LOGIN" translatable="false">https://fuel-spot.com/api/admin/login.php</string>

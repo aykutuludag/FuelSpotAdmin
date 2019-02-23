@@ -116,9 +116,13 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/editTextStationLicense"
                     android:layout_centerHorizontal="true"
-                    android:layout_margin="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
                     android:ems="10"
                     android:gravity="center"
+                    android:hint="@string/noOwner"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
                 <CheckBox
@@ -237,6 +241,7 @@
                         android:layout_alignEnd="@id/gasolineIcon"
                         android:ems="10"
                         android:gravity="center"
+                        android:hint="@string/gasoline"
                         android:inputType="numberDecimal"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -257,6 +262,7 @@
                         android:layout_alignEnd="@id/dieselIcon"
                         android:ems="10"
                         android:gravity="center"
+                        android:hint="@string/diesel"
                         android:inputType="numberDecimal"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -277,6 +283,7 @@
                         android:layout_alignEnd="@id/lpgIcon"
                         android:ems="10"
                         android:gravity="center"
+                        android:hint="@string/lpg"
                         android:inputType="numberDecimal"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -297,6 +304,7 @@
                         android:layout_alignEnd="@id/electricityIcon"
                         android:ems="10"
                         android:gravity="center"
+                        android:hint="@string/electricity"
                         android:inputType="numberDecimal"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
                 </RelativeLayout>

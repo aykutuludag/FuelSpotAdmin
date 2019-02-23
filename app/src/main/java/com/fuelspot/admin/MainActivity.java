@@ -632,6 +632,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 googleMap.getUiSettings().setMapToolbarEnabled(false);
                 googleMap.getUiSettings().setScrollGesturesEnabled(true);
                 googleMap.setTrafficEnabled(true);
+                MarkerAdapter customInfoWindow = new MarkerAdapter(MainActivity.this);
+                googleMap.setInfoWindowAdapter(customInfoWindow);
             }
         });
     }
@@ -720,8 +722,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                             .strokeColor(Color.parseColor("#FF5635"))));
                                 }
 
-                                MarkerAdapter customInfoWindow = new MarkerAdapter(MainActivity.this);
-                                googleMap.setInfoWindowAdapter(customInfoWindow);
                                 mapIsUpdating = false;
                             } catch (JSONException e) {
                                 Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
@@ -820,22 +820,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 prefs.edit().putString("lon", userlon).apply();
                                 MainActivity.getVariables(prefs);
 
-                                if (stationList != null && stationList.size() == 0) {
-                                    if (!mapIsUpdating) {
-                                        updateMapObject();
-                                    }
-                                }
-
                                 float distanceInMeter = locLastKnown.distanceTo(locCurrent);
 
-                                if (distanceInMeter >= (mapDefaultRange / 2)) {
-                                    locLastKnown.setLatitude(Double.parseDouble(userlat));
-                                    locLastKnown.setLongitude(Double.parseDouble(userlon));
-                                    if (!mapIsUpdating) {
-                                        updateMapObject();
-                                    }
-                                } else {
-                                    if (stationList != null && stationList.size() > 0) {
+                                if (stationList != null) {
+                                    if (stationList.size() == 0 || distanceInMeter >= (mapDefaultRange / 2)) {
+                                        locLastKnown.setLatitude(Double.parseDouble(userlat));
+                                        locLastKnown.setLongitude(Double.parseDouble(userlon));
+                                        if (!mapIsUpdating) {
+                                            updateMapObject();
+                                        }
+                                    } else {
                                         for (int i = 0; i < stationList.size(); i++) {
                                             String[] stationLocation = stationList.get(i).getLocation().split(";");
                                             double stationLat = Double.parseDouble(stationLocation[0]);
@@ -893,6 +887,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                 }
                                             }
                                         }
+                                    }
+                                } else {
+                                    if (!mapIsUpdating) {
+                                        updateMapObject();
                                     }
                                 }
                             }
