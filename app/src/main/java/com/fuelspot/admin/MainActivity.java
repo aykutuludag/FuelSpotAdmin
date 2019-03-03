@@ -36,6 +36,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -157,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     //Layout items
     Button buttonMissingStation;
     ProgressDialog dialog;
+    ScrollView mScrollView;
 
     public static void getVariables(SharedPreferences prefs) {
         name = prefs.getString("Name", "");
@@ -206,6 +208,198 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         }
         return photoURL;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        //Window
+        window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        // Initializing Toolbar and setting it as the actionbar
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setLogo(R.drawable.brand_logo);
+        }
+
+        coloredBars(Color.parseColor("#616161"), Color.parseColor("#ffffff"));
+        prefs = getSharedPreferences("AdminInformation", Context.MODE_PRIVATE);
+        requestQueue = Volley.newRequestQueue(this);
+        options = new RequestOptions().centerCrop().error(R.drawable.default_station).error(R.drawable.default_station)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .priority(Priority.HIGH);
+
+        // ProgressDialogs
+        dialog = new ProgressDialog(MainActivity.this);
+        dialog.setTitle("Bölge taranıyor");
+        dialog.setMessage("Lütfen bekleyiniz...");
+        dialog.setIndeterminate(true);
+        dialog.setCancelable(false);
+
+        // Activate map
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        MapsInitializer.initialize(this.getApplicationContext());
+        verifiedIcon = BitmapDescriptorFactory.fromResource(R.drawable.verified_station);
+
+        mScrollView = findViewById(R.id.scrollView);
+        mMapView = findViewById(R.id.mapView);
+        mMapView.onCreate(savedInstanceState);
+
+        locLastKnown = new Location("");
+        locLastKnown.setLatitude(Double.parseDouble(userlat));
+        locLastKnown.setLongitude(Double.parseDouble(userlon));
+
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(5000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult != null) {
+                    synchronized (this) {
+                        super.onLocationResult(locationResult);
+                        Location locCurrent = locationResult.getLastLocation();
+                        if (locCurrent != null) {
+                            if (locCurrent.getAccuracy() <= mapDefaultStationRange * 2) {
+                                userlat = String.valueOf(locCurrent.getLatitude());
+                                userlon = String.valueOf(locCurrent.getLongitude());
+                                prefs.edit().putString("lat", userlat).apply();
+                                prefs.edit().putString("lon", userlon).apply();
+                                MainActivity.getVariables(prefs);
+
+                                float distanceInMeter = locLastKnown.distanceTo(locCurrent);
+
+                                if (stationList != null) {
+                                    if (stationList.size() == 0 || distanceInMeter >= (mapDefaultRange / 2)) {
+                                        locLastKnown.setLatitude(Double.parseDouble(userlat));
+                                        locLastKnown.setLongitude(Double.parseDouble(userlon));
+                                        if (!mapIsUpdating) {
+                                            updateMapObject();
+                                        }
+                                    } else {
+                                        for (int i = 0; i < stationList.size(); i++) {
+                                            String[] stationLocation = stationList.get(i).getLocation().split(";");
+                                            double stationLat = Double.parseDouble(stationLocation[0]);
+                                            double stationLon = Double.parseDouble(stationLocation[1]);
+
+                                            Location locStation = new Location("");
+                                            locStation.setLatitude(stationLat);
+                                            locStation.setLongitude(stationLon);
+
+                                            float newDistance = locCurrent.distanceTo(locStation);
+                                            stationList.get(i).setDistance((int) newDistance);
+                                        }
+
+                                        isAtStation = isWorkerAtStation();
+
+                                        if (isAtStation) {
+                                            if (stationID != currentID) {
+                                                loadLayoutItems();
+
+                                                // For zooming automatically to the location of the marker
+                                                if (googleMap != null) {
+                                                    LatLng mCurrentLocation = new LatLng(Double.parseDouble(stationLocation.split(";")[0]), Double.parseDouble(stationLocation.split(";")[1]));
+                                                    CameraPosition cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapStationZoom).build();
+                                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                                }
+                                            }
+                                        } else {
+                                            if (stationID != 0) {
+                                                stationID = 0;
+                                                stationName = "";
+                                                stationVicinity = "";
+                                                stationLocation = "";
+                                                stationCountry = "";
+                                                placeID = "";
+                                                facilitiesOfStation = "";
+                                                stationLogo = "https://fuel-spot.com/default_icons/station.jpg";
+                                                gasolinePrice = 0;
+                                                dieselPrice = 0;
+                                                lpgPrice = 0;
+                                                electricityPrice = 0;
+                                                stationLicense = "";
+                                                istasyonSahibi = "";
+                                                isStationVerified = 0;
+                                                hasMobilePayment = 0;
+                                                hasFuelDelivery = 0;
+                                                sonGuncelleme = "";
+
+                                                loadLayoutItems();
+
+                                                // For zooming automatically to the location of the marker
+                                                if (googleMap != null) {
+                                                    LatLng mCurrentLocation = new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon));
+                                                    CameraPosition cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapDefaultZoom).build();
+                                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if (!mapIsUpdating) {
+                                        updateMapObject();
+                                    }
+                                }
+                            }
+                        } else {
+                            Snackbar.make(findViewById(android.R.id.content), getString(R.string.error_no_location), Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+                }
+            }
+        };
+
+        buttonMissingStation = findViewById(R.id.buttonEksikIstasyon);
+        buttonMissingStation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchStationsOverGoogle("");
+            }
+        });
+        stationLogoHolder = findViewById(R.id.stationLogo);
+        spinner = findViewById(R.id.simpleSpinner);
+        stationAddressHolder = findViewById(R.id.editTextStationAddress);
+        stationLicenseHolder = findViewById(R.id.editTextStationLicense);
+        textViewOwnerHolder = findViewById(R.id.editTextOwner);
+        textViewStationIDHolder = findViewById(R.id.textViewStationID);
+        onayliIstasyon = findViewById(R.id.checkBox);
+        mobilOdeme = findViewById(R.id.checkBox2);
+        aloyakit = findViewById(R.id.checkBox3);
+        lastUpdateTimeText = findViewById(R.id.stationLastUpdate);
+        verifiedLayout = findViewById(R.id.verifiedSection);
+        gasolineHolder = findViewById(R.id.editTextGasoline);
+        dieselHolder = findViewById(R.id.editTextDiesel);
+        lpgHolder = findViewById(R.id.editTextLPG);
+        electricityHolder = findViewById(R.id.editTextElectricity);
+        imageViewWC = findViewById(R.id.WC);
+        imageViewMarket = findViewById(R.id.Market);
+        imageViewCarWash = findViewById(R.id.CarWash);
+        imageViewTireRepair = findViewById(R.id.TireRepair);
+        imageViewMechanic = findViewById(R.id.Mechanic);
+        imageViewRestaurant = findViewById(R.id.Restaurant);
+        imageViewParkSpot = findViewById(R.id.ParkSpot);
+        buttonUpdateStation = findViewById(R.id.buttonUpdate);
+        buttonUpdateStation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isAtStation) {
+                    updateStation();
+                } else {
+                    Snackbar.make(findViewById(android.R.id.content), getString(R.string.uAreNotAtStation), Snackbar.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        checkLocationPermission();
+        fetchAccount();
+        fetchCompanies();
     }
 
     void loadLayoutItems() {
@@ -628,10 +822,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 googleMap.setMyLocationEnabled(true);
                 googleMap.getUiSettings().setCompassEnabled(true);
                 googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-                googleMap.getUiSettings().setZoomControlsEnabled(true);
                 googleMap.getUiSettings().setMapToolbarEnabled(false);
-                googleMap.getUiSettings().setScrollGesturesEnabled(true);
+                googleMap.getUiSettings().setZoomControlsEnabled(true);
                 googleMap.setTrafficEnabled(true);
+                googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+                    @Override
+                    public void onCameraMoveStarted(int i) {
+                        if (i == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                            mScrollView.requestDisallowInterceptTouchEvent(true);
+                        }
+                    }
+                });
+
+                // For zooming automatically to the location of the marker
+                LatLng mCurrentLocation = new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon));
+                CameraPosition cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapDefaultZoom).build();
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
                 MarkerAdapter customInfoWindow = new MarkerAdapter(MainActivity.this);
                 googleMap.setInfoWindowAdapter(customInfoWindow);
             }
@@ -639,23 +846,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void updateMapObject() {
-        mapIsUpdating = true;
-        stationList.clear();
-        if (circles != null && circles.size() > 0) {
-            for (int i = 0; i < circles.size(); i++) {
-                circles.get(i).remove();
-            }
-            circles.clear();
-        }
-
-        if (markers != null && markers.size() > 0) {
-            if (googleMap != null) {
-                googleMap.clear();
-            }
-            markers.clear();
-        }
-
         if (googleMap != null) {
+            mapIsUpdating = true;
+            stationList.clear();
+            circles.clear();
+            markers.clear();
             googleMap.clear();
 
             //Draw a circle with radius of mapDefaultRange
@@ -664,14 +859,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     .radius(mapDefaultRange)
                     .fillColor(0x220000FF)
                     .strokeColor(Color.parseColor("#FF5635")));
+
+            // For zooming automatically to the location of the marker
+            LatLng mCurrentLocation = new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon));
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapDefaultZoom).build();
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+            if (isNetworkConnected(this)) {
+                fetchStations();
+            } else {
+                mapIsUpdating = false;
+                Toast.makeText(MainActivity.this, "İnternet bağlantısında bir sorun var", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            mapIsUpdating = false;
+            Toast.makeText(MainActivity.this, "İnternet bağlantısında bir sorun var", Toast.LENGTH_LONG).show();
         }
-
-        // For zooming automatically to the location of the marker
-        LatLng mCurrentLocation = new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon));
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapDefaultZoom).build();
-        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-        fetchStations();
     }
 
     private void fetchStations() {
@@ -755,197 +958,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Adding request to the queue
         requestQueue.add(stringRequest);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        //Window
-        window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        // Initializing Toolbar and setting it as the actionbar
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-            getSupportActionBar().setLogo(R.drawable.brand_logo);
-        }
-
-        coloredBars(Color.parseColor("#616161"), Color.parseColor("#ffffff"));
-        prefs = getSharedPreferences("AdminInformation", Context.MODE_PRIVATE);
-        requestQueue = Volley.newRequestQueue(this);
-        options = new RequestOptions().centerCrop().error(R.drawable.default_station).error(R.drawable.default_station)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .priority(Priority.HIGH);
-
-        // ProgressDialogs
-        dialog = new ProgressDialog(MainActivity.this);
-        dialog.setTitle("Bölge taranıyor");
-        dialog.setMessage("Lütfen bekleyiniz...");
-        dialog.setIndeterminate(true);
-        dialog.setCancelable(false);
-
-        // Activate map
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        MapsInitializer.initialize(this.getApplicationContext());
-        verifiedIcon = BitmapDescriptorFactory.fromResource(R.drawable.verified_station);
-
-        mMapView = findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
-
-        locLastKnown = new Location("");
-        locLastKnown.setLatitude(Double.parseDouble(userlat));
-        locLastKnown.setLongitude(Double.parseDouble(userlon));
-
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(5000);
-        mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult != null) {
-                    synchronized (this) {
-                        super.onLocationResult(locationResult);
-                        Location locCurrent = locationResult.getLastLocation();
-                        if (locCurrent != null) {
-                            if (locCurrent.getAccuracy() <= mapDefaultStationRange * 2) {
-                                userlat = String.valueOf(locCurrent.getLatitude());
-                                userlon = String.valueOf(locCurrent.getLongitude());
-                                prefs.edit().putString("lat", userlat).apply();
-                                prefs.edit().putString("lon", userlon).apply();
-                                MainActivity.getVariables(prefs);
-
-                                float distanceInMeter = locLastKnown.distanceTo(locCurrent);
-
-                                if (stationList != null) {
-                                    if (stationList.size() == 0 || distanceInMeter >= (mapDefaultRange / 2)) {
-                                        locLastKnown.setLatitude(Double.parseDouble(userlat));
-                                        locLastKnown.setLongitude(Double.parseDouble(userlon));
-                                        if (!mapIsUpdating) {
-                                            updateMapObject();
-                                        }
-                                    } else {
-                                        for (int i = 0; i < stationList.size(); i++) {
-                                            String[] stationLocation = stationList.get(i).getLocation().split(";");
-                                            double stationLat = Double.parseDouble(stationLocation[0]);
-                                            double stationLon = Double.parseDouble(stationLocation[1]);
-
-                                            Location locStation = new Location("");
-                                            locStation.setLatitude(stationLat);
-                                            locStation.setLongitude(stationLon);
-
-                                            float newDistance = locCurrent.distanceTo(locStation);
-                                            stationList.get(i).setDistance((int) newDistance);
-                                        }
-
-                                        isAtStation = isWorkerAtStation();
-
-                                        if (isAtStation) {
-                                            if (stationID != currentID) {
-                                                loadLayoutItems();
-
-                                                // For zooming automatically to the location of the marker
-                                                if (googleMap != null) {
-                                                    LatLng mCurrentLocation = new LatLng(Double.parseDouble(stationLocation.split(";")[0]), Double.parseDouble(stationLocation.split(";")[1]));
-                                                    CameraPosition cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapStationZoom).build();
-                                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                                                }
-                                            }
-                                        } else {
-                                            if (stationID != 0) {
-                                                stationID = 0;
-                                                stationName = "";
-                                                stationVicinity = "";
-                                                stationLocation = "";
-                                                stationCountry = "";
-                                                placeID = "";
-                                                facilitiesOfStation = "";
-                                                stationLogo = "https://fuel-spot.com/default_icons/station.jpg";
-                                                gasolinePrice = 0;
-                                                dieselPrice = 0;
-                                                lpgPrice = 0;
-                                                electricityPrice = 0;
-                                                stationLicense = "";
-                                                istasyonSahibi = "";
-                                                isStationVerified = 0;
-                                                hasMobilePayment = 0;
-                                                hasFuelDelivery = 0;
-                                                sonGuncelleme = "";
-
-                                                loadLayoutItems();
-
-                                                // For zooming automatically to the location of the marker
-                                                if (googleMap != null) {
-                                                    LatLng mCurrentLocation = new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon));
-                                                    CameraPosition cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapDefaultZoom).build();
-                                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                                                }
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    if (!mapIsUpdating) {
-                                        updateMapObject();
-                                    }
-                                }
-                            }
-                        } else {
-                            Snackbar.make(findViewById(android.R.id.content), getString(R.string.error_no_location), Snackbar.LENGTH_LONG).show();
-                        }
-                    }
-                }
-            }
-        };
-
-        buttonMissingStation = findViewById(R.id.buttonEksikIstasyon);
-        buttonMissingStation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchStationsOverGoogle("");
-            }
-        });
-        stationLogoHolder = findViewById(R.id.stationLogo);
-        spinner = findViewById(R.id.simpleSpinner);
-        stationAddressHolder = findViewById(R.id.editTextStationAddress);
-        stationLicenseHolder = findViewById(R.id.editTextStationLicense);
-        textViewOwnerHolder = findViewById(R.id.editTextOwner);
-        textViewStationIDHolder = findViewById(R.id.textViewStationID);
-        onayliIstasyon = findViewById(R.id.checkBox);
-        mobilOdeme = findViewById(R.id.checkBox2);
-        aloyakit = findViewById(R.id.checkBox3);
-        lastUpdateTimeText = findViewById(R.id.stationLastUpdate);
-        verifiedLayout = findViewById(R.id.verifiedSection);
-        gasolineHolder = findViewById(R.id.editTextGasoline);
-        dieselHolder = findViewById(R.id.editTextDiesel);
-        lpgHolder = findViewById(R.id.editTextLPG);
-        electricityHolder = findViewById(R.id.editTextElectricity);
-        imageViewWC = findViewById(R.id.WC);
-        imageViewMarket = findViewById(R.id.Market);
-        imageViewCarWash = findViewById(R.id.CarWash);
-        imageViewTireRepair = findViewById(R.id.TireRepair);
-        imageViewMechanic = findViewById(R.id.Mechanic);
-        imageViewRestaurant = findViewById(R.id.Restaurant);
-        imageViewParkSpot = findViewById(R.id.ParkSpot);
-        buttonUpdateStation = findViewById(R.id.buttonUpdate);
-        buttonUpdateStation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isAtStation) {
-                    updateStation();
-                } else {
-                    Snackbar.make(findViewById(android.R.id.content), getString(R.string.uAreNotAtStation), Snackbar.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        checkLocationPermission();
-        fetchAccount();
-        fetchCompanies();
     }
 
     private void addMarker(final StationItem sItem) {
@@ -1279,10 +1291,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if (token != null && token.length() > 0) {
             // For getting next 20 stations
-            url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + mapDefaultRange + "&type=gas_station&pagetoken=" + token + "&key=" + getString(R.string.g_api_key);
+            url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + 50000 + "&type=gas_station&pagetoken=" + token + "&key=" + getString(R.string.g_api_key);
         } else {
             // For getting first 20 stations
-            url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + mapDefaultRange + "&type=gas_station" + "&key=" + getString(R.string.g_api_key);
+            url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + 50000 + "&type=gas_station" + "&key=" + getString(R.string.g_api_key);
         }
 
         // Request a string response from the provided URL.
