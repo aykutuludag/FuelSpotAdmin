@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     RequestOptions options;
     BitmapDescriptor verifiedIcon;
     RelativeLayout verifiedLayout;
-    CircleImageView imageViewWC, imageViewMarket, imageViewCarWash, imageViewTireRepair, imageViewMechanic, imageViewRestaurant, imageViewParkSpot;
+    CircleImageView imageViewWC, imageViewMarket, imageViewCarWash, imageViewTireRepair, imageViewMechanic, imageViewRestaurant, imageViewParkSpot, imageViewATM;
     Spinner spinner;
     JSONObject facilitiesObj;
     static List<String> googleIDs = new ArrayList<>();
@@ -385,6 +385,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         imageViewMechanic = findViewById(R.id.Mechanic);
         imageViewRestaurant = findViewById(R.id.Restaurant);
         imageViewParkSpot = findViewById(R.id.ParkSpot);
+        imageViewATM = findViewById(R.id.ATM);
         buttonUpdateStation = findViewById(R.id.buttonUpdate);
         buttonUpdateStation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -397,9 +398,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        checkLocationPermission();
-        fetchAccount();
-        fetchCompanies();
+        if (isNetworkConnected(this)) {
+            checkLocationPermission();
+            fetchAccount();
+            fetchCompanies();
+        } else {
+            Toast.makeText(this, getString(R.string.no_internet), Toast.LENGTH_LONG).show();
+        }
     }
 
     void loadLayoutItems() {
@@ -625,43 +630,49 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if (facilitiesObj.getInt("WC") == 1) {
                 imageViewWC.setAlpha(1.0f);
             } else {
-                imageViewWC.setAlpha(0.5f);
+                imageViewWC.setAlpha(0.25f);
             }
 
             if (facilitiesObj.getInt("Market") == 1) {
                 imageViewMarket.setAlpha(1.0f);
             } else {
-                imageViewMarket.setAlpha(0.5f);
+                imageViewMarket.setAlpha(0.25f);
             }
 
             if (facilitiesObj.getInt("CarWash") == 1) {
                 imageViewCarWash.setAlpha(1.0f);
             } else {
-                imageViewCarWash.setAlpha(0.5f);
+                imageViewCarWash.setAlpha(0.25f);
             }
 
             if (facilitiesObj.getInt("TireRepair") == 1) {
                 imageViewTireRepair.setAlpha(1.0f);
             } else {
-                imageViewTireRepair.setAlpha(0.5f);
+                imageViewTireRepair.setAlpha(0.25f);
             }
 
             if (facilitiesObj.getInt("Mechanic") == 1) {
                 imageViewMechanic.setAlpha(1.0f);
             } else {
-                imageViewMechanic.setAlpha(0.5f);
+                imageViewMechanic.setAlpha(0.25f);
             }
 
             if (facilitiesObj.getInt("Restaurant") == 1) {
                 imageViewRestaurant.setAlpha(1.0f);
             } else {
-                imageViewRestaurant.setAlpha(0.5f);
+                imageViewRestaurant.setAlpha(0.25f);
             }
 
             if (facilitiesObj.getInt("ParkSpot") == 1) {
                 imageViewParkSpot.setAlpha(1.0f);
             } else {
-                imageViewParkSpot.setAlpha(0.5f);
+                imageViewParkSpot.setAlpha(0.25f);
+            }
+
+            if (facilitiesObj.getInt("ATM") == 1) {
+                imageViewATM.setAlpha(1.0f);
+            } else {
+                imageViewATM.setAlpha(0.25f);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -675,7 +686,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         try {
                             if (facilitiesObj.getInt("WC") == 1) {
                                 facilitiesObj.put("WC", "0");
-                                imageViewWC.setAlpha(0.5f);
+                                imageViewWC.setAlpha(0.25f);
                             } else {
                                 facilitiesObj.put("WC", "1");
                                 imageViewWC.setAlpha(1.0f);
@@ -694,7 +705,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         try {
                             if (facilitiesObj.getInt("Market") == 1) {
                                 facilitiesObj.put("Market", "0");
-                                imageViewMarket.setAlpha(0.5f);
+                                imageViewMarket.setAlpha(0.25f);
                             } else {
                                 facilitiesObj.put("Market", "1");
                                 imageViewMarket.setAlpha(1.0f);
@@ -713,7 +724,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         try {
                             if (facilitiesObj.getInt("CarWash") == 1) {
                                 facilitiesObj.put("CarWash", "0");
-                                imageViewCarWash.setAlpha(0.5f);
+                                imageViewCarWash.setAlpha(0.25f);
                             } else {
                                 facilitiesObj.put("CarWash", "1");
                                 imageViewCarWash.setAlpha(1.0f);
@@ -732,7 +743,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         try {
                             if (facilitiesObj.getInt("TireRepair") == 1) {
                                 facilitiesObj.put("TireRepair", "0");
-                                imageViewTireRepair.setAlpha(0.5f);
+                                imageViewTireRepair.setAlpha(0.25f);
                             } else {
                                 facilitiesObj.put("TireRepair", "1");
                                 imageViewTireRepair.setAlpha(1.0f);
@@ -751,7 +762,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         try {
                             if (facilitiesObj.getInt("Mechanic") == 1) {
                                 facilitiesObj.put("Mechanic", "0");
-                                imageViewMechanic.setAlpha(0.5f);
+                                imageViewMechanic.setAlpha(0.25f);
                             } else {
                                 facilitiesObj.put("Mechanic", "1");
                                 imageViewMechanic.setAlpha(1.0f);
@@ -770,7 +781,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         try {
                             if (facilitiesObj.getInt("Restaurant") == 1) {
                                 facilitiesObj.put("Restaurant", "0");
-                                imageViewRestaurant.setAlpha(0.5f);
+                                imageViewRestaurant.setAlpha(0.25f);
                             } else {
                                 facilitiesObj.put("Restaurant", "1");
                                 imageViewRestaurant.setAlpha(1.0f);
@@ -789,10 +800,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         try {
                             if (facilitiesObj.getInt("ParkSpot") == 1) {
                                 facilitiesObj.put("ParkSpot", "0");
-                                imageViewParkSpot.setAlpha(0.5f);
+                                imageViewParkSpot.setAlpha(0.25f);
                             } else {
                                 facilitiesObj.put("ParkSpot", "1");
                                 imageViewParkSpot.setAlpha(1.0f);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+
+            imageViewATM.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isAtStation) {
+                        try {
+                            if (facilitiesObj.getInt("ATM") == 1) {
+                                facilitiesObj.put("ATM", "0");
+                                imageViewATM.setAlpha(0.25f);
+                            } else {
+                                facilitiesObj.put("ATM", "1");
+                                imageViewATM.setAlpha(1.0f);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
