@@ -200,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public static String stationPhotoChooser(String stationName) {
-        String photoURL = "https://fuel-spot.com/default_icons/station.jpg";
+        String photoURL = "https://fuelspot.com.tr/default_icons/station.jpg";
         for (int i = 0; i < companyList.size(); i++) {
             if (stationName.equals(companyList.get(i).getName())) {
                 photoURL = companyList.get(i).getLogo();
@@ -319,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                 stationCountry = "";
                                                 placeID = "";
                                                 facilitiesOfStation = "";
-                                                stationLogo = "https://fuel-spot.com/default_icons/station.jpg";
+                                                stationLogo = "https://fuelspot.com.tr/default_icons/station.jpg";
                                                 gasolinePrice = 0;
                                                 dieselPrice = 0;
                                                 lpgPrice = 0;
@@ -1186,7 +1186,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             CompanyItem item2 = new CompanyItem();
                             item2.setID(0);
                             item2.setName("Bilinmiyor");
-                            item2.setLogo("https://fuel-spot.com/default_icons/station.jpg");
+                            item2.setLogo("https://fuelspot.com.tr/default_icons/station.jpg");
                             companyList.add(item2);
                             try {
                                 JSONArray res = new JSONArray(response);

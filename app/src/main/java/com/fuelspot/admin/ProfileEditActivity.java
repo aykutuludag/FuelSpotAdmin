@@ -469,7 +469,7 @@ public class ProfileEditActivity extends AppCompatActivity {
             if (image != null) {
                 bitmap = BitmapFactory.decodeFile(image.getPath());
                 Glide.with(this).load(bitmap).apply(options).into(userPic);
-                photo = "https://fuel-spot.com/uploads/admin/" + username + ".jpg";
+                photo = "https://fuelspot.com.tr/uploads/admin/" + username + ".jpg";
                 editor.putString("ProfilePhoto", photo);
             }
         }
