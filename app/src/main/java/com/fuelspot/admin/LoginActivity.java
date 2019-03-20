@@ -31,8 +31,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -87,12 +85,6 @@ public class LoginActivity extends AppCompatActivity {
         //Load background and login layout
         background = findViewById(R.id.animatedBackground);
         notLogged = findViewById(R.id.notLoggedLayout);
-
-        // Analytics
-        Tracker t = ((AnalyticsApplication) this.getApplicationContext()).getDefaultTracker();
-        t.setScreenName("LoginActivity");
-        t.enableAdvertisingIdCollection(true);
-        t.send(new HitBuilders.ScreenViewBuilder().build());
 
         //Variables
         prefs = this.getSharedPreferences("AdminInformation", Context.MODE_PRIVATE);

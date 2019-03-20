@@ -46,8 +46,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -109,12 +107,6 @@ public class ProfileEditActivity extends AppCompatActivity {
         }
 
         coloredBars(Color.parseColor("#626262"), Color.parseColor("#ffffff"));
-
-        // Analytics
-        Tracker t = ((AnalyticsApplication) this.getApplication()).getDefaultTracker();
-        t.setScreenName("Profil düzenle");
-        t.enableAdvertisingIdCollection(true);
-        t.send(new HitBuilders.ScreenViewBuilder().build());
 
         prefs = this.getSharedPreferences("AdminInformation", Context.MODE_PRIVATE);
         editor = prefs.edit();

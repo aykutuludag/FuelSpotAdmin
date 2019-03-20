@@ -21,8 +21,6 @@ import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -61,12 +59,6 @@ public class WelcomeActivity extends AppCompatActivity {
         // Window
         window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        // Analytics
-        Tracker t = ((AnalyticsApplication) this.getApplication()).getDefaultTracker();
-        t.setScreenName("Welcome");
-        t.enableAdvertisingIdCollection(true);
-        t.send(new HitBuilders.ScreenViewBuilder().build());
 
         prefs = this.getSharedPreferences("AdminInformation", Context.MODE_PRIVATE);
         requestQueue = Volley.newRequestQueue(WelcomeActivity.this);
