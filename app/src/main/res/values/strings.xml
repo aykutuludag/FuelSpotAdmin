@@ -58,11 +58,9 @@
     <!-- ADMIN APIs -->
     <string name="API_ADMIN_LOGIN" translatable="false">https://fuelspot.com.tr/api/admin/login.php</string>
     <string name="API_ADMIN_UPDATE" translatable="false">https://fuelspot.com.tr/api/admin/update.php</string>
+    <string name="API_ADMIN_ADD_STATION" translatable="false">https://fuelspot.com.tr/api/admin/station-add.php</string>
+    <string name="API_ADMIN_SEARCH_STATION" translatable="false">https://fuelspot.com.tr/api/admin/station-search.php</string>
     <string name="API_ADMIN_UPDATE_STATION" translatable="false">https://fuelspot.com.tr/api/admin/station-update.php</string>
-
-    <!-- STATION APIs -->
-    <string name="API_ADD_STATION" translatable="false">https://fuelspot.com.tr/api/station/add.php</string>
-    <string name="API_SEARCH_STATION" translatable="false">https://fuelspot.com.tr/api/station/search.php</string>
 
     <!-- OTHER APIs -->
     <string name="OTHER_COMPANY" translatable="false">https://fuelspot.com.tr/api/other/company.php</string>

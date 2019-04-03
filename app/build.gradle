@@ -9,7 +9,7 @@ android {
         applicationId "com.fuelspot.admin"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 21
+        versionCode 22
         versionName "1.0"
         multiDexEnabled true
         useLibrary 'org.apache.http.legacy'
@@ -41,7 +41,7 @@ dependencies {
 
     // FIREBASE
     implementation 'com.google.firebase:firebase-core:16.0.8'
-    implementation 'com.google.firebase:firebase-messaging:17.4.0'
+    implementation 'com.google.firebase:firebase-messaging:17.5.0'
 
     // 3RD PARTY
     implementation 'com.github.amirdew:JSON:v1.0.0'

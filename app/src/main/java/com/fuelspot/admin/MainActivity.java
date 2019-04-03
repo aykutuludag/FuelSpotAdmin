@@ -909,7 +909,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void fetchStations() {
         //Showing the progress dialog
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_SEARCH_STATION),
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_SEARCH_STATION),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1421,7 +1421,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * To update stationPrices, use API_UPDATE_STATION */
     private void addStations(final int index) {
         //Showing the progress dialog
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADD_STATION),
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_ADD_STATION),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
