@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     RequestOptions options;
     BitmapDescriptor verifiedIcon;
     RelativeLayout verifiedLayout;
-    CircleImageView imageViewWC, imageViewMarket, imageViewCarWash, imageViewTireRepair, imageViewMechanic, imageViewRestaurant, imageViewParkSpot, imageViewATM;
+    CircleImageView imageViewWC, imageViewMarket, imageViewCarWash, imageViewTireRepair, imageViewMechanic, imageViewRestaurant, imageViewParkSpot, imageViewATM, imageViewMotel;
     Spinner spinner;
     JSONObject facilitiesObj;
     static List<String> googleIDs = new ArrayList<>();
@@ -386,6 +386,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         imageViewRestaurant = findViewById(R.id.Restaurant);
         imageViewParkSpot = findViewById(R.id.ParkSpot);
         imageViewATM = findViewById(R.id.ATM);
+        imageViewMotel = findViewById(R.id.Motel);
         buttonUpdateStation = findViewById(R.id.buttonUpdate);
         buttonUpdateStation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -674,6 +675,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             } else {
                 imageViewATM.setAlpha(0.25f);
             }
+
+            if (facilitiesObj.getInt("Motel") == 1) {
+                imageViewMotel.setAlpha(1.0f);
+            } else {
+                imageViewMotel.setAlpha(0.25f);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -823,6 +830,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             } else {
                                 facilitiesObj.put("ATM", "1");
                                 imageViewATM.setAlpha(1.0f);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+
+            imageViewMotel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isAtStation) {
+                        try {
+                            if (facilitiesObj.getInt("Motel") == 1) {
+                                facilitiesObj.put("Motel", "0");
+                                imageViewMotel.setAlpha(0.25f);
+                            } else {
+                                facilitiesObj.put("Motel", "1");
+                                imageViewMotel.setAlpha(1.0f);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1022,16 +1048,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        System.out.println(response);
+                        loading.dismiss();
                         if (response != null && response.length() > 0) {
-                            loading.dismiss();
-                            switch (response) {
-                                case "Success":
-                                    Toast.makeText(MainActivity.this, getString(R.string.stationUpdated), Toast.LENGTH_LONG).show();
-                                    break;
-                                case "Fail":
-                                    Toast.makeText(MainActivity.this, getString(R.string.stationUpdateFail), Toast.LENGTH_LONG).show();
-                                    break;
+                            if (response.equals("Success")) {
+                                Toast.makeText(MainActivity.this, getString(R.string.stationUpdated), Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(MainActivity.this, getString(R.string.stationUpdateFail), Toast.LENGTH_LONG).show();
                             }
+                        } else {
+                            Toast.makeText(MainActivity.this, getString(R.string.stationUpdateFail), Toast.LENGTH_LONG).show();
                         }
                     }
                 },
@@ -1065,6 +1091,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 params.put("isVerified", String.valueOf(isStationVerified));
                 params.put("mobilePayment", String.valueOf(hasMobilePayment));
                 params.put("fuelDelivery", String.valueOf(hasFuelDelivery));
+                params.put("isActive", String.valueOf(1));
                 params.put("AUTH_KEY", getString(R.string.fuelspot_api_key));
 
                 //returning parameters
