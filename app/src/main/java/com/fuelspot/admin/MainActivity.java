@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         prefs = getSharedPreferences("AdminInformation", Context.MODE_PRIVATE);
         requestQueue = Volley.newRequestQueue(this);
         options = new RequestOptions().centerCrop().error(R.drawable.default_station).error(R.drawable.default_station)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .priority(Priority.HIGH);
 
         // ProgressDialogs
