@@ -8,7 +8,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -17,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -48,13 +51,15 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.fuelspot.admin.adapter.CompanyAdapter;
 import com.fuelspot.admin.adapter.MarkerAdapter;
 import com.fuelspot.admin.model.CompanyItem;
-import com.fuelspot.admin.model.MarkerItem;
 import com.fuelspot.admin.model.StationItem;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -232,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         requestQueue = Volley.newRequestQueue(this);
         options = new RequestOptions().centerCrop().error(R.drawable.default_station).error(R.drawable.default_station)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                .priority(Priority.HIGH);
+        ;
 
         // ProgressDialogs
         dialog = new ProgressDialog(MainActivity.this);
@@ -945,7 +950,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                 for (int i = 0; i < res.length(); i++) {
                                     JSONObject obj = res.getJSONObject(i);
-                                    StationItem item = new StationItem();
+                                    final StationItem item = new StationItem();
                                     item.setID(obj.getInt("id"));
                                     item.setStationName(obj.getString("name"));
                                     item.setVicinity(obj.getString("vicinity"));
@@ -967,21 +972,35 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     item.setIsActive(obj.getInt("isActive"));
                                     item.setLastUpdated(obj.getString("lastUpdated"));
                                     item.setDistance((int) obj.getDouble("distance"));
+                                    Glide.with(MainActivity.this)
+                                            .asBitmap().load(item.getPhotoURL())
+                                            .listener(new RequestListener<Bitmap>() {
+                                                          @Override
+                                                          public boolean onLoadFailed(@Nullable GlideException e, Object o, Target<Bitmap> target, boolean b) {
+                                                              System.out.println("Hata");
+                                                              return false;
+                                                          }
 
+                                                          @Override
+                                                          public boolean onResourceReady(Bitmap bitmap, Object o, Target<Bitmap> target, DataSource dataSource, boolean b) {
+                                                              System.out.println("Drawable yüklendi: " + item.getPhotoURL());
+                                                              item.setStationLogoDrawable(new BitmapDrawable(MainActivity.this.getResources(), bitmap));
+                                                              return false;
+                                                          }
+                                                      }
+                                            ).submit();
                                     stationList.add(item);
-
-                                    // Add marker
-                                    addMarker(item);
-
-                                    // Draw a circle with radius of mapDefaultStationRange
-                                    circles.add(googleMap.addCircle(new CircleOptions()
-                                            .center(new LatLng(Double.parseDouble(item.getLocation().split(";")[0]), Double.parseDouble(item.getLocation().split(";")[1])))
-                                            .radius(mapDefaultStationRange)
-                                            .fillColor(0x220000FF)
-                                            .strokeColor(Color.parseColor("#FF5635"))));
                                 }
 
                                 mapIsUpdating = false;
+
+                                // We are waiting for loading logos
+                                Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    public void run() {
+                                        addMarkers();
+                                    }
+                                }, 500);
                             } catch (JSONException e) {
                                 Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
@@ -1016,29 +1035,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         requestQueue.add(stringRequest);
     }
 
-    private void addMarker(final StationItem sItem) {
-        // Add marker
-        MarkerItem info = new MarkerItem();
-        info.setID(sItem.getID());
-        info.setStationName(sItem.getStationName());
-        info.setPhotoURL(sItem.getPhotoURL());
-        info.setGasolinePrice(sItem.getGasolinePrice());
-        info.setDieselPrice(sItem.getDieselPrice());
-        info.setLpgPrice(sItem.getLpgPrice());
+    private void addMarkers() {
+        for (int i = 0; i < stationList.size(); i++) {
+            StationItem sItem = stationList.get(i);
+            String[] stationKonum = sItem.getLocation().split(";");
+            LatLng sydney = new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1]));
 
-        String[] stationKonum = sItem.getLocation().split(";");
-        LatLng sydney = new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1]));
+            if (sItem.getIsVerified() == 1) {
+                MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station));
+                Marker m = googleMap.addMarker(mOptions);
+                m.setTag(sItem);
+                markers.add(m);
+            } else {
+                MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station));
+                Marker m = googleMap.addMarker(mOptions);
+                m.setTag(sItem);
+                markers.add(m);
+            }
 
-        if (sItem.getIsVerified() == 1) {
-            MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station));
-            Marker m = googleMap.addMarker(mOptions);
-            m.setTag(info);
-            markers.add(m);
-        } else {
-            MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station));
-            Marker m = googleMap.addMarker(mOptions);
-            m.setTag(info);
-            markers.add(m);
+            circles.add(googleMap.addCircle(new CircleOptions()
+                    .center(sydney)
+                    .radius(mapDefaultStationRange)
+                    .fillColor(0x220000FF)
+                    .strokeColor(Color.parseColor("#FF5635"))));
         }
     }
 

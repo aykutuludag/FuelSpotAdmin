@@ -9,7 +9,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.fuelspot.admin.R;
@@ -54,8 +53,7 @@ public class CompanyAdapter extends BaseAdapter {
                 .centerCrop()
                 .placeholder(R.drawable.default_station)
                 .error(R.drawable.default_station)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .priority(Priority.HIGH);
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC);
         Glide.with(mContext).load(feedItemList.get(position).getLogo()).apply(options).into(circleImageViewCompanyLogo);
 
         TextView textViewCompanyName = convertView.findViewById(R.id.company_name);

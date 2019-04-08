@@ -1,5 +1,7 @@
 package com.fuelspot.admin.model;
 
+import android.graphics.drawable.Drawable;
+
 public class StationItem {
 
     private int ID;
@@ -19,9 +21,10 @@ public class StationItem {
     private int isVerified;
     private int hasSupportMobilePayment;
     private int hasFuelDelivery;
-    private int isActive;
     private String lastUpdated;
     private int distance;
+    public int isActive;
+    private Drawable stationLogoDrawable;
 
     public int getID() {
         return ID;
@@ -167,19 +170,27 @@ public class StationItem {
         this.hasFuelDelivery = hasFuelDelivery;
     }
 
-    public int getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(int isActive) {
-        this.isActive = isActive;
-    }
-
     public String getLastUpdated() {
         return lastUpdated;
     }
 
     public void setLastUpdated(String lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    public Drawable getStationLogoDrawable() {
+        return stationLogoDrawable;
+    }
+
+    public void setStationLogoDrawable(Drawable stationLogoDrawable) {
+        this.stationLogoDrawable = stationLogoDrawable;
+    }
+
+    public int getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(int isActive) {
+        this.isActive = isActive;
     }
 }
