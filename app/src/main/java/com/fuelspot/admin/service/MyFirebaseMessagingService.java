@@ -28,7 +28,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             if (remoteMessage.getNotification() != null) {
                 //Consoledan mesaj gönderildiğinde burası tetiklenecektir
                 String title = remoteMessage.getNotification().getTitle();
-                sendNotification("Fuelify", title);
+                sendNotification("FuelSpotAdmin", title);
             }
         }
     }

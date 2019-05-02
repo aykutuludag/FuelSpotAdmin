@@ -54,16 +54,15 @@
     <string name="diesel">Dizel</string>
     <string name="lpg">LPG</string>
     <string name="electricity">Elektrik</string>
-
-    <!-- ADMIN APIs -->
-    <string name="API_ADMIN_LOGIN" translatable="false">https://fuelspot.com.tr/api/admin/login.php</string>
-    <string name="API_ADMIN_UPDATE" translatable="false">https://fuelspot.com.tr/api/admin/update.php</string>
-    <string name="API_ADMIN_ADD_STATION" translatable="false">https://fuelspot.com.tr/api/admin/station-add.php</string>
-    <string name="API_ADMIN_SEARCH_STATION" translatable="false">https://fuelspot.com.tr/api/admin/station-search.php</string>
-    <string name="API_ADMIN_UPDATE_STATION" translatable="false">https://fuelspot.com.tr/api/admin/station-update.php</string>
-
-    <!-- OTHER APIs -->
-    <string name="OTHER_COMPANY" translatable="false">https://fuelspot.com.tr/api/other/company.php</string>
     <string name="title_activity_add_stations">AddStations</string>
 
+    <!-- ADMIN APIs -->
+    <string name="API_ADMIN_LOGIN" translatable="false">https://fuelspot.com.tr/api/v1.0/admin/login.php</string>
+    <string name="API_ADMIN_UPDATE" translatable="false">https://fuelspot.com.tr/api/v1.0/admin/update.php</string>
+    <string name="API_ADMIN_ADD_STATION" translatable="false">https://fuelspot.com.tr/api/v1.0/admin/station-add.php</string>
+    <string name="API_ADMIN_SEARCH_STATION" translatable="false">https://fuelspot.com.tr/api/v1.0/admin/station-search.php</string>
+    <string name="API_ADMIN_UPDATE_STATION" translatable="false">https://fuelspot.com.tr/api/v1.0/admin/station-update.php</string>
+
+    <!-- OTHER APIs -->
+    <string name="OTHER_COMPANY" translatable="false">https://fuelspot.com.tr/api/v1.0/other/company.php</string>
 </resources>

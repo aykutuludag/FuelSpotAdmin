@@ -1098,7 +1098,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 params.put("stationVicinity", stationVicinity);
                 params.put("country", stationCountry);
                 params.put("location", stationLocation);
-                facilitiesOfStation = "[" + String.valueOf(facilitiesObj) + "]";
+                facilitiesOfStation = "[" + facilitiesObj + "]";
                 params.put("facilities", facilitiesOfStation);
                 params.put("stationLogo", stationLogo);
                 params.put("gasolinePrice", String.valueOf(gasolinePrice));
@@ -1533,29 +1533,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_editProfile:
-                Intent i = new Intent(MainActivity.this, ProfileEditActivity.class);
-                startActivity(i);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_editProfile) {
+            Intent i = new Intent(MainActivity.this, ProfileEditActivity.class);
+            startActivity(i);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_PERMISSION: {
-                // If request is cancelled, the result arrays are car_placeholder.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
-                        loadMap();
-                    }
-                } else {
-                    Snackbar.make(this.findViewById(R.id.mainContainer), getString(R.string.error_permission_cancel), Snackbar.LENGTH_LONG).show();
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        // If request is cancelled, the result arrays are car_placeholder.
+        if (requestCode == REQUEST_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+                    loadMap();
                 }
+            } else {
+                Snackbar.make(this.findViewById(R.id.mainContainer), getString(R.string.error_permission_cancel), Snackbar.LENGTH_LONG).show();
             }
         }
     }
@@ -1608,6 +1604,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
             super.onBackPressed();
+            mapIsUpdating = false;
             finish();
             return;
         }

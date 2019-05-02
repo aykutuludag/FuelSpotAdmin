@@ -177,34 +177,31 @@ public class WelcomeActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_PERMISSION: {
-                if (ActivityCompat.checkSelfPermission(WelcomeActivity.this, PERMISSIONS_LOCATION[0]) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(WelcomeActivity.this, PERMISSIONS_LOCATION[1]) == PackageManager.PERMISSION_GRANTED) {
-                    FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-                    mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                userlat = String.valueOf(location.getLatitude());
-                                userlon = String.valueOf(location.getLongitude());
-                                prefs.edit().putString("lat", userlat).apply();
-                                prefs.edit().putString("lon", userlon).apply();
-                                Localization();
-                            } else {
-                                LocationRequest mLocationRequest = new LocationRequest();
-                                mLocationRequest.setInterval(5000);
-                                mLocationRequest.setFastestInterval(1000);
-                                mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                            }
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_PERMISSION) {
+            if (ActivityCompat.checkSelfPermission(WelcomeActivity.this, PERMISSIONS_LOCATION[0]) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(WelcomeActivity.this, PERMISSIONS_LOCATION[1]) == PackageManager.PERMISSION_GRANTED) {
+                FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            userlat = String.valueOf(location.getLatitude());
+                            userlon = String.valueOf(location.getLongitude());
+                            prefs.edit().putString("lat", userlat).apply();
+                            prefs.edit().putString("lon", userlon).apply();
+                            Localization();
+                        } else {
+                            LocationRequest mLocationRequest = new LocationRequest();
+                            mLocationRequest.setInterval(5000);
+                            mLocationRequest.setFastestInterval(1000);
+                            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                         }
-                    });
-                }
-                break;
+                    }
+                });
             }
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

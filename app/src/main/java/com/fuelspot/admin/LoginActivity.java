@@ -288,7 +288,7 @@ public class LoginActivity extends AppCompatActivity {
                                         startActivity(i);
                                         finish();
                                     }
-                                }, 2000);
+                                }, 1250);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

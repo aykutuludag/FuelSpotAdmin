@@ -43,6 +43,7 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.signature.ObjectKey;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 
@@ -168,7 +169,8 @@ public class ProfileEditActivity extends AppCompatActivity {
         //UserPhoto
         userPic = findViewById(R.id.userPhoto);
         options = new RequestOptions().centerCrop().placeholder(R.drawable.default_profile).error(R.drawable.default_profile)
-                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC);
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())));
         Glide.with(this).load(Uri.parse(photo)).apply(options).into(userPic);
         userPic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -437,15 +439,13 @@ public class ProfileEditActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_PERMISSION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    ImagePicker.create(ProfileEditActivity.this).single().start();
-                } else {
-                    Snackbar.make(findViewById(R.id.mainContainer), getString(R.string.error_permission_cancel), Snackbar.LENGTH_LONG).show();
-                }
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        // If request is cancelled, the result arrays are empty.
+        if (requestCode == REQUEST_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                ImagePicker.create(ProfileEditActivity.this).single().start();
+            } else {
+                Snackbar.make(findViewById(R.id.mainContainer), getString(R.string.error_permission_cancel), Snackbar.LENGTH_LONG).show();
             }
         }
     }

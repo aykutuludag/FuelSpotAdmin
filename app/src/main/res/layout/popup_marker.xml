@@ -117,6 +117,20 @@
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="#212121" />
+
+        <TextView
+            android:id="@+id/stationId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/priceDiesel"
+            android:layout_alignStart="@id/gasoline"
+            android:layout_alignEnd="@id/lpg"
+            android:layout_marginTop="2dp"
+            android:fontFamily="@font/gotham_black"
+            android:gravity="center"
+            android:text="ID: 1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="#212121" />
     </RelativeLayout>
 
 </RelativeLayout>
