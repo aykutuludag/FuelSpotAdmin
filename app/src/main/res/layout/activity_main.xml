@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:map="http://schemas.android.com/tools"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,19 +8,19 @@
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -328,7 +328,7 @@
                     android:text="@string/facilities"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
-                <android.support.percent.PercentRelativeLayout
+                <androidx.percentlayout.widget.PercentRelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/title_facilities"
@@ -340,7 +340,7 @@
                         android:layout_height="50dp"
                         android:layout_alignParentStart="true"
                         android:alpha="0.25"
-                        android:src="@drawable/wc"
+                        android:src="@drawable/tesis_wc"
                         app:layout_marginPercent="0.5%"
                         app:layout_widthPercent="19%" />
 
@@ -350,7 +350,7 @@
                         android:layout_height="50dp"
                         android:layout_toEndOf="@id/WC"
                         android:alpha="0.25"
-                        android:src="@drawable/market"
+                        android:src="@drawable/tesis_market"
                         app:layout_marginPercent="0.5%"
                         app:layout_widthPercent="19%" />
 
@@ -360,7 +360,7 @@
                         android:layout_height="50dp"
                         android:layout_toEndOf="@id/Market"
                         android:alpha="0.25"
-                        android:src="@drawable/carwash"
+                        android:src="@drawable/tesis_carwash"
                         app:layout_marginPercent="0.5%"
                         app:layout_widthPercent="19%" />
 
@@ -370,7 +370,7 @@
                         android:layout_height="50dp"
                         android:layout_toEndOf="@id/CarWash"
                         android:alpha="0.25"
-                        android:src="@drawable/tirerepair"
+                        android:src="@drawable/tesis_tirerepair"
                         app:layout_marginPercent="0.5%"
                         app:layout_widthPercent="19%" />
 
@@ -380,7 +380,7 @@
                         android:layout_height="50dp"
                         android:layout_toEndOf="@id/TireRepair"
                         android:alpha="0.25"
-                        android:src="@drawable/mechanic"
+                        android:src="@drawable/tesis_mechanic"
                         app:layout_marginPercent="0.5%"
                         app:layout_widthPercent="19%" />
 
@@ -391,7 +391,7 @@
                         android:layout_below="@id/WC"
                         android:layout_alignParentStart="true"
                         android:alpha="0.25"
-                        android:src="@drawable/restaurant"
+                        android:src="@drawable/tesis_restaurant"
                         app:layout_marginPercent="0.5%"
                         app:layout_widthPercent="19%" />
 
@@ -402,7 +402,7 @@
                         android:layout_below="@+id/Market"
                         android:layout_toEndOf="@id/Restaurant"
                         android:alpha="0.25"
-                        android:src="@drawable/parkspot"
+                        android:src="@drawable/tesis_parkspot"
                         app:layout_marginPercent="0.5%"
                         app:layout_widthPercent="19%" />
 
@@ -413,7 +413,7 @@
                         android:layout_below="@id/CarWash"
                         android:layout_toEndOf="@id/ParkSpot"
                         android:alpha="0.25"
-                        android:src="@drawable/atm"
+                        android:src="@drawable/tesis_atm"
                         app:layout_marginPercent="0.5%"
                         app:layout_widthPercent="19%" />
 
@@ -424,10 +424,10 @@
                         android:layout_below="@id/TireRepair"
                         android:layout_toEndOf="@id/ATM"
                         android:alpha="0.25"
-                        android:src="@drawable/motel"
+                        android:src="@drawable/tesis_motel"
                         app:layout_marginPercent="0.5%"
                         app:layout_widthPercent="19%" />
-                </android.support.percent.PercentRelativeLayout>
+                </androidx.percentlayout.widget.PercentRelativeLayout>
 
             </RelativeLayout>
 
@@ -497,4 +497,4 @@
         </RelativeLayout>
     </ScrollView>
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
