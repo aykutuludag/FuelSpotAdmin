@@ -941,7 +941,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void fetchStations() {
         //Showing the progress dialog
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_SEARCH_STATION),
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getString(R.string.API_ADMIN_SEARCH_STATION) + "?location=" + userlat + ";" + userlon + "&radius=" + mapDefaultRange + "&AUTH_KEY=" + getString(R.string.fuelspot_api_key),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1018,18 +1018,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         volleyError.printStackTrace();
                     }
                 }) {
-            @Override
-            protected Map<String, String> getParams() {
-                //Creating parameters
-                Map<String, String> params = new Hashtable<>();
-
-                params.put("location", userlat + ";" + userlon);
-                params.put("radius", String.valueOf(mapDefaultRange));
-                params.put("AUTH_KEY", getString(R.string.fuelspot_api_key));
-
-                //returning parameters
-                return params;
-            }
         };
 
         //Adding request to the queue
@@ -1225,7 +1213,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     void fetchCompanies() {
         //Showing the progress dialog
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.OTHER_COMPANY),
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getString(R.string.OTHER_COMPANY) + "?AUTH_KEY=" + getString(R.string.fuelspot_api_key),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1266,17 +1254,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         Snackbar.make(findViewById(android.R.id.content), getString(R.string.connection_error), Snackbar.LENGTH_SHORT).show();
                     }
                 }) {
-            @Override
-            protected Map<String, String> getParams() {
-                //Creating parameters
-                Map<String, String> params = new Hashtable<>();
-
-                //Adding parameters
-                params.put("AUTH_KEY", getString(R.string.fuelspot_api_key));
-
-                //returning parameters
-                return params;
-            }
         };
 
         //Adding request to the queue
