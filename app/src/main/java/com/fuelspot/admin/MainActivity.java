@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     // Current station information
     boolean isAtStation;
-    int stationID, isStationVerified, hasMobilePayment, hasFuelDelivery;
+    int stationID, isStationVerified;
     String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi, facilitiesOfStation, stationLicense;
     float gasolinePrice, dieselPrice, lpgPrice, electricityPrice;
 
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     // For adding station over places-api
     static List<String> stationNames = new ArrayList<>();
-    CheckBox onayliIstasyon, mobilOdeme, aloyakit;
+    CheckBox onayliIstasyon;
     RelativeTimeTextView lastUpdateTimeText;
     EditText stationAddressHolder, gasolineHolder, dieselHolder, lpgHolder, electricityHolder, stationLicenseHolder;
     TextView textViewOwnerHolder, textViewStationIDHolder;
@@ -337,8 +337,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                 stationLicense = "";
                                                 istasyonSahibi = "";
                                                 isStationVerified = 0;
-                                                hasMobilePayment = 0;
-                                                hasFuelDelivery = 0;
                                                 sonGuncelleme = "";
 
                                                 loadLayoutItems();
@@ -380,8 +378,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         textViewOwnerHolder = findViewById(R.id.editTextOwner);
         textViewStationIDHolder = findViewById(R.id.textViewStationID);
         onayliIstasyon = findViewById(R.id.checkBox);
-        mobilOdeme = findViewById(R.id.checkBox2);
-        aloyakit = findViewById(R.id.checkBox3);
         lastUpdateTimeText = findViewById(R.id.stationLastUpdate);
         verifiedLayout = findViewById(R.id.verifiedSection);
         gasolineHolder = findViewById(R.id.editTextGasoline);
@@ -502,38 +498,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     isStationVerified = 0;
                     onayliIstasyon.setChecked(false);
                     verifiedLayout.setVisibility(View.GONE);
-                }
-            }
-        });
-
-        if (hasMobilePayment == 1) {
-            mobilOdeme.setChecked(true);
-        } else {
-            mobilOdeme.setChecked(false);
-        }
-        mobilOdeme.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    hasMobilePayment = 1;
-                } else {
-                    hasMobilePayment = 0;
-                }
-            }
-        });
-
-        if (hasFuelDelivery == 1) {
-            aloyakit.setChecked(true);
-        } else {
-            aloyakit.setChecked(false);
-        }
-        aloyakit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    hasFuelDelivery = 1;
-                } else {
-                    hasFuelDelivery = 0;
                 }
             }
         });
@@ -1024,9 +988,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }) {
             @Override
             public Map<String, String> getHeaders() {
-                Map<String, String> params = new HashMap<>();
-                params.put("token", token);
-                return params;
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                return headers;
             }
         };
 
@@ -1088,9 +1052,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }) {
             @Override
             public Map<String, String> getHeaders() {
-                Map<String, String> params = new HashMap<>();
-                params.put("token", token);
-                return params;
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                return headers;
             }
 
             @Override
@@ -1114,8 +1078,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 params.put("licenseNo", stationLicense);
                 params.put("owner", istasyonSahibi);
                 params.put("isVerified", String.valueOf(isStationVerified));
-                params.put("mobilePayment", String.valueOf(hasMobilePayment));
-                params.put("fuelDelivery", String.valueOf(hasFuelDelivery));
                 params.put("isActive", String.valueOf(1));
 
                 //returning parameters
@@ -1210,9 +1172,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }) {
             @Override
             public Map<String, String> getHeaders() {
-                Map<String, String> params = new HashMap<>();
-                params.put("token", token);
-                return params;
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                return headers;
             }
 
             @Override
@@ -1297,9 +1259,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }) {
             @Override
             public Map<String, String> getHeaders() {
-                Map<String, String> params = new HashMap<>();
-                params.put("token", token);
-                return params;
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                return headers;
             }
         };
 
@@ -1332,8 +1294,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     stationLicense = stationList.get(i).getLicenseNo();
                     istasyonSahibi = stationList.get(i).getOwner();
                     isStationVerified = stationList.get(i).getIsVerified();
-                    hasMobilePayment = stationList.get(i).getHasSupportMobilePayment();
-                    hasFuelDelivery = stationList.get(i).getHasFuelDelivery();
                     sonGuncelleme = stationList.get(i).getLastUpdated();
                 }
                 return true;
@@ -1507,9 +1467,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }) {
             @Override
             public Map<String, String> getHeaders() {
-                Map<String, String> params = new HashMap<>();
-                params.put("token", token);
-                return params;
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                return headers;
             }
 
             @Override
