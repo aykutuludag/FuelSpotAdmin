@@ -90,6 +90,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static boolean isVerified;
     public static boolean doubleBackToExitPressedOnce;
     // Admin variables
-    public static String userPhoneNumber, userlat, userlon, name, email, password, photo, gender, birthday, location, userCountry, userCountryName, userDisplayLanguage, currencyCode, currencySymbol, username, userUnit;
+    public static String token, userPhoneNumber, userlat, userlon, name, email, password, photo, gender, birthday, location, userCountry, userCountryName, userDisplayLanguage, currencyCode, currencySymbol, username, userUnit;
     public static List<CompanyItem> companyList = new ArrayList<>();
 
     // for isNotStation
@@ -186,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         currencyCode = prefs.getString("userCurrency", "");
         userPhoneNumber = prefs.getString("userPhoneNumber", "");
         currencySymbol = prefs.getString("currencySymbol", "");
+        token = prefs.getString("token", "");
     }
 
     public static boolean verifyFilePickerPermission(Context context) {
@@ -941,7 +943,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void fetchStations() {
         //Showing the progress dialog
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, getString(R.string.API_ADMIN_SEARCH_STATION) + "?location=" + userlat + ";" + userlon + "&radius=" + mapDefaultRange + "&AUTH_KEY=" + getString(R.string.fuelspot_api_key),
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getString(R.string.API_ADMIN_SEARCH_STATION) + "?location=" + userlat + ";" + userlon + "&radius=" + mapDefaultRange,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1018,6 +1020,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         volleyError.printStackTrace();
                     }
                 }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<>();
+                params.put("token", token);
+                return params;
+            }
         };
 
         //Adding request to the queue
@@ -1077,6 +1085,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }) {
             @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<>();
+                params.put("token", token);
+                return params;
+            }
+
+            @Override
             protected Map<String, String> getParams() {
                 //Creating parameters
                 Map<String, String> params = new Hashtable<>();
@@ -1100,7 +1115,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 params.put("mobilePayment", String.valueOf(hasMobilePayment));
                 params.put("fuelDelivery", String.valueOf(hasFuelDelivery));
                 params.put("isActive", String.valueOf(1));
-                params.put("AUTH_KEY", getString(R.string.fuelspot_api_key));
 
                 //returning parameters
                 return params;
@@ -1193,6 +1207,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }) {
             @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<>();
+                params.put("token", token);
+                return params;
+            }
+
+            @Override
             protected Map<String, String> getParams() {
                 //Creating parameters
                 Map<String, String> params = new Hashtable<>();
@@ -1200,7 +1221,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 //Adding parameters
                 params.put("username", username);
                 params.put("password", password);
-                params.put("AUTH_KEY", getString(R.string.fuelspot_api_key));
 
                 //returning parameters
                 return params;
@@ -1213,7 +1233,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     void fetchCompanies() {
         //Showing the progress dialog
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, getString(R.string.OTHER_COMPANY) + "?AUTH_KEY=" + getString(R.string.fuelspot_api_key),
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getString(R.string.OTHER_COMPANY),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1254,6 +1274,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         Snackbar.make(findViewById(android.R.id.content), getString(R.string.connection_error), Snackbar.LENGTH_SHORT).show();
                     }
                 }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<>();
+                params.put("token", token);
+                return params;
+            }
         };
 
         //Adding request to the queue
@@ -1459,6 +1485,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }) {
             @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<>();
+                params.put("token", token);
+                return params;
+            }
+
+            @Override
             protected Map<String, String> getParams() {
                 //Creating parameters
                 Map<String, String> params = new Hashtable<>();
@@ -1469,7 +1502,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 params.put("location", locations.get(index));
                 params.put("googleID", googleIDs.get(index));
                 params.put("logoURL", stationIcons.get(index));
-                params.put("AUTH_KEY", getString(R.string.fuelspot_api_key));
 
                 //returning parameters
                 return params;

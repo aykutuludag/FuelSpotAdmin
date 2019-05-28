@@ -53,6 +53,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
@@ -69,6 +70,7 @@ import static com.fuelspot.admin.MainActivity.location;
 import static com.fuelspot.admin.MainActivity.name;
 import static com.fuelspot.admin.MainActivity.password;
 import static com.fuelspot.admin.MainActivity.photo;
+import static com.fuelspot.admin.MainActivity.token;
 import static com.fuelspot.admin.MainActivity.userCountry;
 import static com.fuelspot.admin.MainActivity.userDisplayLanguage;
 import static com.fuelspot.admin.MainActivity.userPhoneNumber;
@@ -367,6 +369,13 @@ public class ProfileEditActivity extends AppCompatActivity {
                     }
                 }) {
             @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<>();
+                params.put("token", token);
+                return params;
+            }
+
+            @Override
             protected Map<String, String> getParams() {
                 //Creating parameters
                 Map<String, String> params = new Hashtable<>();
@@ -385,7 +394,6 @@ public class ProfileEditActivity extends AppCompatActivity {
                 params.put("location", location);
                 params.put("country", userCountry);
                 params.put("language", userDisplayLanguage);
-                params.put("AUTH_KEY", getString(R.string.fuelspot_api_key));
 
                 //returning parameters
                 return params;

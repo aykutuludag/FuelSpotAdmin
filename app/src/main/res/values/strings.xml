@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">FuelSpotAdmin</string>
     <string name="password" translatable="false">******</string>
-    <string name="fuelspot_api_key" translatable="false">Ph76g0MSZ2okeWQmShYDlXakjgjhbe</string>
     <string name="g_api_key" translatable="false">AIzaSyAxBaDtIoC8T8SFKAVmEMvWAbph_ChSD1E</string>
 
     <string name="unitSystem1">Litre</string>
@@ -54,7 +53,6 @@
     <string name="diesel">Dizel</string>
     <string name="lpg">LPG</string>
     <string name="electricity">Elektrik</string>
-    <string name="title_activity_add_stations">AddStations</string>
 
     <!-- ADMIN APIs -->
     <string name="API_ADMIN_LOGIN" translatable="false">https://fuelspot.com.tr/api/v1.0/admin/login.php</string>

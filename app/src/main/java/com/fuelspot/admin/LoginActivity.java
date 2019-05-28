@@ -55,6 +55,7 @@ import static com.fuelspot.admin.MainActivity.location;
 import static com.fuelspot.admin.MainActivity.name;
 import static com.fuelspot.admin.MainActivity.password;
 import static com.fuelspot.admin.MainActivity.photo;
+import static com.fuelspot.admin.MainActivity.token;
 import static com.fuelspot.admin.MainActivity.userCountry;
 import static com.fuelspot.admin.MainActivity.userCountryName;
 import static com.fuelspot.admin.MainActivity.userDisplayLanguage;
@@ -172,7 +173,7 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(i);
                     finish();
                 }
-            }, 2000);
+            }, 1500);
         }
 
         //Layout objects
@@ -278,6 +279,10 @@ public class LoginActivity extends AppCompatActivity {
 
                                 isVerified = obj.getInt("isVerified") == 1;
                                 prefs.edit().putBoolean("isVerified", isVerified).apply();
+
+                                token = obj.getString("token");
+                                prefs.edit().putString("token", token).apply();
+
                                 getVariables(prefs);
 
                                 Toast.makeText(LoginActivity.this, getString(R.string.login_success), Toast.LENGTH_LONG).show();
@@ -316,7 +321,7 @@ public class LoginActivity extends AppCompatActivity {
                 //Adding parameters
                 params.put("username", username);
                 params.put("password", password);
-                params.put("AUTH_KEY", getString(R.string.fuelspot_api_key));
+                params.put("deviceType", "android");
 
                 //returning parameters
                 return params;
