@@ -3,6 +3,7 @@ package com.fuelspot.admin;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -86,6 +87,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1238,6 +1240,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     @Override
                     public void onResponse(String response) {
                         if (response != null && response.length() > 0) {
+                            if (response.equals("AuthError")) {
+                                //We're just checking here for any authentication error. If it is, log out.
+
+                                // Do logout
+                                @SuppressLint("SdCardPath")
+                                File sharedPreferenceFile = new File("/data/data/" + getPackageName() + "/shared_prefs/");
+                                File[] listFiles = sharedPreferenceFile.listFiles();
+                                for (File file : listFiles) {
+                                    file.delete();
+                                }
+
+                                PackageManager packageManager = MainActivity.this.getPackageManager();
+                                Intent intent = packageManager.getLaunchIntentForPackage(MainActivity.this.getPackageName());
+                                ComponentName componentName = intent.getComponent();
+                                Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+                                MainActivity.this.startActivity(mainIntent);
+                                Runtime.getRuntime().exit(0);
+                            }
+
                             CompanyItem item2 = new CompanyItem();
                             item2.setID(0);
                             item2.setName("Bilinmiyor");
