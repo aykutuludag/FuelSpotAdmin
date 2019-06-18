@@ -125,8 +125,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     static ArrayList<Circle> circles = new ArrayList<>();
     static ArrayList<Marker> markers = new ArrayList<>();
 
-    // Current station information
-    boolean isAtStation;
+    static List<String> googleIDs = new ArrayList<>();
     int stationID, isStationVerified;
     String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi, facilitiesOfStation, stationLicense;
     float gasolinePrice, dieselPrice, lpgPrice, electricityPrice;
@@ -147,6 +146,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     // For adding station over places-api
     static List<String> stationNames = new ArrayList<>();
+    static List<String> vicinitys = new ArrayList<>();
+    static List<String> locations = new ArrayList<>();
+    static List<String> stationIcons = new ArrayList<>();
+    static List<String> stationCountrys = new ArrayList<>();
+    static List<StationItem> oldStationList = new ArrayList<>();
     CheckBox onayliIstasyon;
     RelativeTimeTextView lastUpdateTimeText;
     EditText stationAddressHolder, gasolineHolder, dieselHolder, lpgHolder, electricityHolder, stationLicenseHolder;
@@ -159,15 +163,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     CircleImageView imageViewWC, imageViewMarket, imageViewCarWash, imageViewTireRepair, imageViewMechanic, imageViewRestaurant, imageViewParkSpot, imageViewATM, imageViewMotel;
     Spinner spinner;
     JSONObject facilitiesObj;
-    static List<String> googleIDs = new ArrayList<>();
-    static List<String> vicinitys = new ArrayList<>();
-    static List<String> locations = new ArrayList<>();
-    static List<String> stationIcons = new ArrayList<>();
-    static List<String> stationCountrys = new ArrayList<>();
+
     //Layout items
     Button buttonMissingStation;
     ProgressDialog dialog;
     ScrollView mScrollView;
+    // Current station information
+    boolean isAtStation, doesOldStationsShown;
 
     public static void getVariables(SharedPreferences prefs) {
         name = prefs.getString("Name", "");
@@ -999,28 +1001,54 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void addMarkers() {
-        for (int i = 0; i < stationList.size(); i++) {
-            StationItem sItem = stationList.get(i);
-            String[] stationKonum = sItem.getLocation().split(";");
-            LatLng sydney = new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1]));
+        if (doesOldStationsShown) {
+            for (int i = 0; i < oldStationList.size(); i++) {
+                StationItem sItem = oldStationList.get(i);
+                String[] stationKonum = sItem.getLocation().split(";");
+                LatLng sydney = new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1]));
 
-            if (sItem.getIsVerified() == 1) {
-                MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station));
-                Marker m = googleMap.addMarker(mOptions);
-                m.setTag(sItem);
-                markers.add(m);
-            } else {
-                MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station));
-                Marker m = googleMap.addMarker(mOptions);
-                m.setTag(sItem);
-                markers.add(m);
+                if (sItem.getIsVerified() == 1) {
+                    MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station));
+                    Marker m = googleMap.addMarker(mOptions);
+                    m.setTag(sItem);
+                    markers.add(m);
+                } else {
+                    MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station));
+                    Marker m = googleMap.addMarker(mOptions);
+                    m.setTag(sItem);
+                    markers.add(m);
+                }
+
+                circles.add(googleMap.addCircle(new CircleOptions()
+                        .center(sydney)
+                        .radius(mapDefaultStationRange)
+                        .fillColor(0x220000FF)
+                        .strokeColor(Color.parseColor("#FF5635"))));
             }
+        } else {
+            for (int i = 0; i < stationList.size(); i++) {
+                StationItem sItem = stationList.get(i);
+                String[] stationKonum = sItem.getLocation().split(";");
+                LatLng sydney = new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1]));
 
-            circles.add(googleMap.addCircle(new CircleOptions()
-                    .center(sydney)
-                    .radius(mapDefaultStationRange)
-                    .fillColor(0x220000FF)
-                    .strokeColor(Color.parseColor("#FF5635"))));
+                if (sItem.getIsVerified() == 1) {
+                    MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station));
+                    Marker m = googleMap.addMarker(mOptions);
+                    m.setTag(sItem);
+                    markers.add(m);
+                } else {
+                    MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station));
+                    Marker m = googleMap.addMarker(mOptions);
+                    m.setTag(sItem);
+                    markers.add(m);
+                }
+
+                circles.add(googleMap.addCircle(new CircleOptions()
+                        .center(sydney)
+                        .radius(mapDefaultStationRange)
+                        .fillColor(0x220000FF)
+                        .strokeColor(Color.parseColor("#FF5635"))));
+            }
         }
     }
 
@@ -1524,10 +1552,41 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_editProfile) {
-            Intent i = new Intent(MainActivity.this, ProfileEditActivity.class);
-            startActivity(i);
-            return true;
+        switch (item.getItemId()) {
+            case (R.id.action_showOldStations):
+                if (!doesOldStationsShown) {
+                    for (int i = 0; i < stationList.size(); i++) {
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        try {
+                            Date date = format.parse(stationList.get(i).getLastUpdated());
+                            if (System.currentTimeMillis() - date.getTime() > 15 * 24 * 60 * 60 * 1000) {
+                                oldStationList.add(stationList.get(i));
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    doesOldStationsShown = true;
+                    Toast.makeText(MainActivity.this, "Son güncellemesi 15 günden eski istasyonlar gösteriliyor.", Toast.LENGTH_LONG).show();
+                } else {
+                    doesOldStationsShown = false;
+                    Toast.makeText(MainActivity.this, "Bütün istasyonlar gösteriliyor.", Toast.LENGTH_LONG).show();
+                }
+
+                googleMap.clear();
+                markers.clear();
+                addMarkers();
+                //Draw a circle with radius of mapDefaultRange
+                googleMap.addCircle(new CircleOptions()
+                        .center(new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon)))
+                        .radius(mapDefaultRange)
+                        .fillColor(0x220000FF)
+                        .strokeColor(Color.parseColor("#FF5635")));
+                break;
+            case (R.id.action_editProfile):
+                Intent i = new Intent(MainActivity.this, ProfileEditActivity.class);
+                startActivity(i);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

@@ -53,6 +53,7 @@
     <string name="diesel">Dizel</string>
     <string name="lpg">LPG</string>
     <string name="electricity">Elektrik</string>
+    <string name="time">Güncel olmayan istasyonlar</string>
 
     <!-- ADMIN APIs -->
     <string name="API_ADMIN_LOGIN" translatable="false">https://fuelspot.com.tr/api/v1.0/admin/login.php</string>

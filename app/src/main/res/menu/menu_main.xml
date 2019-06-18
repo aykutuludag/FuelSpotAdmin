@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_showOldStations"
+        android:icon="@drawable/time"
+        android:title="@string/time"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_editProfile"
         android:icon="@drawable/edit"
         android:title="@string/edit_profile"
