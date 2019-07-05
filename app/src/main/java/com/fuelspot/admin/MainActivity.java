@@ -121,11 +121,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static int mapDefaultStationRange = 50;
     public static float mapStationZoom = 18f;
     static List<StationItem> stationList = new ArrayList<>();
+    List<StationItem> googleStations = new ArrayList<>();
     boolean mapIsUpdating;
     static ArrayList<Circle> circles = new ArrayList<>();
     static ArrayList<Marker> markers = new ArrayList<>();
 
-    static List<String> googleIDs = new ArrayList<>();
     int stationID, isStationVerified;
     String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi, facilitiesOfStation, stationLicense;
     float gasolinePrice, dieselPrice, lpgPrice, electricityPrice;
@@ -145,11 +145,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     FusedLocationProviderClient mFusedLocationClient;
 
     // For adding station over places-api
-    static List<String> stationNames = new ArrayList<>();
-    static List<String> vicinitys = new ArrayList<>();
-    static List<String> locations = new ArrayList<>();
-    static List<String> stationIcons = new ArrayList<>();
-    static List<String> stationCountrys = new ArrayList<>();
     static List<StationItem> oldStationList = new ArrayList<>();
     CheckBox onayliIstasyon;
     RelativeTimeTextView lastUpdateTimeText;
@@ -340,6 +335,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                 istasyonSahibi = "";
                                                 isStationVerified = 0;
                                                 sonGuncelleme = "";
+                                                spinner.setSelection(0);
 
                                                 loadLayoutItems();
 
@@ -893,8 +889,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     .strokeColor(Color.parseColor("#FF5635")));
 
             // For zooming automatically to the location of the marker
-            LatLng mCurrentLocation = new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon));
-            CameraPosition cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapDefaultZoom).build();
+            CameraPosition cameraPosition;
+            if (isAtStation) {
+                LatLng mCurrentLocation = new LatLng(Double.parseDouble(stationLocation.split(";")[0]), Double.parseDouble(stationLocation.split(";")[1]));
+                cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapStationZoom).build();
+            } else {
+                LatLng mCurrentLocation = new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon));
+                cameraPosition = new CameraPosition.Builder().target(mCurrentLocation).zoom(mapDefaultZoom).build();
+            }
+
             googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
             if (isNetworkConnected(this)) {
@@ -1063,6 +1066,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         if (response != null && response.length() > 0) {
                             if (response.equals("Success")) {
                                 Toast.makeText(MainActivity.this, getString(R.string.stationUpdated), Toast.LENGTH_LONG).show();
+                                updateMapObject();
                             } else {
                                 Toast.makeText(MainActivity.this, getString(R.string.stationUpdateFail), Toast.LENGTH_LONG).show();
                             }
@@ -1375,6 +1379,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     void searchStationsOverGoogle(String token) {
+        googleStations.clear();
         dialog.show();
         String url;
 
@@ -1386,6 +1391,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + 50000 + "&type=gas_station" + "&key=" + getString(R.string.g_api_key);
         }
 
+        System.out.println(url);
+
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
@@ -1395,22 +1402,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         if (response != null && response.length() > 0) {
                             if (json.key("results").count() > 0) {
                                 for (int i = 0; i < json.key("results").count(); i++) {
-                                    googleIDs.add(json.key("results").index(i).key("place_id").stringValue());
-                                    stationNames.add(json.key("results").index(i).key("name").stringValue());
-                                    vicinitys.add(json.key("results").index(i).key("vicinity").stringValue());
-
+                                    StationItem sItem = new StationItem();
+                                    sItem.setGoogleMapID(json.key("results").index(i).key("place_id").stringValue());
+                                    sItem.setStationName(json.key("results").index(i).key("name").stringValue());
+                                    sItem.setVicinity(json.key("results").index(i).key("vicinity").stringValue());
                                     double lat = json.key("results").index(i).key("geometry").key("location").key("lat").doubleValue();
                                     double lon = json.key("results").index(i).key("geometry").key("location").key("lng").doubleValue();
-                                    locations.add(String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon));
-
-                                    stationIcons.add(stationPhotoChooser(json.key("results").index(i).key("name").stringValue()));
-                                    stationCountrys.add(countryFinder(lat, lon));
+                                    sItem.setLocation(String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon));
+                                    sItem.setPhotoURL(stationPhotoChooser(json.key("results").index(i).key("name").stringValue()));
+                                    sItem.setCountryCode(countryFinder(lat, lon));
+                                    System.out.println(sItem.getStationName());
+                                    googleStations.add(sItem);
                                 }
 
                                 if (!json.key("next_page_token").isNull() && json.key("next_page_token").stringValue().length() > 0) {
                                     searchStationsOverGoogle(json.key("next_page_token").stringValue());
                                 } else {
-                                    for (int i = 0; i < googleIDs.size(); i++) {
+                                    for (int i = 0; i < googleStations.size(); i++) {
                                         addStations(i);
                                     }
                                     dialog.dismiss();
@@ -1448,6 +1456,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 }
                             }
                         } else {
+                            dialog.dismiss();
                             Snackbar.make(findViewById(android.R.id.content), getString(R.string.error_no_location), Snackbar.LENGTH_LONG).show();
                         }
                     }
@@ -1468,6 +1477,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                dialog.dismiss();
                 Snackbar.make(findViewById(android.R.id.content), error.toString(), Snackbar.LENGTH_LONG).show();
             }
         });
@@ -1490,6 +1500,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(MainActivity.this, volleyError.toString(), Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
                         volleyError.printStackTrace();
                     }
                 }) {
@@ -1505,12 +1517,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 //Creating parameters
                 Map<String, String> params = new Hashtable<>();
 
-                params.put("name", stationNames.get(index));
-                params.put("vicinity", vicinitys.get(index));
-                params.put("country", stationCountrys.get(index));
-                params.put("location", locations.get(index));
-                params.put("googleID", googleIDs.get(index));
-                params.put("logoURL", stationIcons.get(index));
+                params.put("name", googleStations.get(index).getStationName());
+                params.put("vicinity", googleStations.get(index).getVicinity());
+                params.put("country", googleStations.get(index).getCountryCode());
+                params.put("location", googleStations.get(index).getLocation());
+                params.put("googleID", googleStations.get(index).getGoogleMapID());
+                params.put("logoURL", googleStations.get(index).getPhotoURL());
 
                 //returning parameters
                 return params;
@@ -1655,6 +1667,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (doubleBackToExitPressedOnce) {
             super.onBackPressed();
             mapIsUpdating = false;
+            stationList.clear();
+            googleStations.clear();
             finish();
             return;
         }

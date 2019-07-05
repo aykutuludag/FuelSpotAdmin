@@ -43,8 +43,6 @@
     <string name="address">Adres</string>
     <string name="licenseNO">Lisans no</string>
     <string name="stationVerified">Onaylı istasyon</string>
-    <string name="mobilePayment">Mobil ödeme</string>
-    <string name="fuelDelivery">Alo yakıt</string>
     <string name="stationVerifiedText">Bu istasyon FuelSpot tarafından onaylanmıştır.</string>
     <string name="facilities">Tesisler</string>
     <string name="profileUpdated">Profil güncellendi…</string>

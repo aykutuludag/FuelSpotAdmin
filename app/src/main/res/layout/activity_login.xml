@@ -2,23 +2,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background_doodle"
     tools:context=".LoginActivity">
 
-    <VideoView
-        android:id="@+id/animatedBackground"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true" />
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="175dp"
+        android:layout_height="175dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="48dp"
+        android:elevation="2dp"
+        android:src="@drawable/admin" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"
+        android:visibility="gone" />
 
     <RelativeLayout
         android:id="@+id/notLoggedLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#80FFFFFF"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="48dp"
+        android:background="@drawable/round_layout_white"
         android:padding="8dp">
 
         <EditText
@@ -31,10 +45,12 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
+            android:background="@drawable/round_layout"
             android:ems="10"
             android:gravity="center_horizontal|center"
             android:hint="@string/username"
             android:inputType="textPersonName"
+            android:padding="12dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium.Inverse" />
 
         <EditText
@@ -42,15 +58,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/editText"
-            android:layout_alignStart="@+id/editText"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
+            android:background="@drawable/round_layout"
             android:ems="10"
             android:gravity="center"
             android:hint="@string/password"
             android:inputType="textPassword"
+            android:padding="12dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium.Inverse" />
 
         <Button
@@ -59,7 +76,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/editText2"
             android:layout_centerHorizontal="true"
-            android:layout_margin="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/green_box"
             android:text="@string/login"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
     </RelativeLayout>

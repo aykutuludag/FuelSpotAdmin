@@ -7,8 +7,14 @@ import android.widget.TextView;
 
 import com.fuelspot.admin.R;
 import com.fuelspot.admin.model.StationItem;
+import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -32,6 +38,7 @@ public class MarkerAdapter implements GoogleMap.InfoWindowAdapter {
         TextView priceTwo = view.findViewById(R.id.priceDiesel);
         TextView priceThree = view.findViewById(R.id.priceLPG);
         TextView id = view.findViewById(R.id.stationId);
+        RelativeTimeTextView lastUpdate = view.findViewById(R.id.lastUpdate);
 
         sName.setText(infoWindowData.getStationName());
         priceOne.setText("" + infoWindowData.getGasolinePrice());
@@ -39,6 +46,14 @@ public class MarkerAdapter implements GoogleMap.InfoWindowAdapter {
         priceThree.setText("" + infoWindowData.getLpgPrice());
         id.setText("ID: " + infoWindowData.getID());
         sLogo.setImageDrawable(infoWindowData.getStationLogoDrawable());
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        try {
+            Date date = format.parse(infoWindowData.getLastUpdated());
+            lastUpdate.setReferenceTime(date.getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            lastUpdate.setText("Son güncelleme : -");
+        }
 
         return view;
     }

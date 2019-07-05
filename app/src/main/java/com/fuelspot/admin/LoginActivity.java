@@ -6,10 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -19,9 +15,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -67,13 +63,13 @@ import static com.fuelspot.admin.MainActivity.username;
 
 public class LoginActivity extends AppCompatActivity {
 
-    VideoView background;
     RelativeLayout notLogged;
     SharedPreferences prefs;
     Handler handler = new Handler();
     EditText usernameHolder, passwordHolder;
     Button loginButton;
     Window window;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +81,8 @@ public class LoginActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         //Load background and login layout
-        background = findViewById(R.id.animatedBackground);
         notLogged = findViewById(R.id.notLoggedLayout);
+        progressBar = findViewById(R.id.progressBar);
 
         //Variables
         prefs = this.getSharedPreferences("AdminInformation", Context.MODE_PRIVATE);
@@ -165,6 +161,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
 
+            progressBar.setVisibility(View.VISIBLE);
             notLogged.setVisibility(View.GONE);
             handler.postDelayed(new Runnable() {
                 @Override
@@ -286,6 +283,7 @@ public class LoginActivity extends AppCompatActivity {
                                 getVariables(prefs);
 
                                 Toast.makeText(LoginActivity.this, getString(R.string.login_success), Toast.LENGTH_LONG).show();
+                                progressBar.setVisibility(View.VISIBLE);
                                 notLogged.setVisibility(View.GONE);
                                 new Handler().postDelayed(new Runnable() {
                                     @Override
@@ -299,7 +297,7 @@ public class LoginActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         } else {
-                            Snackbar.make(background, getString(R.string.login_fail), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(findViewById(android.R.id.content), getString(R.string.login_fail), Snackbar.LENGTH_SHORT).show();
                             prefs.edit().putBoolean("isSigned", false).apply();
                         }
                     }
@@ -309,7 +307,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError volleyError) {
                         //Dismissing the progress dialog
                         loading.dismiss();
-                        Snackbar.make(background, volleyError.toString(), Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(findViewById(android.R.id.content), volleyError.toString(), Snackbar.LENGTH_SHORT).show();
                         prefs.edit().putBoolean("isSigned", false).apply();
                     }
                 }) {
@@ -336,21 +334,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (background != null) {
-            String uriPath = "android.resource://" + getPackageName() + "/" + R.raw.background_login;
-            Uri uri = Uri.parse(uriPath);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                background.setAudioFocusRequest(AudioManager.AUDIOFOCUS_NONE);
-            }
-            background.setVideoURI(uri);
-            background.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                public void onPrepared(MediaPlayer mp) {
-                    background.start();
-                }
-            });
-        }
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }
 
