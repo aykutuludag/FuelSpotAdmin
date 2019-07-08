@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     static ArrayList<Marker> markers = new ArrayList<>();
 
     int stationID, isStationVerified;
-    String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi, facilitiesOfStation, stationLicense;
+    String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi, facilitiesOfStation, stationLicense, secondaryFuelOfStation;
     float gasolinePrice, dieselPrice, lpgPrice, electricityPrice;
 
     // Temp variables
@@ -148,16 +148,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     static List<StationItem> oldStationList = new ArrayList<>();
     CheckBox onayliIstasyon;
     RelativeTimeTextView lastUpdateTimeText;
-    EditText stationAddressHolder, gasolineHolder, dieselHolder, lpgHolder, electricityHolder, stationLicenseHolder;
+    EditText stationAddressHolder, gasolineHolder, dieselHolder, lpgHolder, electricityHolder, stationLicenseHolder, gasolineHolder2, dieselHolder2;
     TextView textViewOwnerHolder, textViewStationIDHolder;
     Button buttonUpdateStation;
     CircleImageView stationLogoHolder;
     RequestOptions options;
     BitmapDescriptor verifiedIcon;
     RelativeLayout verifiedLayout;
-    CircleImageView imageViewWC, imageViewMarket, imageViewCarWash, imageViewTireRepair, imageViewMechanic, imageViewRestaurant, imageViewParkSpot, imageViewATM, imageViewMotel;
+    CircleImageView imageViewWC, imageViewMarket, imageViewCarWash, imageViewTireRepair, imageViewMechanic, imageViewRestaurant, imageViewParkSpot, imageViewATM, imageViewMotel, imageViewCoffeeShop, imageViewMosque;
     Spinner spinner;
-    JSONObject facilitiesObj;
+    JSONObject facilitiesObj = new JSONObject();
+    JSONObject secondaryFuelObj = new JSONObject();
 
     //Layout items
     Button buttonMissingStation;
@@ -382,6 +383,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         dieselHolder = findViewById(R.id.editTextDiesel);
         lpgHolder = findViewById(R.id.editTextLPG);
         electricityHolder = findViewById(R.id.editTextElectricity);
+        gasolineHolder2 = findViewById(R.id.editTextGasoline2);
+        dieselHolder2 = findViewById(R.id.editTextDiesel2);
         imageViewWC = findViewById(R.id.WC);
         imageViewMarket = findViewById(R.id.Market);
         imageViewCarWash = findViewById(R.id.CarWash);
@@ -391,6 +394,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         imageViewParkSpot = findViewById(R.id.ParkSpot);
         imageViewATM = findViewById(R.id.ATM);
         imageViewMotel = findViewById(R.id.Motel);
+        imageViewCoffeeShop = findViewById(R.id.CoffeeShop);
+        imageViewMosque = findViewById(R.id.PlaceOfWorship);
         buttonUpdateStation = findViewById(R.id.buttonUpdate);
         buttonUpdateStation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -595,6 +600,72 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+        // SecondaryFuel
+        try {
+            JSONArray secondaryFuelRes = new JSONArray(secondaryFuelOfStation);
+            secondaryFuelObj = secondaryFuelRes.getJSONObject(0);
+
+            if (secondaryFuelObj.getString("gasoline2") != null && secondaryFuelObj.getString("gasoline2").length() > 0) {
+                gasolineHolder2.setText("" + Float.parseFloat(secondaryFuelObj.getString("gasoline2")));
+            }
+
+            if (secondaryFuelObj.getString("diesel2") != null && secondaryFuelObj.getString("diesel2").length() > 0) {
+                dieselHolder2.setText("" + Float.parseFloat(secondaryFuelObj.getString("diesel2")));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        gasolineHolder2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    try {
+                        float gasoline2 = Float.parseFloat(s.toString());
+                        String text = String.format(Locale.US, "%.2f", gasoline2);
+                        secondaryFuelObj.put("gasoline2", text);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        dieselHolder2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null && s.length() > 0) {
+                    try {
+                        float diesel2 = Float.parseFloat(s.toString());
+                        String text = String.format(Locale.US, "%.2f", diesel2);
+                        secondaryFuelObj.put("diesel2", text);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
         // Facilities
         try {
             JSONArray facilitiesRes = new JSONArray(facilitiesOfStation);
@@ -653,6 +724,30 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             } else {
                 imageViewMotel.setAlpha(0.25f);
             }
+
+            /* NEW FACILITIES v1.1 */
+            if (!facilitiesObj.has("CoffeeShop")) {
+                facilitiesObj.put("CoffeeShop", "0");
+                imageViewCoffeeShop.setAlpha(0.25f);
+            } else {
+                if (facilitiesObj.getInt("CoffeeShop") == 1) {
+                    imageViewCoffeeShop.setAlpha(1.0f);
+                } else {
+                    imageViewCoffeeShop.setAlpha(0.25f);
+                }
+            }
+
+            if (!facilitiesObj.has("Mosque")) {
+                facilitiesObj.put("Mosque", "0");
+                imageViewMosque.setAlpha(0.25f);
+            } else {
+                if (facilitiesObj.getInt("Mosque") == 1) {
+                    imageViewMosque.setAlpha(1.0f);
+                } else {
+                    imageViewMosque.setAlpha(0.25f);
+                }
+            }
+            /* NEW FACILITIES v1.1 */
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -828,6 +923,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }
             });
+
+            imageViewCoffeeShop.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isAtStation) {
+                        try {
+                            if (facilitiesObj.getInt("CoffeeShop") == 1) {
+                                facilitiesObj.put("CoffeeShop", "0");
+                                imageViewCoffeeShop.setAlpha(0.25f);
+                            } else {
+                                facilitiesObj.put("CoffeeShop", "1");
+                                imageViewCoffeeShop.setAlpha(1.0f);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+
+            imageViewMosque.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isAtStation) {
+                        try {
+                            if (facilitiesObj.getInt("Mosque") == 1) {
+                                facilitiesObj.put("Mosque", "0");
+                                imageViewMosque.setAlpha(0.25f);
+                            } else {
+                                facilitiesObj.put("Mosque", "1");
+                                imageViewMosque.setAlpha(1.0f);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -939,6 +1072,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     item.setDieselPrice((float) obj.getDouble("dieselPrice"));
                                     item.setLpgPrice((float) obj.getDouble("lpgPrice"));
                                     item.setElectricityPrice((float) obj.getDouble("electricityPrice"));
+                                    item.setSecondaryFuels(obj.getString("otherFuels"));
                                     item.setIsVerified(obj.getInt("isVerified"));
                                     item.setHasSupportMobilePayment(obj.getInt("isMobilePaymentAvailable"));
                                     item.setHasFuelDelivery(obj.getInt("isDeliveryAvailable"));
@@ -1059,6 +1193,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        System.out.println(response);
                         loading.dismiss();
                         if (response != null && response.length() > 0) {
                             if (response.equals("Success")) {
@@ -1104,6 +1239,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 params.put("dieselPrice", String.valueOf(dieselPrice));
                 params.put("lpgPrice", String.valueOf(lpgPrice));
                 params.put("electricityPrice", String.valueOf(electricityPrice));
+                secondaryFuelOfStation = "[" + secondaryFuelObj + "]";
+                params.put("otherFuels", secondaryFuelOfStation);
                 params.put("licenseNo", stationLicense);
                 params.put("owner", istasyonSahibi);
                 params.put("isVerified", String.valueOf(isStationVerified));
@@ -1320,6 +1457,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     dieselPrice = stationList.get(i).getDieselPrice();
                     lpgPrice = stationList.get(i).getLpgPrice();
                     electricityPrice = stationList.get(i).getElectricityPrice();
+                    secondaryFuelOfStation = stationList.get(i).getSecondaryFuels();
                     stationLicense = stationList.get(i).getLicenseNo();
                     istasyonSahibi = stationList.get(i).getOwner();
                     isStationVerified = stationList.get(i).getIsVerified();

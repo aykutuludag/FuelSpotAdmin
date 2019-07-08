@@ -48,7 +48,9 @@
     <string name="profileUpdated">Profil güncellendi…</string>
     <string name="noOwner">SAHİP YOK</string>
     <string name="gasoline">Benzin</string>
+    <string name="gasoline2">2. Benzin</string>
     <string name="diesel">Dizel</string>
+    <string name="diesel2">2. Dizel</string>
     <string name="lpg">LPG</string>
     <string name="electricity">Elektrik</string>
     <string name="time">Güncel olmayan istasyonlar</string>

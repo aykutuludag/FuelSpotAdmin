@@ -227,6 +227,19 @@
                         android:inputType="numberDecimal"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
+                    <EditText
+                        android:id="@+id/editTextGasoline2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/editTextGasoline"
+                        android:layout_alignStart="@+id/gasolineIcon"
+                        android:layout_alignEnd="@id/gasolineIcon"
+                        android:ems="10"
+                        android:gravity="center"
+                        android:hint="@string/gasoline2"
+                        android:inputType="numberDecimal"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/dieselIcon"
                         android:layout_width="64dp"
@@ -245,6 +258,19 @@
                         android:ems="10"
                         android:gravity="center"
                         android:hint="@string/diesel"
+                        android:inputType="numberDecimal"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+                    <EditText
+                        android:id="@+id/editTextDiesel2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/editTextDiesel"
+                        android:layout_alignStart="@+id/dieselIcon"
+                        android:layout_alignEnd="@id/dieselIcon"
+                        android:ems="10"
+                        android:gravity="center"
+                        android:hint="@string/diesel2"
                         android:inputType="numberDecimal"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -409,6 +435,27 @@
                         android:layout_toEndOf="@id/ATM"
                         android:alpha="0.25"
                         android:src="@drawable/tesis_motel"
+                        app:layout_marginPercent="0.5%"
+                        app:layout_widthPercent="19%" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/CoffeeShop"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_below="@id/Mechanic"
+                        android:layout_toEndOf="@id/Motel"
+                        android:alpha="0.25"
+                        android:src="@drawable/tesis_kahveci"
+                        app:layout_marginPercent="0.5%"
+                        app:layout_widthPercent="19%" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/PlaceOfWorship"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_below="@id/Restaurant"
+                        android:alpha="0.25"
+                        android:src="@drawable/tesis_cami"
                         app:layout_marginPercent="0.5%"
                         app:layout_widthPercent="19%" />
                 </androidx.percentlayout.widget.PercentRelativeLayout>

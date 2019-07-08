@@ -18,12 +18,13 @@ public class StationItem {
     private float dieselPrice;
     private float lpgPrice;
     private float electricityPrice;
+    private String secondaryFuels;
     private int isVerified;
     private int hasSupportMobilePayment;
     private int hasFuelDelivery;
     private String lastUpdated;
     private int distance;
-    public int isActive;
+    private int isActive;
     private Drawable stationLogoDrawable;
 
     public int getID() {
@@ -144,6 +145,14 @@ public class StationItem {
 
     public void setElectricityPrice(float electricityPrice) {
         this.electricityPrice = electricityPrice;
+    }
+
+    public String getSecondaryFuels() {
+        return secondaryFuels;
+    }
+
+    public void setSecondaryFuels(String secondaryFuels) {
+        this.secondaryFuels = secondaryFuels;
     }
 
     public int getIsVerified() {
