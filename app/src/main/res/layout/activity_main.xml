@@ -472,8 +472,9 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginBottom="16dp"
-                    android:background="@drawable/green_box"
+                    android:background="@drawable/orange_box"
                     android:fontFamily="@font/gotham_black"
+                    android:padding="8dp"
                     android:text="Bölgeyi tara"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 

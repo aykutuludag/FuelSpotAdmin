@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // ProgressDialogs
         dialog = new ProgressDialog(MainActivity.this);
         dialog.setTitle("Bölge taranıyor");
-        dialog.setMessage("Lütfen bekleyiniz...");
+        dialog.setMessage("Bu işlem 1-2 dakika sürebilir. Lütfen bekleyiniz...");
         dialog.setIndeterminate(true);
         dialog.setCancelable(false);
 
@@ -951,13 +951,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                             .listener(new RequestListener<Bitmap>() {
                                                           @Override
                                                           public boolean onLoadFailed(@Nullable GlideException e, Object o, Target<Bitmap> target, boolean b) {
-                                                              System.out.println("Hata");
                                                               return false;
                                                           }
 
                                                           @Override
                                                           public boolean onResourceReady(Bitmap bitmap, Object o, Target<Bitmap> target, DataSource dataSource, boolean b) {
-                                                              System.out.println("Drawable yüklendi: " + item.getPhotoURL());
                                                               item.setStationLogoDrawable(new BitmapDrawable(MainActivity.this.getResources(), bitmap));
                                                               return false;
                                                           }
@@ -1061,7 +1059,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        System.out.println(response);
                         loading.dismiss();
                         if (response != null && response.length() > 0) {
                             if (response.equals("Success")) {
@@ -1385,13 +1382,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if (token != null && token.length() > 0) {
             // For getting next 20 stations
-            url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + 50000 + "&type=gas_station&pagetoken=" + token + "&key=" + getString(R.string.g_api_key);
+            url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + mapDefaultRange + "&type=gas_station&pagetoken=" + token + "&key=" + getString(R.string.g_api_key);
         } else {
             // For getting first 20 stations
-            url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + 50000 + "&type=gas_station" + "&key=" + getString(R.string.g_api_key);
+            url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userlat + "," + userlon + "&radius=" + mapDefaultRange + "&type=gas_station" + "&key=" + getString(R.string.g_api_key);
         }
-
-        System.out.println(url);
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -1411,15 +1406,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     sItem.setLocation(String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon));
                                     sItem.setPhotoURL(stationPhotoChooser(json.key("results").index(i).key("name").stringValue()));
                                     sItem.setCountryCode(countryFinder(lat, lon));
-                                    System.out.println(sItem.getStationName());
                                     googleStations.add(sItem);
                                 }
 
-                                if (!json.key("next_page_token").isNull() && json.key("next_page_token").stringValue().length() > 0) {
+                                if (json.key("next_page_token").exist() && json.key("next_page_token").stringValue().length() > 0) {
                                     searchStationsOverGoogle(json.key("next_page_token").stringValue());
                                 } else {
                                     for (int i = 0; i < googleStations.size(); i++) {
-                                        addStations(i);
+                                        try {
+                                            addStations(i);
+                                            Thread.sleep(500);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                     dialog.dismiss();
                                     Toast.makeText(MainActivity.this, "Bölge başarıyla tarandı.", Toast.LENGTH_SHORT).show();
