@@ -605,11 +605,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             JSONArray secondaryFuelRes = new JSONArray(secondaryFuelOfStation);
             secondaryFuelObj = secondaryFuelRes.getJSONObject(0);
 
-            if (secondaryFuelObj.getString("gasoline2") != null && secondaryFuelObj.getString("gasoline2").length() > 0) {
+            if (secondaryFuelObj.has("gasoline2") && secondaryFuelObj.getString("gasoline2").length() > 0) {
                 gasolineHolder2.setText("" + Float.parseFloat(secondaryFuelObj.getString("gasoline2")));
             }
 
-            if (secondaryFuelObj.getString("diesel2") != null && secondaryFuelObj.getString("diesel2").length() > 0) {
+            if (secondaryFuelObj.has("diesel2") && secondaryFuelObj.getString("diesel2").length() > 0) {
                 dieselHolder2.setText("" + Float.parseFloat(secondaryFuelObj.getString("diesel2")));
             }
         } catch (JSONException e) {
