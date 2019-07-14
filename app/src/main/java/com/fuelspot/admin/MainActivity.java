@@ -1193,7 +1193,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        System.out.println(response);
                         loading.dismiss();
                         if (response != null && response.length() > 0) {
                             if (response.equals("Success")) {
@@ -1362,77 +1361,79 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     void fetchCompanies() {
-        //Showing the progress dialog
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, getString(R.string.OTHER_COMPANY),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        if (response != null && response.length() > 0) {
-                            if (response.equals("AuthError")) {
-                                //We're just checking here for any authentication error. If it is, log out.
+        if (companyList == null || companyList.size() == 0) {
+            //Showing the progress dialog
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, getString(R.string.OTHER_COMPANY),
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            if (response != null && response.length() > 0) {
+                                if (response.equals("AuthError")) {
+                                    //We're just checking here for any authentication error. If it is, log out.
 
-                                // Do logout
-                                @SuppressLint("SdCardPath")
-                                File sharedPreferenceFile = new File("/data/data/" + getPackageName() + "/shared_prefs/");
-                                File[] listFiles = sharedPreferenceFile.listFiles();
-                                for (File file : listFiles) {
-                                    file.delete();
+                                    // Do logout
+                                    @SuppressLint("SdCardPath")
+                                    File sharedPreferenceFile = new File("/data/data/" + getPackageName() + "/shared_prefs/");
+                                    File[] listFiles = sharedPreferenceFile.listFiles();
+                                    for (File file : listFiles) {
+                                        file.delete();
+                                    }
+
+                                    PackageManager packageManager = MainActivity.this.getPackageManager();
+                                    Intent intent = packageManager.getLaunchIntentForPackage(MainActivity.this.getPackageName());
+                                    ComponentName componentName = intent.getComponent();
+                                    Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+                                    MainActivity.this.startActivity(mainIntent);
+                                    Runtime.getRuntime().exit(0);
                                 }
 
-                                PackageManager packageManager = MainActivity.this.getPackageManager();
-                                Intent intent = packageManager.getLaunchIntentForPackage(MainActivity.this.getPackageName());
-                                ComponentName componentName = intent.getComponent();
-                                Intent mainIntent = Intent.makeRestartActivityTask(componentName);
-                                MainActivity.this.startActivity(mainIntent);
-                                Runtime.getRuntime().exit(0);
-                            }
+                                CompanyItem item2 = new CompanyItem();
+                                item2.setID(0);
+                                item2.setName("Bilinmiyor");
+                                item2.setLogo("https://fuelspot.com.tr/default_icons/station.png");
+                                companyList.add(item2);
+                                try {
+                                    JSONArray res = new JSONArray(response);
+                                    for (int i = 0; i < res.length(); i++) {
+                                        JSONObject obj = res.getJSONObject(i);
 
-                            CompanyItem item2 = new CompanyItem();
-                            item2.setID(0);
-                            item2.setName("Bilinmiyor");
-                            item2.setLogo("https://fuelspot.com.tr/default_icons/station.png");
-                            companyList.add(item2);
-                            try {
-                                JSONArray res = new JSONArray(response);
-                                for (int i = 0; i < res.length(); i++) {
-                                    JSONObject obj = res.getJSONObject(i);
+                                        CompanyItem item = new CompanyItem();
+                                        item.setID(obj.getInt("id"));
+                                        item.setName(obj.getString("companyName"));
+                                        item.setLogo(obj.getString("companyLogo"));
+                                        item.setWebsite(obj.getString("companyWebsite"));
+                                        item.setPhone(obj.getString("companyPhone"));
+                                        item.setAddress(obj.getString("companyAddress"));
+                                        item.setNumOfVerifieds(obj.getInt("numOfVerifieds"));
+                                        item.setNumOfStations(obj.getInt("numOfStations"));
+                                        companyList.add(item);
+                                    }
 
-                                    CompanyItem item = new CompanyItem();
-                                    item.setID(obj.getInt("id"));
-                                    item.setName(obj.getString("companyName"));
-                                    item.setLogo(obj.getString("companyLogo"));
-                                    item.setWebsite(obj.getString("companyWebsite"));
-                                    item.setPhone(obj.getString("companyPhone"));
-                                    item.setAddress(obj.getString("companyAddress"));
-                                    item.setNumOfVerifieds(obj.getInt("numOfVerifieds"));
-                                    item.setNumOfStations(obj.getInt("numOfStations"));
-                                    companyList.add(item);
+                                    CompanyAdapter customAdapter = new CompanyAdapter(MainActivity.this, companyList);
+                                    spinner.setAdapter(customAdapter);
+                                } catch (JSONException e) {
+                                    Snackbar.make(findViewById(android.R.id.content), e.toString(), Snackbar.LENGTH_SHORT).show();
                                 }
-
-                                CompanyAdapter customAdapter = new CompanyAdapter(MainActivity.this, companyList);
-                                spinner.setAdapter(customAdapter);
-                            } catch (JSONException e) {
-                                Snackbar.make(findViewById(android.R.id.content), e.toString(), Snackbar.LENGTH_SHORT).show();
                             }
                         }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Snackbar.make(findViewById(android.R.id.content), getString(R.string.connection_error), Snackbar.LENGTH_SHORT).show();
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + token);
-                return headers;
-            }
-        };
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            Snackbar.make(findViewById(android.R.id.content), getString(R.string.connection_error), Snackbar.LENGTH_SHORT).show();
+                        }
+                    }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    HashMap<String, String> headers = new HashMap<>();
+                    headers.put("Authorization", "Bearer " + token);
+                    return headers;
+                }
+            };
 
-        //Adding request to the queue
-        requestQueue.add(stringRequest);
+            //Adding request to the queue
+            requestQueue.add(stringRequest);
+        }
     }
 
     boolean isWorkerAtStation() {
@@ -1514,7 +1515,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     void searchStationsOverGoogle(String token) {
-        googleStations.clear();
         dialog.show();
         String url;
 
@@ -1531,8 +1531,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        JSON json = new JSON(response);
                         if (response != null && response.length() > 0) {
+                            JSON json = new JSON(response);
+                            JSONObject obj = json.getJsonObject();
+
                             if (json.key("results").count() > 0) {
                                 for (int i = 0; i < json.key("results").count(); i++) {
                                     StationItem sItem = new StationItem();
@@ -1541,25 +1543,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     sItem.setVicinity(json.key("results").index(i).key("vicinity").stringValue());
                                     double lat = json.key("results").index(i).key("geometry").key("location").key("lat").doubleValue();
                                     double lon = json.key("results").index(i).key("geometry").key("location").key("lng").doubleValue();
+
+                                    System.out.println(sItem.getStationName() + " " + String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon));
+
                                     sItem.setLocation(String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon));
                                     sItem.setPhotoURL(stationPhotoChooser(json.key("results").index(i).key("name").stringValue()));
                                     sItem.setCountryCode(countryFinder(lat, lon));
                                     googleStations.add(sItem);
                                 }
 
-                                if (json.key("next_page_token").exist() && json.key("next_page_token").stringValue().length() > 0) {
-                                    searchStationsOverGoogle(json.key("next_page_token").stringValue());
+                                if (!obj.has("next_page_token") || obj.optString("next_page_token").length() == 0) {
+                                    addStations(googleStations);
                                 } else {
-                                    for (int i = 0; i < googleStations.size(); i++) {
-                                        try {
-                                            addStations(i);
-                                            Thread.sleep(500);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    dialog.dismiss();
-                                    Toast.makeText(MainActivity.this, "Bölge başarıyla tarandı.", Toast.LENGTH_SHORT).show();
+                                    searchStationsOverGoogle(json.key("next_page_token").stringValue());
                                 }
                             } else {
                                 // Maybe s/he is in the countryside. Increase mapDefaultRange, decrease mapDefaultZoom
@@ -1625,49 +1621,63 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /* This method add_fuel stations. If station exists in db, then update it (except prices). Returns stationInfos.
      * To update stationPrices, use API_UPDATE_STATION */
-    private void addStations(final int index) {
-        //Showing the progress dialog
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_ADD_STATION),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        System.out.println(response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(MainActivity.this, volleyError.toString(), Toast.LENGTH_LONG).show();
-                        dialog.dismiss();
-                        volleyError.printStackTrace();
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + token);
-                return headers;
+    private void addStations(List<StationItem> arrayList) {
+        for (int i = 0; i < arrayList.size(); i++) {
+            //Showing the progress dialog
+            final int finalI = i;
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_ADD_STATION),
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            System.out.println(response + " " + finalI);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            Toast.makeText(MainActivity.this, volleyError.toString(), Toast.LENGTH_LONG).show();
+                            dialog.dismiss();
+                            volleyError.printStackTrace();
+                        }
+                    }) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    HashMap<String, String> headers = new HashMap<>();
+                    headers.put("Authorization", "Bearer " + token);
+                    return headers;
+                }
+
+                @Override
+                protected Map<String, String> getParams() {
+                    //Creating parameters
+                    Map<String, String> params = new Hashtable<>();
+
+                    params.put("name", googleStations.get(finalI).getStationName());
+                    params.put("vicinity", googleStations.get(finalI).getVicinity());
+                    params.put("country", googleStations.get(finalI).getCountryCode());
+                    params.put("location", googleStations.get(finalI).getLocation());
+                    params.put("googleID", googleStations.get(finalI).getGoogleMapID());
+                    params.put("logoURL", googleStations.get(finalI).getPhotoURL());
+
+                    //returning parameters
+                    return params;
+                }
+            };
+
+            //Adding request to the queue
+            requestQueue.add(stringRequest);
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+        }
 
-            @Override
-            protected Map<String, String> getParams() {
-                //Creating parameters
-                Map<String, String> params = new Hashtable<>();
-
-                params.put("name", googleStations.get(index).getStationName());
-                params.put("vicinity", googleStations.get(index).getVicinity());
-                params.put("country", googleStations.get(index).getCountryCode());
-                params.put("location", googleStations.get(index).getLocation());
-                params.put("googleID", googleStations.get(index).getGoogleMapID());
-                params.put("logoURL", googleStations.get(index).getPhotoURL());
-
-                //returning parameters
-                return params;
-            }
-        };
-
-        //Adding request to the queue
-        requestQueue.add(stringRequest);
+        googleStations.clear();
+        dialog.dismiss();
+        Toast.makeText(MainActivity.this, "Bölge başarıyla tarandı.", Toast.LENGTH_SHORT).show();
+        fetchStations();
     }
 
     public void coloredBars(int color1, int color2) {
@@ -1704,6 +1714,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         switch (item.getItemId()) {
             case (R.id.action_showOldStations):
                 if (!doesOldStationsShown) {
+                    oldStationList.clear();
                     for (int i = 0; i < stationList.size(); i++) {
                         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                         try {
