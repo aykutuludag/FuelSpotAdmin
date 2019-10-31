@@ -114,8 +114,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static List<CompanyItem> companyList = new ArrayList<>();
 
     // for isNotStation
-    public static int mapDefaultRange = 2500;
-    public static float mapDefaultZoom = 14.5f;
+    public static int mapDefaultRange = 3000;
+    public static float mapDefaultZoom = 12.75f;
 
     // for isAtStation
     public static int mapDefaultStationRange = 50;
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     int stationID, isStationVerified;
     String stationName, stationVicinity, stationCountry, stationLocation, stationLogo, placeID, sonGuncelleme, istasyonSahibi, facilitiesOfStation, stationLicense, secondaryFuelOfStation;
-    float gasolinePrice, dieselPrice, lpgPrice, electricityPrice;
+    float gasolinePrice, dieselPrice, lpgPrice, electricityPrice, gasoline2, diesel2;
 
     // Temp variables
     int currentID;
@@ -159,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Spinner spinner;
     JSONObject facilitiesObj = new JSONObject();
     JSONObject secondaryFuelObj = new JSONObject();
+    List<String> googleIDs = new ArrayList<>();
 
     //Layout items
     Button buttonMissingStation;
@@ -250,8 +251,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         dialog.setCancelable(false);
 
         // Activate map
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         MapsInitializer.initialize(this.getApplicationContext());
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         verifiedIcon = BitmapDescriptorFactory.fromResource(R.drawable.verified_station);
 
         mScrollView = findViewById(R.id.scrollView);
@@ -285,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 float distanceInMeter = locLastKnown.distanceTo(locCurrent);
 
                                 if (stationList != null) {
-                                    if (stationList.size() == 0 || distanceInMeter >= (mapDefaultRange / 2)) {
+                                    if (stationList.size() == 0 || distanceInMeter >= (mapDefaultRange / 2f)) {
                                         locLastKnown.setLatitude(Double.parseDouble(userlat));
                                         locLastKnown.setLongitude(Double.parseDouble(userlon));
                                         if (!mapIsUpdating) {
@@ -332,7 +333,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                 dieselPrice = 0;
                                                 lpgPrice = 0;
                                                 electricityPrice = 0;
+                                                gasoline2 = 0;
+                                                diesel2 = 0;
                                                 stationLicense = "";
+                                                secondaryFuelOfStation = "";
                                                 istasyonSahibi = "";
                                                 isStationVerified = 0;
                                                 sonGuncelleme = "";
@@ -606,16 +610,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             secondaryFuelObj = secondaryFuelRes.getJSONObject(0);
 
             if (secondaryFuelObj.has("gasoline2") && secondaryFuelObj.getString("gasoline2").length() > 0) {
-                gasolineHolder2.setText("" + Float.parseFloat(secondaryFuelObj.getString("gasoline2")));
+                gasoline2 = Float.parseFloat(secondaryFuelObj.getString("gasoline2"));
+                gasolineHolder2.setText("" + gasoline2);
+            } else {
+                gasoline2 = 0;
             }
 
             if (secondaryFuelObj.has("diesel2") && secondaryFuelObj.getString("diesel2").length() > 0) {
-                dieselHolder2.setText("" + Float.parseFloat(secondaryFuelObj.getString("diesel2")));
+                diesel2 = Float.parseFloat(secondaryFuelObj.getString("diesel2"));
+                dieselHolder2.setText("" + diesel2);
+            } else {
+                diesel2 = 0;
             }
         } catch (JSONException e) {
+            gasoline2 = 0;
+            diesel2 = 0;
             e.printStackTrace();
         }
 
+        String dummyB2 = "" + gasoline2;
+        gasolineHolder2.setText(dummyB2);
         gasolineHolder2.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -631,7 +645,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void afterTextChanged(Editable s) {
                 if (s != null && s.length() > 0) {
                     try {
-                        float gasoline2 = Float.parseFloat(s.toString());
+                        gasoline2 = Float.parseFloat(s.toString());
                         String text = String.format(Locale.US, "%.2f", gasoline2);
                         secondaryFuelObj.put("gasoline2", text);
                     } catch (JSONException e) {
@@ -641,6 +655,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+        String dummyBD2 = "" + diesel2;
+        dieselHolder2.setText(dummyBD2);
         dieselHolder2.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -656,7 +672,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void afterTextChanged(Editable s) {
                 if (s != null && s.length() > 0) {
                     try {
-                        float diesel2 = Float.parseFloat(s.toString());
+                        diesel2 = Float.parseFloat(s.toString());
                         String text = String.format(Locale.US, "%.2f", diesel2);
                         secondaryFuelObj.put("diesel2", text);
                     } catch (JSONException e) {
@@ -749,6 +765,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
             /* NEW FACILITIES v1.1 */
         } catch (JSONException e) {
+            imageViewWC.setAlpha(0.25f);
+            imageViewMarket.setAlpha(0.25f);
+            imageViewCarWash.setAlpha(0.25f);
+            imageViewTireRepair.setAlpha(0.25f);
+            imageViewMechanic.setAlpha(0.25f);
+            imageViewRestaurant.setAlpha(0.25f);
+            imageViewParkSpot.setAlpha(0.25f);
+            imageViewATM.setAlpha(0.25f);
+            imageViewMotel.setAlpha(0.25f);
+            imageViewCoffeeShop.setAlpha(0.25f);
+            imageViewMosque.setAlpha(0.25f);
             e.printStackTrace();
         }
 
@@ -1096,6 +1123,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                       }
                                             ).submit();
                                     stationList.add(item);
+                                    googleIDs.add(item.getGoogleMapID());
                                 }
 
                                 mapIsUpdating = false;
@@ -1136,29 +1164,57 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void addMarkers() {
+        markers.clear();
+        googleMap.clear();
+
         if (doesOldStationsShown) {
             for (int i = 0; i < oldStationList.size(); i++) {
                 StationItem sItem = oldStationList.get(i);
                 String[] stationKonum = sItem.getLocation().split(";");
                 LatLng sydney = new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1]));
 
-                if (sItem.getIsVerified() == 1) {
-                    MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station));
-                    Marker m = googleMap.addMarker(mOptions);
-                    m.setTag(sItem);
-                    markers.add(m);
-                } else {
-                    MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station));
-                    Marker m = googleMap.addMarker(mOptions);
-                    m.setTag(sItem);
-                    markers.add(m);
-                }
+                Location ankara = new Location("");
+                ankara.setLatitude(sydney.latitude);
+                ankara.setLongitude(sydney.longitude);
+                boolean isDuplicated = checkForDuplicate(ankara, i);
 
-                circles.add(googleMap.addCircle(new CircleOptions()
-                        .center(sydney)
-                        .radius(mapDefaultStationRange)
-                        .fillColor(0x220000FF)
-                        .strokeColor(Color.parseColor("#FF5635"))));
+                if (isDuplicated) {
+                    if (sItem.getIsVerified() == 1) {
+                        MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station));
+                        Marker m = googleMap.addMarker(mOptions);
+                        m.setTag(sItem);
+                        markers.add(m);
+                    } else {
+                        MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.duplicate_station));
+                        Marker m = googleMap.addMarker(mOptions);
+                        m.setTag(sItem);
+                        markers.add(m);
+                    }
+
+                    circles.add(googleMap.addCircle(new CircleOptions()
+                            .center(sydney)
+                            .radius(mapDefaultStationRange)
+                            .fillColor(0x22000000)
+                            .strokeColor(Color.parseColor("#000000"))));
+                } else {
+                    if (sItem.getIsVerified() == 1) {
+                        MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station));
+                        Marker m = googleMap.addMarker(mOptions);
+                        m.setTag(sItem);
+                        markers.add(m);
+                    } else {
+                        MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station));
+                        Marker m = googleMap.addMarker(mOptions);
+                        m.setTag(sItem);
+                        markers.add(m);
+                    }
+
+                    circles.add(googleMap.addCircle(new CircleOptions()
+                            .center(sydney)
+                            .radius(mapDefaultStationRange)
+                            .fillColor(0x220000FF)
+                            .strokeColor(Color.parseColor("#FF5635"))));
+                }
             }
         } else {
             for (int i = 0; i < stationList.size(); i++) {
@@ -1166,25 +1222,69 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 String[] stationKonum = sItem.getLocation().split(";");
                 LatLng sydney = new LatLng(Double.parseDouble(stationKonum[0]), Double.parseDouble(stationKonum[1]));
 
-                if (sItem.getIsVerified() == 1) {
-                    MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station));
-                    Marker m = googleMap.addMarker(mOptions);
-                    m.setTag(sItem);
-                    markers.add(m);
-                } else {
-                    MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station));
-                    Marker m = googleMap.addMarker(mOptions);
-                    m.setTag(sItem);
-                    markers.add(m);
-                }
+                Location ankara = new Location("");
+                ankara.setLatitude(sydney.latitude);
+                ankara.setLongitude(sydney.longitude);
+                boolean isDuplicated = checkForDuplicate(ankara, i);
 
-                circles.add(googleMap.addCircle(new CircleOptions()
-                        .center(sydney)
-                        .radius(mapDefaultStationRange)
-                        .fillColor(0x220000FF)
-                        .strokeColor(Color.parseColor("#FF5635"))));
+                if (isDuplicated) {
+                    if (sItem.getIsVerified() == 1) {
+                        MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station));
+                        Marker m = googleMap.addMarker(mOptions);
+                        m.setTag(sItem);
+                        markers.add(m);
+                    } else {
+                        MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.duplicate_station));
+                        Marker m = googleMap.addMarker(mOptions);
+                        m.setTag(sItem);
+                        markers.add(m);
+                    }
+
+                    circles.add(googleMap.addCircle(new CircleOptions()
+                            .center(sydney)
+                            .radius(mapDefaultStationRange)
+                            .fillColor(0x22000000)
+                            .strokeColor(Color.parseColor("#000000"))));
+                } else {
+                    if (sItem.getIsVerified() == 1) {
+                        MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.verified_station));
+                        Marker m = googleMap.addMarker(mOptions);
+                        m.setTag(sItem);
+                        markers.add(m);
+                    } else {
+                        MarkerOptions mOptions = new MarkerOptions().position(sydney).title(sItem.getStationName()).snippet(sItem.getVicinity()).icon(BitmapDescriptorFactory.fromResource(R.drawable.regular_station));
+                        Marker m = googleMap.addMarker(mOptions);
+                        m.setTag(sItem);
+                        markers.add(m);
+                    }
+
+                    circles.add(googleMap.addCircle(new CircleOptions()
+                            .center(sydney)
+                            .radius(mapDefaultStationRange)
+                            .fillColor(0x220000FF)
+                            .strokeColor(Color.parseColor("#FF5635"))));
+                }
             }
         }
+
+        //Draw a circle with radius of mapDefaultRange
+        googleMap.addCircle(new CircleOptions()
+                .center(new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon)))
+                .radius(mapDefaultRange)
+                .fillColor(0x220000FF)
+                .strokeColor(Color.parseColor("#FF5635")));
+    }
+
+    private boolean checkForDuplicate(Location ank, int index) {
+        for (int j = 0; j < stationList.size(); j++) {
+            Location locStation = new Location("");
+            locStation.setLatitude(Double.parseDouble(stationList.get(j).getLocation().split(";")[0]));
+            locStation.setLongitude(Double.parseDouble(stationList.get(j).getLocation().split(";")[1]));
+            if (locStation.distanceTo(ank) <= 50f && index != j) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void updateStation() {
@@ -1472,20 +1572,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     void reTry() {
         // Maybe s/he is in the countryside. Increase mapDefaultRange, decrease mapDefaultZoom
-        if (mapDefaultRange == 2500) {
+        if (mapDefaultRange == 3000) {
             mapIsUpdating = false;
 
-            mapDefaultRange = 5000;
-            mapDefaultZoom = 13f;
+            mapDefaultRange = 6000;
+            mapDefaultZoom = 12f;
             Toast.makeText(MainActivity.this, "İstasyon bulunamadı. YENİ MENZİL: " + mapDefaultRange + " metre", Toast.LENGTH_SHORT).show();
             if (!mapIsUpdating) {
                 updateMapObject();
             }
-        } else if (mapDefaultRange == 5000) {
+        } else if (mapDefaultRange == 6000) {
             mapIsUpdating = false;
 
             mapDefaultRange = 10000;
-            mapDefaultZoom = 12f;
+            mapDefaultZoom = 11.5f;
             Toast.makeText(MainActivity.this, "İstasyon bulunamadı. YENİ MENZİL: " + mapDefaultRange + " metre", Toast.LENGTH_SHORT).show();
             if (!mapIsUpdating) {
                 updateMapObject();
@@ -1537,32 +1637,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                             if (json.key("results").count() > 0) {
                                 for (int i = 0; i < json.key("results").count(); i++) {
-                                    StationItem sItem = new StationItem();
-                                    sItem.setGoogleMapID(json.key("results").index(i).key("place_id").stringValue());
-                                    sItem.setStationName(json.key("results").index(i).key("name").stringValue());
-                                    sItem.setVicinity(json.key("results").index(i).key("vicinity").stringValue());
-                                    double lat = json.key("results").index(i).key("geometry").key("location").key("lat").doubleValue();
-                                    double lon = json.key("results").index(i).key("geometry").key("location").key("lng").doubleValue();
+                                    if (!googleIDs.contains(json.key("results").index(i).key("place_id").stringValue())) {
+                                        StationItem sItem = new StationItem();
+                                        sItem.setGoogleMapID(json.key("results").index(i).key("place_id").stringValue());
+                                        sItem.setStationName(json.key("results").index(i).key("name").stringValue());
+                                        sItem.setVicinity(json.key("results").index(i).key("vicinity").stringValue());
+                                        double lat = json.key("results").index(i).key("geometry").key("location").key("lat").doubleValue();
+                                        double lon = json.key("results").index(i).key("geometry").key("location").key("lng").doubleValue();
 
-                                    System.out.println(sItem.getStationName() + " " + String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon));
-
-                                    sItem.setLocation(String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon));
-                                    sItem.setPhotoURL(stationPhotoChooser(json.key("results").index(i).key("name").stringValue()));
-                                    sItem.setCountryCode(countryFinder(lat, lon));
-                                    googleStations.add(sItem);
+                                        sItem.setLocation(String.format(Locale.US, "%.5f", lat) + ";" + String.format(Locale.US, "%.5f", lon));
+                                        sItem.setPhotoURL(stationPhotoChooser(json.key("results").index(i).key("name").stringValue()));
+                                        sItem.setCountryCode(countryFinder(lat, lon));
+                                        googleStations.add(sItem);
+                                    }
                                 }
 
                                 if (!obj.has("next_page_token") || obj.optString("next_page_token").length() == 0) {
-                                    addStations(googleStations);
+                                    addStations();
                                 } else {
                                     searchStationsOverGoogle(json.key("next_page_token").stringValue());
                                 }
                             } else {
                                 // Maybe s/he is in the countryside. Increase mapDefaultRange, decrease mapDefaultZoom
-                                if (mapDefaultRange == 2500) {
+                                if (mapDefaultRange == 3000) {
                                     dialog.dismiss();
-                                    mapDefaultRange = 5000;
-                                    mapDefaultZoom = 12f;
+                                    mapDefaultRange = 6000;
+                                    mapDefaultZoom = 12.75f;
                                     Toast.makeText(MainActivity.this, "İstasyon bulunamadı. YENİ MENZİL: " + mapDefaultRange + " metre", Toast.LENGTH_SHORT).show();
                                     searchStationsOverGoogle("");
                                 } else if (mapDefaultRange == 5000) {
@@ -1621,8 +1721,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /* This method add_fuel stations. If station exists in db, then update it (except prices). Returns stationInfos.
      * To update stationPrices, use API_UPDATE_STATION */
-    private void addStations(List<StationItem> arrayList) {
-        for (int i = 0; i < arrayList.size(); i++) {
+    private void addStations() {
+        for (int i = 0; i < googleStations.size(); i++) {
             //Showing the progress dialog
             final int finalI = i;
             StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.API_ADMIN_ADD_STATION),
@@ -1668,16 +1768,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             requestQueue.add(stringRequest);
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        googleStations.clear();
-        dialog.dismiss();
-        Toast.makeText(MainActivity.this, "Bölge başarıyla tarandı.", Toast.LENGTH_SHORT).show();
-        fetchStations();
+        try {
+            Thread.sleep(1000);
+
+            googleStations.clear();
+            dialog.dismiss();
+            Toast.makeText(MainActivity.this, "Bölge başarıyla tarandı.", Toast.LENGTH_SHORT).show();
+
+            updateMapObject();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void coloredBars(int color1, int color2) {
@@ -1733,15 +1840,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     Toast.makeText(MainActivity.this, "Bütün istasyonlar gösteriliyor.", Toast.LENGTH_LONG).show();
                 }
 
-                googleMap.clear();
-                markers.clear();
                 addMarkers();
-                //Draw a circle with radius of mapDefaultRange
-                googleMap.addCircle(new CircleOptions()
-                        .center(new LatLng(Double.parseDouble(userlat), Double.parseDouble(userlon)))
-                        .radius(mapDefaultRange)
-                        .fillColor(0x220000FF)
-                        .strokeColor(Color.parseColor("#FF5635")));
                 break;
             case (R.id.action_editProfile):
                 Intent i = new Intent(MainActivity.this, ProfileEditActivity.class);
@@ -1753,7 +1852,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        // If request is cancelled, the result arrays are car_placeholder.
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         if (requestCode == REQUEST_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {

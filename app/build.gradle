@@ -9,8 +9,8 @@ android {
         applicationId "com.fuelspot.admin"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 38
-        versionName "1.1.1"
+        versionCode 39
+        versionName "1.1.2"
         multiDexEnabled true
         useLibrary 'org.apache.http.legacy'
     }
@@ -31,7 +31,7 @@ android {
 
 dependencies {
     // BASE
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.percentlayout:percentlayout:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
 
@@ -46,15 +46,15 @@ dependencies {
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
     // FIREBASE
-    implementation 'com.google.firebase:firebase-core:17.0.0'
-    implementation 'com.google.firebase:firebase-messaging:19.0.1'
+    implementation 'com.google.firebase:firebase-core:17.2.1'
+    implementation 'com.google.firebase:firebase-messaging:20.0.0'
 
     // 3RD PARTY
     implementation 'com.github.amirdew:JSON:v1.0.0'
-    implementation 'de.hdodenhof:circleimageview:3.0.0'
-    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    implementation 'de.hdodenhof:circleimageview:3.0.1'
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
     implementation 'com.github.curioustechizen.android-ago:library:1.4.0'
-    implementation 'com.github.esafirm.android-image-picker:imagepicker:2.0.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
+    implementation 'com.github.esafirm.android-image-picker:imagepicker:2.1.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0'
 }
 apply plugin: 'com.google.gms.google-services'

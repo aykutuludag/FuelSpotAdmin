@@ -1,5 +1,6 @@
 package com.fuelspot.admin;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -19,13 +20,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Currency;
 import java.util.List;
@@ -38,6 +42,7 @@ import static com.fuelspot.admin.MainActivity.currencyCode;
 import static com.fuelspot.admin.MainActivity.currencySymbol;
 import static com.fuelspot.admin.MainActivity.getVariables;
 import static com.fuelspot.admin.MainActivity.isSigned;
+import static com.fuelspot.admin.MainActivity.mapDefaultStationRange;
 import static com.fuelspot.admin.MainActivity.userCountry;
 import static com.fuelspot.admin.MainActivity.userCountryName;
 import static com.fuelspot.admin.MainActivity.userDisplayLanguage;
@@ -51,6 +56,9 @@ public class WelcomeActivity extends AppCompatActivity {
     SharedPreferences prefs;
     Button continueButton;
     Window window;
+    LocationRequest mLocationRequest;
+    LocationCallback mLocationCallback;
+    FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +72,37 @@ public class WelcomeActivity extends AppCompatActivity {
         prefs = this.getSharedPreferences("AdminInformation", Context.MODE_PRIVATE);
         requestQueue = Volley.newRequestQueue(WelcomeActivity.this);
 
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(5000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult != null) {
+                    synchronized (this) {
+                        super.onLocationResult(locationResult);
+                        Location locCurrent = locationResult.getLastLocation();
+                        if (locCurrent != null) {
+                            if (locCurrent.getAccuracy() <= mapDefaultStationRange * 2) {
+                                userlat = String.valueOf(locCurrent.getLatitude());
+                                userlon = String.valueOf(locCurrent.getLongitude());
+                                prefs.edit().putString("lat", userlat).apply();
+                                prefs.edit().putString("lon", userlon).apply();
+                                MainActivity.getVariables(prefs);
+                                Localization();
+                            }
+                        } else {
+                            Toast.makeText(WelcomeActivity.this, getString(R.string.error_no_location), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+            }
+        };
+
         continueButton = findViewById(R.id.permissionButton);
         continueButton.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("MissingPermission")
@@ -73,25 +112,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     ActivityCompat.requestPermissions(WelcomeActivity.this, new String[]
                             {PERMISSIONS_STORAGE[0], PERMISSIONS_STORAGE[1], PERMISSIONS_LOCATION[0], PERMISSIONS_LOCATION[1]}, REQUEST_PERMISSION);
                 } else {
-                    FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(WelcomeActivity.this);
-                    mFusedLocationClient.getLastLocation().addOnSuccessListener(WelcomeActivity.this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                userlat = String.valueOf(location.getLatitude());
-                                userlon = String.valueOf(location.getLongitude());
-                                prefs.edit().putString("lat", userlat).apply();
-                                prefs.edit().putString("lon", userlon).apply();
-                                Localization();
-                            } else {
-                                LocationRequest mLocationRequest = new LocationRequest();
-                                mLocationRequest.setInterval(5000);
-                                mLocationRequest.setFastestInterval(1000);
-                                mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                            }
-                        }
-                    });
+                    mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
                 }
             }
         });
@@ -179,30 +200,16 @@ public class WelcomeActivity extends AppCompatActivity {
     @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         if (requestCode == REQUEST_PERMISSION) {
-            if (ActivityCompat.checkSelfPermission(WelcomeActivity.this, PERMISSIONS_LOCATION[0]) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(WelcomeActivity.this, PERMISSIONS_LOCATION[1]) == PackageManager.PERMISSION_GRANTED) {
-                FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-                mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            userlat = String.valueOf(location.getLatitude());
-                            userlon = String.valueOf(location.getLongitude());
-                            prefs.edit().putString("lat", userlat).apply();
-                            prefs.edit().putString("lon", userlon).apply();
-                            Localization();
-                        } else {
-                            LocationRequest mLocationRequest = new LocationRequest();
-                            mLocationRequest.setInterval(5000);
-                            mLocationRequest.setFastestInterval(1000);
-                            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                        }
-                    }
-                });
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+                }
+            } else {
+                Snackbar.make(this.findViewById(R.id.mainContainer), getString(R.string.error_permission_cancel), Snackbar.LENGTH_LONG).show();
             }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

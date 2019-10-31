@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.fuelspot.admin.LoginActivity;
@@ -22,7 +23,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     boolean alarm;
 
     @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
+    public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         prefs = getSharedPreferences("Preferences", MODE_PRIVATE);
         alarm = prefs.getBoolean("Alarm", true);
         if (alarm) {
