@@ -1823,18 +1823,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (!doesOldStationsShown) {
                     oldStationList.clear();
                     for (int i = 0; i < stationList.size(); i++) {
-                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                        try {
-                            Date date = format.parse(stationList.get(i).getLastUpdated());
-                            if (System.currentTimeMillis() - date.getTime() > 15 * 24 * 60 * 60 * 1000) {
-                                oldStationList.add(stationList.get(i));
-                            }
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                        StationItem tempItem = stationList.get(i);
+                        if (tempItem.getGasolinePrice() == 0f && tempItem.getDieselPrice() == 0f && tempItem.getLpgPrice() == 0f) {
+                            oldStationList.add(tempItem);
                         }
                     }
                     doesOldStationsShown = true;
-                    Toast.makeText(MainActivity.this, "Son güncellemesi 15 günden eski istasyonlar gösteriliyor.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Fiyatı olmayan istasyonlar gösterliyor.", Toast.LENGTH_LONG).show();
                 } else {
                     doesOldStationsShown = false;
                     Toast.makeText(MainActivity.this, "Bütün istasyonlar gösteriliyor.", Toast.LENGTH_LONG).show();
